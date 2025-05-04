@@ -1,4 +1,3 @@
-# Exported from Render on 2025-05-04T14:30:26Z
 services:
   - type: web
     name: Mutual_Fund_Recommender
@@ -8,7 +7,7 @@ services:
     region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn Myproject.wsgi:application
-    postDeployCommand: python manage.py migrate && python manage.py collectstatic --noinput
+    postDeployScript: python manage.py migrate && python manage.py collectstatic --noinput
     envVars:
       - key: ALLOWED_HOSTS
         sync: false
