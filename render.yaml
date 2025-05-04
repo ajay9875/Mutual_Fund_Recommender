@@ -1,0 +1,30 @@
+# Exported from Render on 2025-05-04T14:30:26Z
+services:
+- type: web
+  name: Mutual_Fund_Recommender
+  runtime: python
+  repo: https://github.com/ajay9875/Mutual_Fund_Recommender
+  plan: free
+  envVars:
+  - key: ALLOWED_HOSTS
+    sync: false
+  - key: EMAIL_USE_SSL
+    sync: false
+  - key: EMAIL_USE_TLS
+    sync: false
+  - key: DEFAULT_FROM_EMAIL
+    sync: false
+  - key: EMAIL_HOST_PASSWORD
+    sync: false
+  - key: EMAIL_HOST_USER
+    sync: false
+  - key: EMAIL_PORT
+    sync: false
+  - key: EMAIL_HOST
+    sync: false
+  - key: SECRET_KEY
+    sync: false
+  region: oregon
+  buildCommand: pip install -r requirements.txt
+  startCommand: gunicorn Myproject.wsgi:application
+version: "1"
