@@ -46,6 +46,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",  # ✅ Must come before AuthenticationMiddleware
     "django.contrib.auth.middleware.AuthenticationMiddleware",  # ✅ Required for request.user
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Right after SecurityMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.messages.middleware.MessageMiddleware",  # Required for flash messages
@@ -129,6 +130,13 @@ STATIC_URL = '/static/'  # URL for serving static files
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),  # For a project-wide static folder
 ]
+
+# Static files (CSS, JavaScript, Images)
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# Whitenoise compression
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Required in Production for `collectstatic`
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

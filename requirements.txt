@@ -8,3 +8,4 @@ python-dotenv
 wheel
 setuptools
 gunicorn
+whitenoise
