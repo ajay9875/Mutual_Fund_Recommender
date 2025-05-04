@@ -21,6 +21,25 @@ __pycache__/
 .idea/
 .vscode/
 
+# Database
+*.sqlite3
+*.db
+*.sqlite
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+
 # Explicitly keep these (remove from .gitignore if present)
 !Myproject/
 !Myapp/

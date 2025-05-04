@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-p7bv-03i&pdm0e&f_ce_=y5d$_2xbdj90xelz$fl-*3vb#4@)0'
 
 # Ensure DEBUG is True for development
-DEBUG = True
+DEBUG = False
  
 # SECURITY WARNING: don't run with debug turned on in production!
 #ALLOWED_HOSTS = []
@@ -43,10 +43,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← Must be 2nd
     "django.contrib.sessions.middleware.SessionMiddleware",  # ✅ Must come before AuthenticationMiddleware
     "django.contrib.auth.middleware.AuthenticationMiddleware",  # ✅ Required for request.user
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Right after SecurityMiddleware
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.messages.middleware.MessageMiddleware",  # Required for flash messages
