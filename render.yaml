@@ -7,7 +7,6 @@ services:
     region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn Myproject.wsgi:application
-    postDeployScript: python manage.py migrate && python manage.py collectstatic --noinput
     envVars:
       - key: ALLOWED_HOSTS
         sync: false
