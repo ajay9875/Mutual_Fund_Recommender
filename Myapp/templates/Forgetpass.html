@@ -1,0 +1,44 @@
+{% extends 'Header.html' %}
+{% load static %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Forgotpass.css' %}">
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
+{% endblock extra_css %}
+
+{% block header %} {{ header }} {% endblock header %}
+
+{% block content %}
+  <!-- Home Button-->
+  <div class="home">
+    <a href="/" class="btn"><img src="{% static 'icons/homeicon.png' %}"></a>
+  </div>
+
+        <!-- Flashed message will be appear here -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                   <div class='msg'> {{ message }} </div>
+                  </div> 
+                </div>
+            {% endfor %}
+        {% endif %}
+
+
+    <div class="forget-pass">
+        <form method="POST" action="/forgetpass/">
+            {% csrf_token %}
+            <label for="username">Enter Username</label>
+            <input type="text" class="form-control" name="username" onclick="hideMessage()" required>
+
+            <label for="email">Registered Email</label>
+            <input type="email" class="email form-control" name="email" required>
+
+            <button id="submit-btn" type="submit">Send OTP</button>
+         </form>
+       </div>
+
+{% endblock content %}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/Base.css'%}">
+</head>
+<body>
+        <!-- Dynamic Content Goes Here -->
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <!-- Reusable Footer -->
+        <footer class='footer'>
+            <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+        </footer>
+</body>
+</html>

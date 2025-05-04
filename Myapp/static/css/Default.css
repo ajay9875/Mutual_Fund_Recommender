@@ -1,0 +1,141 @@
+/* --- General Styles --- */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+h1, h2, h3 {
+    color: #2c3e50;
+}
+
+p {
+    color: #555;
+    line-height: 1.6;
+}
+
+/* --- Hero Section --- */
+.hero {
+    background: linear-gradient(to right, #3498db, #2ecc71);
+    color: white;
+    padding: 50px 20px;
+    text-align: center;
+    border-radius: 10px;
+    margin: 0px 20px 30px 20px;
+}
+.hero h1 {
+    font-size: 36px;
+}
+.hero p {
+    font-size: 18px;
+    margin-top: 10px;
+}
+/* --- Call to Action Section --- */
+.hero .cta-button {
+    background: #ffcc00;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    font-size: 18px;
+    padding: 12px 20px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.hero .cta-button:hover {
+    background: #f1c101;
+}
+
+/* --- Features Section --- */
+.features {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    margin: 0px 20px 30px 20px;
+}
+.features h2 {
+    margin-bottom: 20px;
+}
+.features p {
+    font-size: 16px;
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+}
+.features pre {
+    color:#686868;
+    font-size: 16px;
+    margin: 10px 0;
+}
+.features p::before {
+    content: '✔';
+    color: #2ecc71;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* --- Steps Section --- */
+.steps {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    margin: 0px 20px 30px 20px;
+}
+.step {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.step span {
+    background: #3498db;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+/* --- Testimonials Section --- */
+.testimonials {
+    background: #f9f9f9;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    margin: 0px 20px 30px 20px;
+}
+.testimonial {
+    background: white;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.testimonial p {
+    font-style: italic;
+    color: #555;
+}
+.testimonial span {
+    display: block;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-top: 10px;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .step {
+        flex-direction: column;
+        text-align: center;
+    }
+    .hero h1 {
+        font-size: 28px;
+    }
+    .hero p {
+        font-size: 16px;
+    }
+}

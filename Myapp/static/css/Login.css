@@ -1,0 +1,82 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #c5ddf3;
+    padding: 0;
+}
+/* Login Page */
+.Loginpage {
+    width: fit-content;
+    justify-self: center;
+    padding: 30px;
+    background-color: rgb(247, 236, 236);
+    border-radius: 5px;
+    overflow-x: hidden;
+    border: solid 5px #c7c6c6;
+}
+.Loginpage h3 {
+    text-align: center;
+    color: brown;
+    margin-bottom: 10px;
+}
+
+.log-icon {
+    text-align: center;
+}
+
+.log-icon img {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+label, input {
+    width:100%;
+    display: flex;
+    margin-bottom:5px;
+}
+
+.Loginpage button {
+    margin-bottom:15px;
+    text-align: center;
+    width: 100%;
+    padding: 5px;
+    background-color:green;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    justify-self: center;
+}
+
+.Loginpage button:hover {
+    background-color: darkgreen;
+}
+
+.link {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.link a {
+    text-decoration: none;
+    font-size: small;
+    color: blue;
+}
+
+.logo-image{
+    justify-self: flex-end;
+    margin: 10px 10px 10px 0px;
+}
+
+.logo-image img{
+    height:50px;
+    width:50px;
+    border-radius: 100%;
+}

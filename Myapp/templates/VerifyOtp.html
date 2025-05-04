@@ -1,0 +1,43 @@
+{% extends 'Header.html' %}
+{% load static %}
+
+{% block title %} {{ title }} {% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/VirifyOtp.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
+{% endblock extra_css %}
+
+{% block header %} {{ header }} {% endblock header %}
+
+{% block content %}
+  <!-- Home Button-->
+  <div class="home">
+    <a href="/" class="btn"><img src="{% static 'icons/homeicon.png' %}"></a>
+  </div>
+
+        <!-- Flashed message will be appear here -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                   <div class='msg'> {{ message }} </div>
+                  </div> 
+                </div>
+            {% endfor %}
+        {% endif %}
+
+    <!-- Verify OTP Form  -->
+    <div class="verifyotp">
+        <form method="POST" action="/verifyotp/">
+            {% csrf_token %}
+            <h2>Verify OTP</h2>
+
+            <label for="otp">Enter OTP</label>
+            <input type="text" class="form-control" name="otp" autocomplete="off" required>
+
+            <button id="verifyotp-btn" type="submit">Verify OTP</button>
+        </form>
+    </div>
+
+{% endblock content %}

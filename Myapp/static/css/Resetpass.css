@@ -1,0 +1,75 @@
+label, input {
+    display: block; /* Ensure each element starts on a new line */
+    width: 300px;
+    height: 25px;
+  }
+input{
+    margin: 0 0 15px 0;
+}
+
+/* Forget password section styling */
+.forget-pass {
+     justify-self: center;
+     width: fit-content;
+     height: fit-content;
+     border: groove 2px black;
+     padding: 25px;
+     background-color: #dad8d8;
+     margin-top: 10px;
+
+}
+/* verify otp button style */
+#verifyotp-btn{
+    background-color: rgb(206, 204, 204);
+    border-radius: 5px;
+    padding: 5px;
+    border: solid 1px black;
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    cursor: pointer;
+}
+#verifyotp-btn:hover{
+    background-color: rgb(187, 187, 187);
+}
+
+/* Submit button styles */
+#submit-btn {
+    background-color:rgb(7, 106, 255);
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+    font-size: 16px;
+    border: solid 1px black;
+    cursor: pointer;
+}
+
+#submit-btn:hover {
+    background-color: blue;
+}
+
+/* Placeholder styling for all inputs */
+input::placeholder {
+    color: #888; /* Default placeholder color */
+    font-style: italic;
+}
+
+/* Ensure email field is styled consistently */
+.email::placeholder {
+    color: #444; /* Make email placeholder color slightly darker */
+    font-weight: bold; /* Make it stand out */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .forget-pass {
+        width: 90%; /* Expand the form to fit mobile screens */
+        margin: 20px auto;
+    }
+
+    form label,
+    form input,
+    form button {
+        width: 90%; /* Adjust to fit better on mobile */
+        max-width: 100%;
+    }
+}

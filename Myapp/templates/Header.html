@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Default Title{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/Header.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+    {% block extra_css %}{% endblock extra_css %}
+</head>
+
+<body> 
+
+    <!-- Reusable Header -->
+    <header class="header">
+        {% block header %}{% endblock header %}
+    </header>
+    <!-- Dynamic Content Goes Here -->
+    <main>
+        {% block content %} {% endblock content %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+    </footer>
+
+    <!-- java script code -->
+    {% block js_code %} {% endblock js_code %}
+
+</body>
+</html>

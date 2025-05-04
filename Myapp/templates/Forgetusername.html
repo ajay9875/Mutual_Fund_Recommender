@@ -1,0 +1,40 @@
+{% extends 'Header.html' %}
+{% load static %}
+
+{% block title %} {{ title }} {% endblock title %}
+
+{% block extra_css %} 
+    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Forgotusername.css' %}">
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
+{% endblock extra_css %}
+
+{% block header %} {{ header }} {% endblock header %}
+
+{% block content %}
+    <!-- Home Button -->
+    <div class="home">
+      <a href="/" class="btn"><img src="{% static 'icons/homeicon.png' %}"></a>
+    </div>
+
+        <!-- Flashed message will be appear here -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                   <div class='msg'> {{ message }} </div>
+                  </div> 
+                </div>
+            {% endfor %}
+        {% endif %}
+
+    <div class="form">
+        <form  action="/forgetusername/" method="POST">
+            {% csrf_token %}
+                <label for="email">Registered email</label>
+                <input type="email" id="email" name="email" placeholder="" required>
+
+                <button>SUBMIT</button>
+        </form>
+  </div>
+
+{% endblock content %}

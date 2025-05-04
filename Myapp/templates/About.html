@@ -1,0 +1,58 @@
+{% extends 'Header.html' %}
+{% load static %}
+       
+{% block title %} {{ title }} {% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/About.css' %}">
+{% endblock extra_css %}
+
+{% block header %} {{ header }} {% endblock %}
+
+{% block content %}
+
+   <div class="main-content-class">
+    <div class="home">
+        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+      </div>
+
+    <div class="about-content">
+        <h3>Welcome to Mutual Fund Recommendation</h3>
+        <p>
+            Whether you're a seasoned investor or just starting your financial journey,
+            our platform provides data-backed insights and real-time analysis to guide
+            you towards profitable and secure investments. With a seamless, user-friendly
+            experience, we make choosing the right mutual funds simpler, smarter,
+            and more efficient.
+            Invest with confidence. Grow with precision. Your financial future starts here!
+        </p>
+    </div>
+  </div>
+
+
+    <div class="team-section">
+        <h2>Meet Our Team</h2>
+          <div class="team-member">
+            <div class="team">
+                <img src="{% static 'icons/pic.jpeg'%}" alt="Picture">
+                <h5>Ajay Kumar Sah</h5>
+                <p>Team Member</p>
+            </div>
+            <div class="team">
+                <img src="{% static 'icons/pic.jpeg'%}" alt="Picture">
+                <h5>Aditya Kumar Choudhary</h5>
+                <p>Team Member</p>
+            </div>
+            <div class="team">
+                <img src="{% static 'icons/pic.jpeg'%}" alt="Picture">
+                <h5>Gufran Ansari</h5>
+                <p>Team Member</p>
+            </div>
+            <div class="team">
+                <img src="{% static 'icons/pic.jpeg'%}" alt="Picture">
+                <h5>Shameer Raza</h5>
+                <p>Team Member</p>
+           </div>
+        </div>
+    </div>
+{% endblock %}

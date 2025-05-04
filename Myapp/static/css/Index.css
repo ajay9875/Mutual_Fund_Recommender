@@ -1,0 +1,256 @@
+/* Push content below the fixed header */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 95px 0px 85px 0px;
+    padding: 0;
+}
+/* Header Style */
+.header {
+    position:fixed;
+    width: 100%;
+    top:0;
+    left:0;
+    padding: 12px 0px 12px 0px;
+    background-color: rgb(51, 51, 51);
+}
+.nav-links ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap:10px;
+    padding: 0;
+    margin: 0;
+}
+.nav-links ul li {
+    padding: 10px 15px;
+}
+.nav-links ul li a {
+    text-decoration: none;
+    color: lightgrey;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 10px 15px;
+}
+
+.nav-links ul li:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+.logo img{
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+}
+.logo{
+    margin-left: auto;
+    margin-right: 20px;
+    cursor: default;
+}
+/* Footer Styles */
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white; /* White background */
+    color: rgb(160, 160, 160); /* Black text */
+    text-align: center; /* Centered text */
+    font-size: 12px; /* Slightly larger for readability */
+    padding: 8px 0; /* Reduced padding for a strip-like appearance */
+    font-weight: 500;
+    height: 25px;
+    left: 0;
+    z-index: 1000; /* Ensure the footer stays on top of other content */
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Profile Button Style */
+.profile-btn img{
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+}
+.profile-btn{
+    margin-left: auto;
+}
+/* Profile Name Style */
+.full_name{
+    max-width: 150px;
+    max-height: 75px;
+    font-family: cursive;
+    font-size: medium;
+    color: white;
+    text-align: center;
+    margin: 0px 15px 0px 5px;
+}
+
+/* Profile button content */
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    margin: 20px 10px 0px 0px;
+    padding: 20px;
+    background: gray;
+    min-width: 150px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    z-index: 1000;
+  }
+
+  .profile-dropdown a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+    transition: 0.3s;
+  }
+
+  .profile-dropdown a:hover {
+    background: #f1f1f1;
+  }
+
+/* All container style */
+.all {
+    display: flex;
+    justify-content: space-around; /* Pushes footer to bottom */
+}
+
+/* --- Form Container --- */
+.form-container {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    width: 420px;
+    text-align: center;
+    transition: 0.3s ease-in-out;
+}
+
+/* Hover Effect */
+.form-container:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Form Heading --- */
+.form-container h2 {
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* --- Form Group Styling --- */
+.form-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+/* --- Labels --- */
+.form-group label {
+    font-weight: 500;
+    color: #34495e;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* --- Select Dropdowns & Input Fields --- */
+.form-group select,
+.form-group input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    transition: 0.3s ease-in-out;
+}
+
+/* Hover & Focus effects */
+.form-group select:hover,
+.form-group input:hover,
+.form-group select:focus,
+.form-group input:focus {
+    border-color: #3498db;
+    background-color: #ffffff;
+    outline: none;
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+}
+
+/* --- Two Input Fields in the Same Line --- */
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Adds spacing between inputs */
+}
+
+/* Ensuring Inputs Fit Within the Same Line */
+.form-row .form-group {
+    width: 50%;
+    margin-bottom: 18px;
+}
+
+/* --- Button Styling --- */
+.get-recommendation-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+/* Hover Effect */
+.get-recommendation-btn:hover {
+    background-color: #218838;
+}
+
+/* All recommendation style */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #007bff;
+    color: white;
+}
+.recommendation {
+    margin-top: 20px;
+}
+.recommendation p {
+    font-size: 16px;
+    color: red;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 480px) {
+    .form-container {
+        width: 90%;
+        padding: 20px;
+    }
+
+    button {
+        font-size: 16px;
+    }
+
+    /* Stack inputs vertically on small screens */
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-row .form-group {
+        width: 100%;
+    }
+}

@@ -1,0 +1,138 @@
+{% extends 'Header.html' %}
+       
+{% block title %} {{ title }} {% endblock %}
+
+{% block content %}
+
+{% load static %}
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Services Container */
+.services-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+.row {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Service Card */
+.service-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 250px;
+    height: 200px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+/* Service Image */
+.service-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 100%;
+    margin-bottom: 15px;
+}
+
+/* Service Title */
+.service-card h5 {
+    margin: 10px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .services-container {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .service-card {
+        padding: 15px;
+    }
+
+    .services-header {
+        font-size: 16px;
+        padding: 15px;
+    }
+
+    .home img {
+        height: 45px;
+        width: 45px;
+    }
+}
+</style>
+{% block header %} {{ header }} {% endblock %}
+    <!-- Home Button-->
+      <div class="home">
+        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+      </div>
+
+    <div class="services-container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="{% static 'icons/course-enroll.jpg' %}" alt="Course Enrollment">
+                    <h5>Course Enrollment</h5>
+                    <p>Easily browse and enroll in a variety of courses tailored to your needs.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="{% static 'icons/flexible-schedule.jpg' %}" alt="Flexible Scheduling">
+                    <h5>Flexible Scheduling</h5>
+                    <p>Choose class schedules that suit your convenience and learning pace.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="{% static 'icons/progress-tracking.png' %}" alt="Progress Tracking">
+                    <h5>Progress Tracking</h5>
+                    <p>Monitor your learning progress with detailed reports and analytics.</p>
+                </div>
+            </div>
+        </div>
+
+          <div class="row">
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="{% static 'icons/certified.webp' %}" alt="Certification">
+                    <h5>Certification</h5>
+                    <p>Earn recognized certifications upon successful course completion.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="{% static 'icons/expert-support.jpg' %}" alt="Expert Support">
+                    <h5>Expert Support</h5>
+                    <p>Get guidance from experienced instructors and support staff.</p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="service-card">
+                    <img src="{% static 'icons/community-forums.png'%}" alt="Community Forums">
+                    <h5>Community Forums</h5>
+                    <p>Join discussions with fellow learners to share knowledge and insights.</p>
+                </div>
+            </div>
+          </div>
+        </div>
+
+{% endblock %}

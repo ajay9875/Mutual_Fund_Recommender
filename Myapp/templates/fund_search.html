@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutual Fund Search</title>
+</head>
+<body>
+    <h2>Search Mutual Fund</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="fund_ticker">Enter Fund Ticker:</label>
+        <input type="text" name="fund_ticker" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if fund_data %}
+    <h3>Fund Details:</h3>
+    <ul>
+        <li><strong>Name:</strong> {{ fund_data.Name }}</li>
+        <li><strong>Fund Type:</strong> {{ fund_data.Fund_Type }}</li>
+        <li><strong>Risk Level:</strong> {{ fund_data.Risk_Level }}</li>
+        <li><strong>Expense Ratio:</strong> {{ fund_data.Expense_Ratio }}</li>
+        <li><strong>1-Year Return:</strong> {{ fund_data.1-Year Return }}</li>
+        <li><strong>5-Year Average Return:</strong> {{ fund_data.5-Year Average Return }}</li>
+        <li><strong>Fund Ticker:</strong> {{ fund_data.Fund_Ticker }}</li>
+    </ul>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,30 @@
+# Virtual environments
+.venv/
+venv/
+
+# Database
+db.sqlite3
+
+# Media files (user-uploaded content)
+media/
+
+# Python cache/compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+*.env
+
+# IDE specific files
+.idea/
+.vscode/
+
+# Explicitly keep these (remove from .gitignore if present)
+!Myproject/
+!Myapp/
+!static/
+!manage.py
+!requirements.txt
+!/.gitignore

@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard: Mutual Fund Recommendations</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+  <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+  <link rel="stylesheet" href="{% static 'css/Index.css' %}">
+  <script src="{% static 'javascript/allmessage.js' %}"></script>
+</head>
+
+<body>
+  <header class="header">
+    <nav class="nav-links">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="\about">About Us</a></li>
+        <li><a href="\services">Services</a></li>
+        <li><a href="\contact">Contact Us</a></li>
+        <!-- Session Timer -->
+        {% if remaining_time %}
+          <div id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
+        {% endif %} 
+          <a href="?menu=profile" onclick="toggleProfileMenu(); return false;" class="profile-btn">
+            {% if profilepic %}
+              <img src="{{ profilepic }}" class="profile-icon">
+            {% else %}
+              <img src="{% static 'favicon/favicon.webp' %}" class="profile-icon" style="background-color: gray;">
+            {% endif %}
+        
+          </a>
+
+           <div class="full_name"> {{ full_name }} </div>
+      </ul>  
+    </nav>
+    <div class="profile-dropdown">
+      <a href="/profile">Your Info</a>
+      <a href="/your-funds">Your Funds</a>
+      <a href="{% url 'account_settings' %}">Settings</a>
+      <a href="/logout">Logout</a>
+      <a href="{% url 'delete_account' %}" class="delete-account-link">Delete Account</a>
+
+    </div>
+  </header>
+       
+        <!-- Flashed message will be appear here -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                   <div class='msg'> {{ message }} </div>
+                  </div> 
+                </div>
+            {% endfor %}
+        {% endif %}
+   
+    <div class='all'>
+      <div class="left-side">
+        <!-- Recommendation form-->
+        <div class="form-container">
+          <h2>Mutual Fund Recommendation Form</h2>
+      
+          <form action="/dashboard/" method="POST">
+            {% csrf_token %}
+
+            <!-- Company Type (Full Width) -->
+            <div class="form-group">
+              <label for="company_type">Preferred Company Type:</label>
+              <select id="company_type" name="company_type">
+                  <option value="" selected>Please select a company type</option>
+                  <option value="bank">Bank</option>
+                  <option value="amc">Asset Management Company (AMC)</option>
+                  <option value="government">Government Schemes</option>
+                  <option value="private">Private Financial Institution</option>
+                  <option value="international">International Fund</option>
+                  <option value="other">Other</option>
+              </select>
+            </div>          
+      
+              <!-- Risk Level & Investment Duration (Same Line) -->
+              <div class="form-row">
+                  <div class="form-group">
+                      <label for="risk">Select Risk Level:</label>
+                      <select id="risk" name="risk">
+                        <option value="" selected>Please select a risk level</option>
+                          <option value="low">Low</option>
+                          <option value="medium">Medium</option>
+                          <option value="high">High</option>
+                      </select>
+                  </div>
+      
+                  <div class="form-group">
+                      <label for="duration">Investment Duration:</label>
+                      <select id="duration" name="duration">
+                        <option value="" selected>Please select a duration</option>
+                          <option value="1_year">1 Year</option>
+                          <option value="3_years">3 Years</option>
+                          <option value="5_years">5+ Years</option>
+                      </select>
+                  </div>
+              </div>
+      
+              <!-- Investment Type & Profit Type (Same Line) -->
+              <div class="form-row">
+                  <div class="form-group">
+                      <label for="investment_type">Investment Type:</label>
+                      <select id="investment_type" name="investment_type">
+                        <option value="" selected>Please select a investment type</option>
+                          <option value="lump_sum">Lump Sum</option>
+                          <option value="sip">SIP (Installments)</option>
+                      </select>
+                  </div>
+      
+                  <div class="form-group">
+                      <label for="profit_type">Expected Profit Type:</label>
+                      <select id="profit_type" name="profit_type">
+                        <option value="" selected>Please select a profit type</option>
+                          <option value="high">High</option>
+                          <option value="medium">Medium</option>
+                          <option value="low">Low</option>
+                      </select>
+                  </div>
+              </div>
+      
+              <!-- Profit Percentage (Full Width) -->
+              <div class="form-group">
+                <label for="profit_percentage">Expected Profit Percentage:</label>
+                <select id="profit_percentage" name="profit_percentage" onchange="toggleCustomProfit(this)">
+                    <option value="" selected>Please select a precentage type</option>
+                    <option value="5">5%(Low)</option>
+                    <option value="8">8%(Moderate)</option>
+                    <option value="10">10%(Good)</option>
+                    <option value="12">12%(High)</option>
+                    <option value="15">15%+(Very High)</option>
+                    <option value="other">Other (Enter Manually)</option>
+                </select>
+                
+                <!-- Hidden input field for manual entry -->
+                <input type="number" id="custom_profit" name="custom_profit" placeholder="Enter custom % (e.g., 7.5, 11)" style="display: none;">
+            </div>
+            
+              <!-- Submit Button -->
+              <button class="get-recommendation-btn" type="submit">Get Recommendation</button>
+          </form>
+      </div>
+    </div>
+    
+    <div class="rightside">
+      <div class='recommendation'>
+        <h2>All Recommended Mutual Funds</h2>
+        {% if recommended_funds %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fund Name</th>
+                        <th>Category</th>
+                        <th>Risk</th>
+                        <th>Return Rate</th>
+                        <th>Investment Type</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fund in recommended_funds %}
+                        <tr>
+                            <td>{{ fund.name }}</td>
+                            <td>{{ fund.category }}</td>
+                            <td>{{ fund.risk }}</td>
+                            <td>{{ fund.return_rate }}%</td>
+                            <td>{{ fund.investment_type }}</td>
+                            <td>{{ fund.duration }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No recommendations available! Please try to get recommendation now.</p>
+        {% endif %}
+    </div>
+  </div>
+</div>
+        <!-- Footer -->
+        <footer class='footer'>
+            <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+          </footer>
+          
+    <script>
+          // Show custom input if user want to give Manually
+          function toggleCustomProfit(selectElement) {
+              var customInput = document.getElementById("custom_profit");
+          
+              if (selectElement.value === "other") {
+                  customInput.style.display = "block"; // Show input field
+                  customInput.required = true; // Make it required
+              } else {
+                  customInput.style.display = "none"; // Hide input field
+                  customInput.required = false; // Remove required attribute
+              }
+          }          
+    
+    // Toggle function for profile button
+    function toggleProfileMenu() {
+      const dropdown = document.querySelector('.profile-dropdown');
+      
+      if (dropdown.style.display === 'block') {
+          dropdown.style.display = 'none';  // Hide if visible
+      } else {
+          dropdown.style.display = 'block'; // Show if hidden
+      }
+    }
+
+    function toggleCustomProfit(select) {
+      const customProfitInput = document.getElementById('custom_profit');
+      if (select.value === 'other') {
+          customProfitInput.style.display = 'block';
+      } else {
+          customProfitInput.style.display = 'none';
+      }
+  }
+  let remainingTime = {{ remaining_time }}; // Get session time from Flask
+    
+  function updateTimer() {
+      let timerElement = document.getElementById("session-timer");
+
+      if (remainingTime > 0) {
+          let minutes = Math.floor(remainingTime / 60);
+          let seconds = Math.floor(remainingTime % 60);
+          timerElement.innerText = `Session expires in ${minutes}m ${seconds}s`;
+
+          // Change color dynamically when < 5 minutes
+          if (remainingTime < 300) { // 5 minutes = 300 seconds
+              timerElement.style.color = "red";
+          } else {
+              timerElement.style.color = "white";
+          }
+
+          remainingTime--;
+          setTimeout(updateTimer, 1000);
+          
+      } else {
+          timerElement.innerText = "Logging out...";
+          setTimeout(() => {
+              window.location.href = "{% url 'logout' %}";  // Auto logout
+              window.location.reload();  // ✅ Corrected: Add parentheses to call the function
+            }, 2000);
+      }
+  }
+
+  window.onload = updateTimer;
+
+    </script> 
+</body>
+</html>

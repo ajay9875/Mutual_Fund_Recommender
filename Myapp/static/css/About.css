@@ -1,0 +1,80 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #c5ddf3;
+    padding: 0;
+}
+/* Ensure flexible layout */
+.main-content-class {
+    display: flex;
+    flex-wrap: wrap; /* Ensures proper stacking on small screens */
+    justify-content: center;
+    padding: 10px;
+}
+
+/* About Content */
+.about-content {
+    padding: 20px;
+    margin: auto;
+    width: 90%; /* Makes it scale properly */
+    max-width: 900px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    text-align: justify;
+}
+h3{
+    text-align: center;
+}
+/* Team Section */
+.team-section {
+    padding: 20px;
+    text-align: center;
+}
+
+.team-member{
+    display:flex;
+    justify-content:space-around;
+}
+.team {
+    text-align: center;
+}
+.team img {
+    border-radius: 50%;
+    width: 65px; /* Resizes well on small screens */
+    height: 65px;
+    object-fit: cover;
+}
+
+/* Reduce font size on smaller screens */
+.team h5 {
+    margin: 10px 0 5px;
+    font-size: 16px;
+}
+
+.team p {
+    font-size: 14px;
+    color: #666;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .about-section {
+        font-size: 18px;
+        padding: 15px;
+    }
+    .about-content {
+        width: 95%;
+        font-size: 14px;
+        padding: 15px;
+    }
+    .team-member {
+        max-width: 250px;
+    }
+    .team-member img {
+        width: 80px;
+        height: 80px;
+    }
+}

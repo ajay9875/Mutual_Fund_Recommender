@@ -1,0 +1,58 @@
+{% extends "Header.html" %}
+{% load static %}
+
+{% block title %} {{ title }} {% endblock title %}
+
+{% block extra_css %}
+   <link rel="stylesheet" href="{% static 'css/Delete_account.css' %}">
+{% endblock extra_css %}
+
+{% block header %} {{ header }} {% endblock header %}
+
+{% block content %}
+<div class="delete-account-container">
+    <h2>Delete Your Account Permanently</h2>
+    <p class="warning-message">
+        ⚠️ This action cannot be undone.<br> All your data including profile, 
+        settings, and history will be permanently erased.
+    </p>
+    <form method="POST" action="{% url 'delete_account' %}" id="deleteForm">
+        {% csrf_token %}
+        <label for="confirm" class="confirm-label">
+            Type <strong>"DELETE"</strong> to confirm:
+        </label>
+
+        <input type="text" id="confirm" name="confirm" pattern="DELETE" 
+               title="Please type 'DELETE' to confirm" 
+               required class="confirmation-input"><br><br>
+        <button type="submit" class="delete-btn" id="deleteButton" disabled>
+            Delete Account Forever
+        </button>
+    </form>
+    <button type="button" onclick="window.location.href='/'" class="cancel-btn">Cancel</button>
+</div>
+{% endblock %}
+
+<!-- Moved JavaScript to bottom of content block -->
+{% block js_code %} 
+<script>
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmInput = document.getElementById('confirm');
+        const deleteButton = document.getElementById('deleteButton');
+        const deleteForm = document.getElementById('deleteForm');
+
+        // Enable/disable delete button
+        confirmInput.addEventListener('input', function(e) {
+            deleteButton.disabled = e.target.value.trim().toUpperCase() !== 'DELETE';
+        });
+
+        // Form submission handler
+        deleteForm.addEventListener('submit', function(e) {
+            if (!confirm('Are you absolutely sure? This cannot be undone!')) {
+                e.preventDefault(); // Cancel form submission
+            }
+        });
+    });
+</script>
+{% endblock js_code %}

@@ -1,0 +1,65 @@
+{% extends "Header.html" %}
+{% load static %}
+
+{% block title %} {{ title }} {% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/Settings.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
+{% endblock extra_css %}
+
+<!-- Header details -->
+{% block header %} {{ header }} {% endblock %}
+
+{% block content %}
+
+    <!-- Home Button-->
+    <div class="home">
+        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+      </div>
+        <!-- Flashed message will be appear here -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                   <div class='msg'> {{ message }} </div>
+                  </div> 
+                </div>
+            {% endfor %}
+        {% endif %}
+   
+
+      <div class="container">
+        <h2>Account Settings</h2>
+        <!-- Change Password Form -->
+        <form method="POST" action="{% url 'account_settings' %}">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="changepass">
+            <label for="old_password">Old Password:</label>
+            <input type="password" id="old_password" name="old_password" required>
+
+            <label for="new_password">New Password:</label>
+            <input type="password" id="new_password" name="new_password" required>
+
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+
+            <button type="submit">Change Password</button>
+        </form>
+
+        <hr>
+
+        <!-- Upload Profile Photo Form -->
+        <form method="POST" enctype="multipart/form-data" action="{% url 'account_settings' %}">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="uploadpic">
+            <label for="profile_photo">Upload Profile Picture:</label>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required>
+
+            <button type="submit">Upload Picture</button>
+        </form>
+    </div>
+
+{% endblock content %}
+
+

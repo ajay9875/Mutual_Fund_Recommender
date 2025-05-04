@@ -1,0 +1,87 @@
+{% extends "Base.html" %}
+{% load static %}
+
+{% block title %} AI-Powered Mutual Fund Recommendation {% endblock %}
+
+{% block extra_css %}
+   <link rel="stylesheet" href="{% static 'css/Default.css' %}">
+   <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+   <script src="{% static 'javascript/allmessage.js' %}"></script>
+{% endblock extra_css %}
+
+{% block content %}
+        <!-- Flashed message will be appear here -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                   <div class='msg'> {{ message }} </div>
+                  </div> 
+                </div>
+            {% endfor %}
+        {% endif %}
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Welcome to AI-Powered Mutual Fund Recommendation</h1>
+        <p>Discover the best investment opportunities tailored to your financial goals and risk appetite with our AI-driven platform.</p>
+        <a href="/newuser" class="cta-button">Get Started for Free</a>
+    </div>
+
+    <!-- Why Choose Us Section -->
+    <div class="features">
+        <h2>Why Choose Us?</h2>
+        <ul>
+            <li><strong>AI-Powered Insights:</strong> Our advanced algorithms analyze market data to provide the best investment options.</li>
+            <li><strong>Personalized Recommendations:</strong> Tailored fund suggestions based on your preferences.</li>
+            <li><strong>Real-Time Market Trends:</strong> Stay updated with the latest trends and mutual fund performance.</li>
+            <li><strong>Safe & Secure:</strong> Your data security is our top priority.</li>
+        </ul>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="features">
+        <h2>How It Works?</h2>
+        <div class="steps">
+            <div class="step"><strong>Step 1:</strong> Register and log in.</div>
+            <div class="step"><strong>Step 2:</strong> Enter your investment preferences.</div>
+            <div class="step"><strong>Step 3:</strong> Get instant AI-driven recommendations.</div>
+            <div class="step"><strong>Step 4:</strong> Track and manage your investments.</div>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="testimonials">
+        <h2>What Our Users Say</h2>
+        <p><em>"This platform helped me find the best mutual funds with ease. Highly recommended!"</em> – A Happy Investor</p>
+        <p><em>"The AI-driven recommendations saved me hours of research. Fantastic tool!"</em> – Financial Advisor</p>
+    </div>
+
+    <!-- Additional Sections -->
+    <!-- Security & Transparency -->
+    <div class="features">
+        <h2>Security & Transparency</h2>
+        <p>We prioritize your financial security and ensure that all recommendations are based on transparent, unbiased data analysis.</p>
+    </div>
+
+    <!-- Market Trends & Insights -->
+    <div class="features">
+        <h2>Market Trends & Insights</h2>
+        <p>Stay ahead with the latest insights on market movements, investment strategies, and top-performing funds.</p>
+    </div>
+
+    <!-- FAQs Section -->
+    <div class="features">
+        <h2>Frequently Asked Questions</h2>
+        <pre><strong>Q: How does the AI select mutual funds?</strong></pre>
+        <p>Ans: The AI analyzes market trends, historical data, and user preferences to recommend the best options.</p>
+        <pre><strong>Q: Is this platform free to use?</strong></pre>
+        <p>Ans: Yes, registration is free, and you can explore our recommendations without any charges.</p>
+    </div>
+
+    <!-- Contact Us Section -->
+    <div id="down" class="features contact">
+        <h2>Contact Us</h2>
+        <p>If you have any questions or need assistance, reach out to us at <strong>support@mutualfundai.com</strong></p>
+    </div>
+
+{% endblock content %}

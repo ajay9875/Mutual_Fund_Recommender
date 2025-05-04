@@ -1,0 +1,62 @@
+/* Center the delete account section */
+.delete-account-container {
+    width: fit-content;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Heading */
+.delete-account-container h2 {
+    color: #d9534f;
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+/* Warning text */
+.delete-account-container p {
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Delete button */
+.delete-btn {
+    justify-self: center;
+    display: block;
+    background: #f3160e;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+.delete-btn:hover {
+    background: red;
+}
+
+/* Cancel button */
+.cancel-btn {
+    justify-self: center;
+    cursor: pointer;
+    display: block;
+    padding: 10px;
+    background: rgb(54, 54, 245);
+    color: white;
+    border: none;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 300px;
+}
+
+.cancel-btn:hover {
+    background: blue;
+}
