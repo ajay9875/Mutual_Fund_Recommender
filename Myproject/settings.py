@@ -124,7 +124,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-STATIC_URL = '/static/'  # URL for serving static files
+"""STATIC_URL = '/static/'  # URL for serving static files
 
 # Optional: Define Global Static Files Directory
 STATICFILES_DIRS = [
@@ -139,7 +139,13 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Required in Production for `collectstatic`
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')"""
+
+# KEEP ONLY ONE COPY OF THESE (remove duplicates):
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # For collectstatic
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # Your source files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -175,6 +181,10 @@ if DEBUG:
     MEDIAFILES = static(MEDIA_URL, document_root=MEDIA_ROOT)
 else:
     MEDIAFILES = []
+
+# Whitenoise compression and caching
+WHITENOISE_MANIFEST_STRICT = False
+WHITENOISE_MAX_AGE = 31536000  # 1 year cache
 
 # Optional: Set the error pages explicitly
 ERROR_404_TEMPLATE = '404.html'

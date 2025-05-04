@@ -125,6 +125,13 @@ p {
     color: #2c3e50;
     margin-top: 10px;
 }
+.features_contact{
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    margin: 0px 20px 30px 20px;
+}
 .features_contact a{
     margin-left: 20px;
 }
