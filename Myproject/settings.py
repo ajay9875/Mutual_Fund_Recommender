@@ -15,14 +15,20 @@ DEBUG = False
  
 # SECURITY WARNING: don't run with debug turned on in production!
 #ALLOWED_HOSTS = []
-ALLOWED_HOSTS = [
-    'mutual-fund-recommender.onrender.com',
-    'localhost',  # For local development
-    '127.0.0.1',   # For local development
+# settings.py
+import os
+
+# Base allowed hosts (development defaults)
+BASE_ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
 ]
 
-import os
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+# Environment variable hosts (production)
+ENV_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+
+# Combine both lists and filter empty strings
+ALLOWED_HOSTS = [host for host in [*BASE_ALLOWED_HOSTS, *ENV_HOSTS] if host]
 
 # Application definition
 INSTALLED_APPS = [
