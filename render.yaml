@@ -5,10 +5,22 @@ services:
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn Myproject.wsgi:application
-    postDeploy:
-      commands:
-        - python manage.py migrate
-        - python manage.py collectstatic --noinput
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: Myproject.settings
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+
+jobs:
+  - name: django-db-migrate
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: |
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: Myproject.settings
