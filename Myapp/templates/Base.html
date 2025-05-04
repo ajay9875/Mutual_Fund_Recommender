@@ -18,11 +18,11 @@
     <header class="header">
         <nav class="nav-links">
           <ul>
-            <li><a href="\about">About Us</a></li>
-            <li><a href="\services">Services</a></li>
-            <li><a href="\contact">Contact Us</a></li>
+            <li><a href="{% url 'about' %}">About Us</a></li>
+            <li><a href="{% url 'services' %}">Services</a></li>
+            <li><a href="{% url 'contact' %}">Contact Us</a></li>
             <li><a href="{% url 'login' %}">User - Login</a></li>
-            <li><a href="\admin">Admin - Login</a></li>
+            <li><a href="{% url 'admin' %}">Admin - Login</a></li>
             <a href="#top" class="logo">
               <img src="{% static 'favicon/favicon.webp' %}" alt="Profile" class="profile-icon">
             </a>
