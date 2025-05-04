@@ -14,10 +14,17 @@ SECRET_KEY = 'django-insecure-p7bv-03i&pdm0e&f_ce_=y5d$_2xbdj90xelz$fl-*3vb#4@)0
 DEBUG = False
  
 # SECURITY WARNING: don't run with debug turned on in production!
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'mutual-fund-recommender.onrender.com',
+    'localhost',  # For local development
+    '127.0.0.1',   # For local development
+]
+
+import os
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
-
 INSTALLED_APPS = [
     #'Myapp',
     'Myapp.apps.MyappConfig',  # Add the app to the list of installed apps
