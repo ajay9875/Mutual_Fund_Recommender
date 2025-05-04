@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
@@ -8,15 +9,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-p7bv-03i&pdm0e&f_ce_=y5d$_2xbdj90xelz$fl-*3vb#4@)0'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Ensure DEBUG is True for development
-DEBUG = True
+DEBUG = False
  
 # SECURITY WARNING: don't run with debug turned on in production!
 #ALLOWED_HOSTS = []
-# settings.py
-import os
 
 # Base allowed hosts (development defaults)
 BASE_ALLOWED_HOSTS = [
@@ -159,8 +158,8 @@ EMAIL_HOST = "smtp.gmail.com"  # Use Gmail's SMTP server
 EMAIL_PORT = 587  # SMTP Port (Use 465 if using SSL)
 EMAIL_USE_TLS = True  # Enable TLS encryption
 EMAIL_USE_SSL = False  # SSL should be False when TLS is True
-EMAIL_HOST_USER = "mutualfundrecommendation@gmail.com"  # Replace with your Gmail ID
-EMAIL_HOST_PASSWORD = "mstc ewzm gmdc fdyp"  # Replace with App Password from Step 1
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Default email sender
 
 # Set session timeout to 10 minutes
