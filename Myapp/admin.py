@@ -1,5 +1,8 @@
 from django.contrib import admin
 from Myapp.models import Contact, MutualFund, ProfilePic  # ✅ Keep these
+from .models import Task
+
+admin.site.register(Task)
 
 # Register Contact Model
 admin.site.register(Contact)

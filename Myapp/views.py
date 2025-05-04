@@ -33,6 +33,12 @@ from django.contrib import messages
 from django.http import HttpResponseServerError
 from django.shortcuts import render
 
+from .models import Task
+def task_list(request):
+    tasks = Task.objects.all()
+    return render(request, 'task_list.html', {'tasks': tasks})
+
+
 def my_view(request):
     try:
         # Some code that might raise an exception

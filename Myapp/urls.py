@@ -4,6 +4,7 @@ from Myapp import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from . import views
 
  # Ensure all views are imported for another routing
 
@@ -26,4 +27,5 @@ urlpatterns = [
     path("account_settings/", views.account_settings, name="account_settings"),
     path("delete_account/", views.delete_account, name="delete_account"),
 
+    path('tasks/', views.task_list, name='task_list'),
 ]
