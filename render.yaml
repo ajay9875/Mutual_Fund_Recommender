@@ -1,13 +1,18 @@
 services:
   - type: web
-    name: Mutual_Fund_Recommender
-    runtime: python
-    repo: https://github.com/ajay9875/Mutual_Fund_Recommender
+    name: mutual-fund-recommender
+    env: python
     plan: free
-    region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn Myproject.wsgi:application
+    autoDeploy: true
     envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: Myproject.settings
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
       - key: ALLOWED_HOSTS
         sync: false
       - key: EMAIL_USE_SSL
@@ -24,5 +29,7 @@ services:
         sync: false
       - key: EMAIL_HOST
         sync: false
-      - key: SECRET_KEY
-        sync: false
+    postDeploy:
+      commands:
+        - python manage.py migrate
+        - python manage.py collectstatic --noinput
