@@ -55,7 +55,7 @@ def notification_scheduler():
     while True:
         now = datetime.now()
         # Check if it's 4:10 PM
-        if now.hour == 17 and now.minute == 35:
+        if now.hour == 17 and now.minute == 47:
             if not sent_today:
                 send_daily_notifications()  # Send email notifications
                 sent_today = True
