@@ -4,40 +4,26 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.models import User
 from django.contrib import messages
-from Myapp.models import Contact
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
-from .models import ProfilePic
-import os
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.conf import settings
-from django.core.files.storage import default_storage
-from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-import os
 from django.conf import settings
 from django.utils.timezone import now
 from django.utils import timezone
-from datetime import datetime, timedelta
 from django.core.mail import send_mail
-from django.conf import settings
-
-import random
-
-#import yfinance as yf
-#import numpy as np
-#from sklearn.metrics.pairwise import cosine_similarity
-from django.shortcuts import render, redirect
-from django.contrib import messages
 from django.http import HttpResponseServerError
-from django.shortcuts import render
+
+from Myapp.models import Contact
+from .models import ProfilePic
+
+import os
+import random
+from datetime import datetime, timedelta
 
 from .models import Task
 def task_list(request):
     tasks = Task.objects.all()
     return render(request, 'task_list.html', {'tasks': tasks})
-
 
 def my_view(request):
     try:
@@ -662,7 +648,6 @@ def newuser(request):
             is_active=True
         )
 
-        
         # Get first name and last name
         first_name = first_name
         last_name = last_name
@@ -674,7 +659,7 @@ def newuser(request):
         WEBSITE_NAME = "🔷 Mutual Fund Recommendation System"
 
         # Subject Line
-        subject = f"{WEBSITE_NAME} 🔑 Your OTP to Reset Password"
+        subject = f"{WEBSITE_NAME} 🎉Registration Successful!"
 
         # HTML Email Body
         message = f"""

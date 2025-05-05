@@ -1,5 +1,4 @@
 import os
-from decouple import config
 from pathlib import Path
 from django.contrib.messages import constants as messages
 
@@ -10,11 +9,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
-#print(SECRET_KEY)
+SECRET_KEY = os.getenv("SECRET_KEY")
+print(SECRET_KEY)
 # Ensure DEBUG is True for development
 DEBUG = False
-
+ 
 # SECURITY WARNING: don't run with debug turned on in production!
 #ALLOWED_HOSTS = []
 
@@ -102,6 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -158,8 +158,8 @@ EMAIL_HOST = "smtp.gmail.com"  # Use Gmail's SMTP server
 EMAIL_PORT = 587  # SMTP Port (Use 465 if using SSL)
 EMAIL_USE_TLS = True  # Enable TLS encryption
 EMAIL_USE_SSL = False  # SSL should be False when TLS is True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Default email sender
 
 # Set session timeout to 10 minutes
@@ -187,15 +187,3 @@ WHITENOISE_MAX_AGE = 31536000  # 1 year cache
 
 # Optional: Set the error pages explicitly
 ERROR_404_TEMPLATE = '404.html'
-
-#To send daily notifications to all users
-INSTALLED_APPS += ['django_crontab']
-
-CRONJOBS = [
-    # minute hour day month weekday, then call the management command
-    ('10 16 * * *',
-     'django.core.management.call_command',
-     ['send_daily_notifications'],
-     {'pythonpath': BASE_DIR, 'verbosity': 1}
-    ),
-]

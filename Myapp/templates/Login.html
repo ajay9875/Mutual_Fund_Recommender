@@ -6,7 +6,6 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/Login.css' %}">
     <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
 {% endblock extra_css %}
 
 <!-- Header details -->
@@ -57,3 +56,8 @@
  </div>
 
 {% endblock content %}
+
+<!-- java script code -->
+{% block js_code %} 
+  <script src="{% static 'javascript/allmessage.js' %}"></script>
+{% endblock js_code %}

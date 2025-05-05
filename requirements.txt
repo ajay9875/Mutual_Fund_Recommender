@@ -1,11 +1,11 @@
 Django
 django-crispy-forms
 Pillow
-numpy
 scikit-learn
-pandas
 python-dotenv
 wheel
 setuptools
 gunicorn
 whitenoise
+python-decouple
+django-crontab
