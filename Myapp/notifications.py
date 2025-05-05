@@ -61,14 +61,14 @@ def send_daily_notifications():
 
 def notification_scheduler():
     """
-    Scheduler function to send daily notifications at 4:10 PM.
+    Scheduler function to send daily notifications at 09:00 AM.
     Runs in a separate thread.
     """
     sent_today = False
     while True:
         now = datetime.now()
         # Check if it's 4:10 PM
-        if now.hour == 10 and now.minute == 10:
+        if now.hour == 18 and now.minute == 10:
             if not sent_today:
                 send_daily_notifications()  # Send email notifications
                 sent_today = True
