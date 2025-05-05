@@ -6,6 +6,7 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'css/Login.css' %}">
     <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock extra_css %}
 
 <!-- Header details -->
@@ -22,11 +23,6 @@
             {% endfor %}
         {% endif %}
 
-    <!-- Home Button-->
-    <div class="home">
-        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
-      </div>
-
         <!-- Right Side - Login Form -->
         <div class="Loginpage">
             <div class="log-icon">
@@ -37,18 +33,22 @@
             <form method="POST" action="{% url 'login' %}">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" name="username" autocomplete="off" onclick='hideMessage()' required>
+                    <div class="password-container">
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username" autocomplete="off" required>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" autocomplete="off" required>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" placeholder="Enter Password" autocomplete="off" required>
+                        <i class="fa-solid fa-eye toggle-icon" id="togglePassword" onclick="togglePassword()"></i>
+                    </div>                   
                 </div>
                 <button type="submit">SUBMIT</button>
                 <div class="link">
                     <a href="/forgetpass">Forgot password?</a>
                     <a href="/forgetusername">Forgot username?</a>
                     <a href="{% url 'newuser' %}">New user?</a>
+                    <a href="/">← Back to Home</a>
                 </div>
             </form>
         </div>
@@ -60,4 +60,5 @@
 <!-- java script code -->
 {% block js_code %} 
   <script src="{% static 'javascript/allmessage.js' %}"></script>
+  <script src="{% static 'javascript/login.js' %}"></script>
 {% endblock js_code %}

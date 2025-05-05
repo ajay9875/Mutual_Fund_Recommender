@@ -22,11 +22,6 @@
          {% endfor %}
      {% endif %}
 
-    <!-- Home Button -->
-    <div class="home">
-        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
-    </div>
-
     <div class="forget-pass">
         <form method="POST" action="/resetpass/">
             {% csrf_token %}
@@ -37,6 +32,8 @@
             <input type="password" class="form-control" name="cpassword" placeholder="" required>
 
             <button id="submit-btn" type="submit">SUBMIT</button>
+
+            <p style="text-align: center; text-decoration: none;"><a href="/" style="text-decoration: none;">← Back to Home</a></p>
         </form>
     </div>
 

@@ -12,10 +12,6 @@
 {% block header %} {{ header }} {% endblock header %}
 
 {% block content %}
-    <!-- Home Button -->
-    <div class="home">
-      <a href="/" class="btn"><img src="{% static 'icons/homeicon.png' %}"></a>
-    </div>
 
         <!-- Flashed message will be appear here -->
         {% if messages %}
@@ -34,6 +30,7 @@
                 <input type="email" id="email" name="email" placeholder="" required>
 
                 <button>SUBMIT</button>
+                <p style="text-align: center; text-decoration: none;"><a href="/" style="text-decoration: none;">← Back to Home</a></p>
         </form>
   </div>
 

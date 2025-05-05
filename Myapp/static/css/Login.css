@@ -69,14 +69,20 @@ label, input {
     font-size: small;
     color: blue;
 }
-
-.logo-image{
-    justify-self: flex-end;
-    margin: 10px 10px 10px 0px;
+.password-container {
+    position: relative;
 }
-
-.logo-image img{
-    height:50px;
-    width:50px;
-    border-radius: 100%;
+.password-container input {
+    width: 100%;
+    padding-right: 40px; /* 👈 This is essential to push the text away from the icon */
+    box-sizing: border-box;
+}
+.password-container .toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    padding-right: 5px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #555;
 }
