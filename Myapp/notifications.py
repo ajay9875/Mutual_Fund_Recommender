@@ -67,12 +67,12 @@ def notification_scheduler():
     sent_today = False
     while True:
         now = datetime.now()
-        # Check if it's 4:10 PM
-        if now.hour == 18 and now.minute == 10:
+        # Check if it's 9:00 PM
+        if now.hour == 9 and now.minute == 00:
             if not sent_today:
                 send_daily_notifications()  # Send email notifications
                 sent_today = True
         else:
             sent_today = False  # Reset the flag after 4:10 PM
 
-        time.sleep(5)  # Sleep for 1 minute before checking again
+        time.sleep(5)  # Sleep for 5 seconds before checking again
