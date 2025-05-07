@@ -58,8 +58,36 @@
 
             <button type="submit">Upload Picture</button>
         </form>
-    </div>
+        <hr>
+        <br>
+           <label>Delete Account Forever:</label>
+            <button class="delete-account-btn" type="button" onclick="window.location.href='{% url 'delete_account' %}'" class="delete-account-btn">
+                Delete Account Forever
+              </button>
+       </div>
 
 {% endblock content %}
 
+{% block js_code %} 
+<script>
+    // Wait for DOM to load
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmInput = document.getElementById('confirm');
+        const deleteButton = document.getElementById('deleteButton');
+        const deleteForm = document.getElementById('deleteForm');
+
+        // Enable/disable delete button
+        confirmInput.addEventListener('input', function(e) {
+            deleteButton.disabled = e.target.value.trim().toUpperCase() !== 'DELETE';
+        });
+
+        // Form submission handler
+        deleteForm.addEventListener('submit', function(e) {
+            if (!confirm('Are you absolutely sure? This cannot be undone!')) {
+                e.preventDefault(); // Cancel form submission
+            }
+        });
+    });
+</script>
+{% endblock js_code %}
 

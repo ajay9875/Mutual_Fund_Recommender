@@ -39,9 +39,14 @@ button {
     cursor: pointer;
     border-radius: 5px;
 }
-button:hover {
-    background: #218838;
-}
 #profile_photo:hover{
     cursor: pointer;
+}
+
+.delete-account-btn {
+    background: red;
+    width: 100%;
+}
+.delete-account-btn button:hover{
+    background-color: rgb(205, 2, 2);
 }
