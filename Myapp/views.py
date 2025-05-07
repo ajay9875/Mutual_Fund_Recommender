@@ -780,36 +780,3 @@ def delete_account(request):
         'header': 'Confirm Account Deletion'
     }
     return render(request, "Delete_account.html", context)
-
-"""def upload_profile_picture(request):
-    if request.method == "POST":
-        if "profile_picture" in request.FILES:
-            user = request.user
-            image = request.FILES["profile_picture"]
-
-            print(f"DEBUG: File received - {image.name}")  # ✅ Debugging
-
-            # Ensure the upload directory exists
-            upload_dir = os.path.join(settings.MEDIA_ROOT, "profile_pics/")
-            os.makedirs(upload_dir, exist_ok=True)
-
-            # Generate unique filename
-            image_filename = f"{user.username}_{image.name}"
-            file_path = os.path.join("profile_pics/", image_filename)  # ✅ Relative to MEDIA_ROOT
-
-            # Save file
-            saved_path = default_storage.save(file_path, image)
-            print(f"DEBUG: File saved at {saved_path}")  # ✅ Debugging
-
-            # Update profile picture in the database
-            profile, created = ProfilePic.objects.get_or_create(username=user)
-            profile.filename = saved_path
-            profile.save()
-
-            messages.success(request, "Profile picture updated successfully!")
-        else:
-            print("DEBUG: No file received!")  # ❌ Debugging
-            messages.error(request, "No file uploaded! Please select a file.")
-
-        return redirect("account_settings")  # Redirect to settings page
-"""
