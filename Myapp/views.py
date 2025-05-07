@@ -12,15 +12,18 @@ from django.utils.timezone import now
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.http import HttpResponseServerError
-
 from Myapp.models import Contact
 from .models import ProfilePic
-
 import os
 import random
 from datetime import datetime, timedelta
-
 from .models import Task
+
+import requests
+from dotenv import load_dotenv
+
+load_dotenv() 
+
 def task_list(request):
     tasks = Task.objects.all()
     return render(request, 'task_list.html', {'tasks': tasks})
@@ -33,119 +36,6 @@ def my_view(request):
         # Trigger a custom 500 error page
         return HttpResponseServerError(render(request, "404.html"))
 
-'''
-def get_real_time_data(ticker):
-    """Fetch real-time data (Closing prices) from Yahoo Finance."""
-    try:
-        fund = yf.Ticker(ticker)
-        historical_data = fund.history(period="5y")  # Fetch 5 years of data
-        if historical_data.empty:
-            return None
-        return historical_data['Close']  # You can extend this to use other metrics like volume, etc.
-    except Exception as e:
-        print(f"Error fetching data for {ticker}: {e}")
-        return None
-
-def content_based_recommendation(company_type, risk_level, top_n=5):
-    """Recommend funds based on company type and risk level using Yahoo Finance data."""
-    # Define fund tickers for different types
-    fund_tickers = {
-        'equity': 'VFINX',  # Example: Vanguard 500 Index Fund
-        'debt': 'BND',  # Example: Vanguard Total Bond Market ETF
-        'international': 'VTIAX',  # Example: Vanguard Total International Stock Index Fund
-    }
-
-    # Use the ticker corresponding to the selected company type
-    ticker = fund_tickers.get(company_type, 'VFINX')
-
-    # Fetch real-time data using the ticker
-    real_time_data = get_real_time_data(ticker)
-    if real_time_data is None:
-        return ['No data available for this fund type.']
-
-    # Calculate average return rate (percentage change)
-    avg_return = real_time_data.pct_change().mean() * 100  # Calculate average return rate
-
-    # Prepare a list of recommended funds (using mock data here)
-    fund_data = [(ticker, company_type, risk_level, avg_return)]  # Example: [("VFINX", "equity", "low", avg_return)]
-
-    # Generate a feature matrix based on the company type, risk, and average return rate
-    feature_matrix = np.array([[f[1] == company_type, f[2] == risk_level, f[3]] for f in fund_data])
-
-    # Ensure feature_matrix is 2D
-    if feature_matrix.ndim == 1:
-        feature_matrix = feature_matrix.reshape(-1, 1)
-
-    # Calculate cosine similarity based on the features
-    similarities = cosine_similarity(feature_matrix)
-
-    # Get similarity scores for the first fund in the list
-    scores = list(enumerate(similarities[0]))  # Use fund at index 0 as a reference
-    scores = sorted(scores, key=lambda x: x[1], reverse=True)[1:top_n+1]  # Sort based on similarity scores
-
-    # Return the recommended funds based on similarity scores
-    recommended_funds = [fund_data[i[0]] for i in scores]
-    return recommended_funds
-'''
-'''
-def classify_risk(avg_return):
-    """Classify mutual funds into risk categories based on return rate."""
-    if avg_return >= 12:  
-        return "High Risk"
-    elif 6 <= avg_return < 12:  
-        return "Moderate Risk"
-    else:  
-        return "Low Risk"
-
-def get_real_time_fund_data(fund_ticker):
-    """Fetch mutual fund details dynamically from Yahoo Finance."""
-    try:
-        fund = Ticker(fund_ticker)
-
-        # Get basic fund details
-        summary = fund.summary_detail.get(fund_ticker, {})
-        quote_info = fund.quote_type.get(fund_ticker, {})
-
-        # Get 5-year historical prices
-        history = fund.history(period="5y")
-        if history.empty:
-            return None
-
-        # Calculate return rate (avg annualized return)
-        avg_return = history['close'].pct_change().mean() * 100
-
-        # Classify risk level dynamically
-        risk_level = classify_risk(avg_return)
-
-        # Prepare response data
-        fund_details = {
-            "Name": quote_info.get('longName', 'N/A'),
-            "Fund Type": quote_info.get('quoteType', 'N/A'),
-            "Risk Level": risk_level,
-            "Expense Ratio": summary.get('expenseRatio', 'N/A'),
-            "1-Year Return": summary.get('trailingAnnualDividendYield', 'N/A'),
-            "5-Year Average Return": round(avg_return, 2),
-            "Fund Ticker": fund_ticker,
-        }
-
-        return fund_details
-
-    except Exception as e:
-        print(f"Error fetching fund data: {e}")
-        return None
-
-def fund_search(request):
-    """Django view to search for mutual funds in real-time."""
-    fund_data = None
-
-    if request.method == "POST":
-        fund_ticker = request.POST.get("fund_ticker")
-        
-        if fund_ticker:
-            fund_data = get_real_time_fund_data(fund_ticker)
-
-    return render(request, "fund_search.html", {"fund_data": fund_data})
-'''
 def default(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -154,6 +44,24 @@ def default(request):
 # Landing / Home page rendering for not logged in user(Redirect to dashboard if logged in user found)
 def landing_page(request):
     return render(request,'Default.html')
+
+API_KEY = os.getenv("API_ACCESS_KEY")
+def get_fund_data_by_api(fund_type):
+        
+    url = "https://stock.indianapi.in/mutual_funds_details"
+
+    querystring = {"stock_name":fund_type}
+
+    headers = {"X-Api-Key": API_KEY}
+
+    try:
+        response = requests.get(url, headers=headers, params=querystring)
+        response.raise_for_status()  # Raise an error for bad status codes
+        return response.json()       # Return the data instead of printing
+    
+    except requests.exceptions.RequestException as e:
+        print("Error fetching mutual fund data:", e)
+        return None  # or return {} or [] depending on your use case
 
 @never_cache
 def userdashboard(request):
@@ -180,8 +88,23 @@ def userdashboard(request):
     if not full_name:
             full_name = username
 
-    recommended_funds = request.session.get('recommended_funds', [])
+    recommended_funds = []
 
+    if request.method == "POST":
+        fund_type = request.POST["company_type"] 
+        raw_data = get_fund_data_by_api(fund_type)
+        if raw_data:
+            fund = raw_data
+            processed = {
+                'fund_name': fund['basic_info']['fund_name'],
+                'category': fund['basic_info']['category'],
+                'risk': fund['basic_info']['risk_level'],
+                'return_rate': fund['returns']['cagr'].get('5y', 'N/A'),  # or any time period
+                'investment_type': fund['basic_info']['scheme_type'],
+                'duration': "5 years",  # You can adjust this logic
+            }
+            recommended_funds.append(processed)
+            
     context = {
         "remaining_time": remaining_time,
         "full_name": full_name,
@@ -189,7 +112,6 @@ def userdashboard(request):
         "recommended_funds": recommended_funds,
         "MEDIA_URL": settings.MEDIA_URL,  # Pass MEDIA_URL explicitly
     }
-    print(f'Profile picture: {profilepic}')
     return render(request, 'Index.html', context)
 
 # Handle login request by user
@@ -210,7 +132,7 @@ def loginUser(request):
             request.session['username'] = user.username  # Store username
             #request.session['profilepic'] = user.profile_picture  # Store username
             request.session['full_name'] = f"{user.first_name} {user.last_name}"  # Store full name
-            messages.success(request, "You have successfully logged in!")
+            messages.success(request, "Login successful!")
             return redirect('dashboard')
         else:
             messages.error(request, "Invalid Credentials! Please try again.")

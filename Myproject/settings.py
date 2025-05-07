@@ -108,7 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Kolkata'
-USE_TZ = True  # Keep Django aware of time zones
+USE_TZ = True # Keep Django aware of time zones
 
 USE_I18N = True
 
@@ -163,7 +163,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Default email sender
 
 # Set session timeout to 10 minutes
-SESSION_COOKIE_AGE = 360
+SESSION_COOKIE_AGE = 3600
 
 # Ensure sessions do not expire when the browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
@@ -189,13 +189,14 @@ WHITENOISE_MAX_AGE = 31536000  # 1 year cache
 ERROR_404_TEMPLATE = '404.html'
 
 #To send daily notifications to all users
-INSTALLED_APPS += ['django_crontab']
+"""INSTALLED_APPS += ['django_crontab']
 
 CRONJOBS = [
     # minute hour day month weekday, then call the management command
-    ('10 16 * * *',
+    ('11 12 * * *',  # Run at 9:00 AM every day
      'django.core.management.call_command',
      ['send_daily_notifications'],
      {'pythonpath': BASE_DIR, 'verbosity': 1}
     ),
-]
+]"""
+

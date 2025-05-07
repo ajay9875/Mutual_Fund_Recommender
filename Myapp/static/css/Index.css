@@ -75,6 +75,7 @@ html {
 }
 .profile-btn{
     margin-left: auto;
+    margin-right: 15px;
 }
 /* Profile Name Style */
 .full_name{
@@ -113,21 +114,19 @@ html {
     background: #f1f1f1;
   }
 
-/* All container style */
-.all {
-    display: flex;
-    justify-content: space-around; /* Pushes footer to bottom */
-}
-
 /* --- Form Container --- */
 .form-container {
+    display: none;
     background: white;
     padding: 25px;
+    margin-left: 15px;
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    width: 420px;
+    max-width: 420px;
     text-align: center;
     transition: 0.3s ease-in-out;
+    position: fixed; /* stays on top */
+    z-index: 1000;
 }
 
 /* Hover Effect */
@@ -226,8 +225,16 @@ th {
     background-color: #007bff;
     color: white;
 }
+.greet{
+    justify-self: center;
+}
 .recommendation {
+    width: fit-content;
+    padding: 20px;
     margin-top: 20px;
+    justify-self: center;
+    text-align: center;
+    border: groove 2px black;
 }
 .recommendation p {
     font-size: 16px;

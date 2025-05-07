@@ -16,9 +16,11 @@
     <nav class="nav-links">
       <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="\about">About Us</a></li>
+        <li><a href="\about">About</a></li>
         <li><a href="\services">Services</a></li>
-        <li><a href="\contact">Contact Us</a></li>
+        <li><a href="\contact">Contact</a></li>
+        <li><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;">Get Recommendation</a></li>
+
         <!-- Session Timer -->
         {% if remaining_time %}
           <div id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
@@ -31,10 +33,9 @@
             {% endif %}
         
           </a>
-
-           <div class="full_name"> {{ full_name }} </div>
       </ul>  
     </nav>
+
     <div class="profile-dropdown">
       <a href="/profile">Your Info</a>
       <a href="/your-funds">Your Funds</a>
@@ -55,8 +56,6 @@
             {% endfor %}
         {% endif %}
    
-    <div class='all'>
-      <div class="left-side">
         <!-- Recommendation form-->
         <div class="form-container">
           <h2>Mutual Fund Recommendation Form</h2>
@@ -70,6 +69,7 @@
               <select id="company_type" name="company_type">
                   <option value="" selected>Please select a company type</option>
                   <option value="bank">Bank</option>
+                  <option value="Healthcare">Healthcare</option>
                   <option value="amc">Asset Management Company (AMC)</option>
                   <option value="government">Government Schemes</option>
                   <option value="private">Private Financial Institution</option>
@@ -143,12 +143,11 @@
               <!-- Submit Button -->
               <button class="get-recommendation-btn" type="submit">Get Recommendation</button>
           </form>
-      </div>
     </div>
     
-    <div class="rightside">
+      <div class="greet"><h4>Welcome back, {{ full_name }}! 👋</h4></div>
       <div class='recommendation'>
-        <h2>All Recommended Mutual Funds</h2>
+        <h3>All Recommended Mutual Funds</h3>
         {% if recommended_funds %}
             <table>
                 <thead>
@@ -164,7 +163,7 @@
                 <tbody>
                     {% for fund in recommended_funds %}
                         <tr>
-                            <td>{{ fund.name }}</td>
+                            <td>{{ fund.fund_name }}</td>
                             <td>{{ fund.category }}</td>
                             <td>{{ fund.risk }}</td>
                             <td>{{ fund.return_rate }}%</td>
@@ -175,17 +174,32 @@
                 </tbody>
             </table>
         {% else %}
-            <p>No recommendations available! Please try to get recommendation now.</p>
+          <p>No results yet. To get a personalized recommendation, click the <strong>"Get Recommendation"</strong> button above.</p>
         {% endif %}
     </div>
-  </div>
-</div>
         <!-- Footer -->
         <footer class='footer'>
             <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
           </footer>
           
     <script>
+          //Show recommendation form only by clicking button
+          function showRecommendationForm() {
+              let rec_form = document.querySelector('.form-container');
+              
+              // Toggle display
+              if (rec_form.style.display === "block") {
+                  rec_form.style.display = "none";
+                  // Remove query param if needed
+                  history.pushState(null, "", window.location.pathname);
+              } else {
+                  rec_form.style.display = "block";
+                  // Change URL without reloading
+                  const newUrl = window.location.pathname + "?menu=recommendation_form";
+                  history.pushState(null, "", newUrl);
+              }
+          }
+
           // Show custom input if user want to give Manually
           function toggleCustomProfit(selectElement) {
               var customInput = document.getElementById("custom_profit");
@@ -205,6 +219,7 @@
       
       if (dropdown.style.display === 'block') {
           dropdown.style.display = 'none';  // Hide if visible
+          
       } else {
           dropdown.style.display = 'block'; // Show if hidden
       }
@@ -218,7 +233,8 @@
           customProfitInput.style.display = 'none';
       }
   }
-  let remainingTime = {{ remaining_time }}; // Get session time from Flask
+
+  let remainingTime = {{ remaining_time|default:0 }}; // Use Django variable in JS
     
   function updateTimer() {
       let timerElement = document.getElementById("session-timer");
@@ -232,7 +248,8 @@
           if (remainingTime < 300) { // 5 minutes = 300 seconds
               timerElement.style.color = "red";
           } else {
-              timerElement.style.color = "white";
+              timerElement.style.color = "lightgrey";
+              ;
           }
 
           remainingTime--;

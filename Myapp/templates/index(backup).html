@@ -8,7 +8,7 @@
   <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
   <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
   <link rel="stylesheet" href="{% static 'css/Index.css' %}">
-  <link rel="stylesheet" href="{% static 'css/Base.css' %}">
+  <script src="{% static 'javascript/allmessage.js' %}"></script>
 </head>
 
 <body>
@@ -16,19 +16,32 @@
     <nav class="nav-links">
       <ul>
         <li><a href="/">Home</a></li>
-        <li><a href="\about">About Us</a></li>
+        <li><a href="\about">About</a></li>
         <li><a href="\services">Services</a></li>
-        <li><a href="\contact">Contact Us</a></li> 
+        <li><a href="\contact">Contact</a></li>
+        <li><a href="#" onclick="showRecommendationForm();">Get Recommendation</a></li>
+
+        <!-- Session Timer -->
+        {% if remaining_time %}
+          <div id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
+        {% endif %} 
           <a href="?menu=profile" onclick="toggleProfileMenu(); return false;" class="profile-btn">
-            <img src="{% static 'favicon/favicon.webp' %}" alt="Profile" class="profile-icon">
-           </a>
+            {% if profilepic %}
+              <img src="{{ profilepic }}" class="profile-icon">
+            {% else %}
+              <img src="{% static 'favicon/favicon.webp' %}" class="profile-icon" style="background-color: gray;">
+            {% endif %}
+        
+          </a>
+
            <div class="full_name"> {{ full_name }} </div>
       </ul>  
     </nav>
+
     <div class="profile-dropdown">
       <a href="/profile">Your Info</a>
       <a href="/your-funds">Your Funds</a>
-      <a href="/settings">Settings</a>
+      <a href="{% url 'account_settings' %}">Settings</a>
       <a href="/logout">Logout</a>
       <a href="{% url 'delete_account' %}" class="delete-account-link">Delete Account</a>
 
@@ -40,20 +53,16 @@
             {% for message in messages %}
                 <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
                    <div class='msg'> {{ message }} </div>
-
-                    <button class="close-btn" onclick="hideMessage(this)">&times;</button>
                   </div> 
                 </div>
             {% endfor %}
         {% endif %}
    
-    <div class='all'>
-      <div class="left-side">
         <!-- Recommendation form-->
         <div class="form-container">
           <h2>Mutual Fund Recommendation Form</h2>
       
-          <form action="/recommend/" method="POST">
+          <form action="/dashboard/" method="POST">
             {% csrf_token %}
 
             <!-- Company Type (Full Width) -->
@@ -135,10 +144,8 @@
               <!-- Submit Button -->
               <button class="get-recommendation-btn" type="submit">Get Recommendation</button>
           </form>
-      </div>
     </div>
     
-    <div class="rightside">
       <div class='recommendation'>
         <h2>All Recommended Mutual Funds</h2>
         {% if recommended_funds %}
@@ -170,33 +177,22 @@
             <p>No recommendations available! Please try to get recommendation now.</p>
         {% endif %}
     </div>
-  </div>
-</div>
         <!-- Footer -->
         <footer class='footer'>
             <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
           </footer>
           
     <script>
-      // Reload page automatically while session expires
-      var remainingTime = parseFloat("{{ remaining_time|default:0 }}") * 1000;  // Ensure it's a number
-
-      if (remainingTime > 0) {
-          setTimeout(function() {
-              location.reload();  // 🔄 Refresh the page when session expires
-          }, remainingTime);
-      }
-          
-      //Hide all message onclick remove or input field
-      function hideMessage(element) {
-        if (element) {
-             element.parentElement.style.display = 'none';
-        }
-        else {
-            const e = document.getElementById('messages');
-            e.style.display = 'none';
-        }
-      }
+          //Show recommendation form only by clicking button
+          function showRecommendationForm(){
+              let rec_form = document.querySelector('.form-container');
+              if (rec_form.style.display === "block" || rec_form.style.display === "") {
+                rec_form.style.display = "none";
+              }
+              else{
+                rec_form.style.display = "block";
+              }
+         }
 
           // Show custom input if user want to give Manually
           function toggleCustomProfit(selectElement) {
@@ -230,6 +226,39 @@
           customProfitInput.style.display = 'none';
       }
   }
+
+  let remainingTime = {{ remaining_time|default:0 }}; // Use Django variable in JS
+    
+  function updateTimer() {
+      let timerElement = document.getElementById("session-timer");
+
+      if (remainingTime > 0) {
+          let minutes = Math.floor(remainingTime / 60);
+          let seconds = Math.floor(remainingTime % 60);
+          timerElement.innerText = `Session expires in ${minutes}m ${seconds}s`;
+
+          // Change color dynamically when < 5 minutes
+          if (remainingTime < 300) { // 5 minutes = 300 seconds
+              timerElement.style.color = "red";
+          } else {
+              timerElement.style.color = "lightgrey";
+              ;
+          }
+
+          remainingTime--;
+          setTimeout(updateTimer, 1000);
+          
+      } else {
+          timerElement.innerText = "Logging out...";
+          setTimeout(() => {
+              window.location.href = "{% url 'logout' %}";  // Auto logout
+              window.location.reload();  // ✅ Corrected: Add parentheses to call the function
+            }, 2000);
+      }
+  }
+
+  window.onload = updateTimer;
+
     </script> 
 </body>
 </html>
