@@ -77,16 +77,7 @@ html {
     margin-left: auto;
     margin-right: 15px;
 }
-/* Profile Name Style */
-.full_name{
-    max-width: 150px;
-    max-height: 75px;
-    font-family: cursive;
-    font-size: medium;
-    color: white;
-    text-align: center;
-    margin: 0px 15px 0px 5px;
-}
+
 
 /* Profile button content */
 .profile-dropdown {
@@ -211,11 +202,6 @@ html {
     background-color: #218838;
 }
 
-/* All recommendation style */
-/*table {
-    width: fit-content;
-    border-collapse: collapse;
-}*/
 table {
     margin: 0 auto; /* Center the table */
     width: auto;    /* Ensure it wraps content */
@@ -231,31 +217,23 @@ th {
     background-color: #007bff;
     color: white;
 }
-/*.greet{
-    justify-self: center;
-}*/
+
 .greet {
     text-align: center;
     margin-top: 20px;
 }
 
-/*.recommendation {
-    width: fit-content;
-    padding: 20px;
-    margin-top: 20px;
-    justify-self: center;
-    text-align: center;
-    border: groove 2px black;
-}
-*/
 .recommendation {
     max-width: 90%;
-    margin: 20px auto; /* Center horizontally */
+    margin: 10px auto; /* Center horizontally */
     padding: 20px;
     text-align: center;
     border: groove 2px black;
     background-color: white;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+}
+.recommendation h3 {
+    margin-top: 0px;
 }
 
 .recommendation p {
