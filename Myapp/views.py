@@ -60,7 +60,6 @@ def get_fund_data_by_api(fund_type):
         return response.json()       # Return the data instead of printing
     
     except requests.exceptions.RequestException as e:
-        print("Error fetching mutual fund data:", e)
         return None  # or return {} or [] depending on your use case
 
 @never_cache
@@ -92,18 +91,29 @@ def userdashboard(request):
 
     if request.method == "POST":
         fund_type = request.POST["company_type"] 
+        if fund_type == "other":
+            fund_type = request.POST["manual_company_type"]
         raw_data = get_fund_data_by_api(fund_type)
         if raw_data:
-            fund = raw_data
-            processed = {
-                'fund_name': fund['basic_info']['fund_name'],
-                'category': fund['basic_info']['category'],
-                'risk': fund['basic_info']['risk_level'],
-                'return_rate': fund['returns']['cagr'].get('5y', 'N/A'),  # or any time period
-                'investment_type': fund['basic_info']['scheme_type'],
-                'duration': "5 years",  # You can adjust this logic
-            }
-            recommended_funds.append(processed)
+            try:
+                fund = raw_data
+                processed = {
+                    'fund_name': fund['basic_info']['fund_name'],
+                    'category': fund['basic_info']['category'],
+                    'risk': fund['basic_info']['risk_level'],
+                    'return_rate': fund['returns']['cagr'].get('5y', 'N/A'),  # or any time period
+                    'investment_type': fund['basic_info']['scheme_type'],
+                    'duration': "5 years",  # You can adjust this logic
+                }
+                recommended_funds.append(processed)
+            except KeyError as e:
+                messages.error(request, f"Data is not present.")
+                # Optionally log the error for debugging
+                # app.logger.error(f"KeyError processing fund data: {str(e)} - Raw data: {raw_data}")
+                
+            except Exception as e:
+                messages.error(request, "An error occurred while processing fund data.")
+                # app.logger.error(f"Unexpected error processing fund: {str(e)} - Raw data: {raw_data}")
             
     context = {
         "remaining_time": remaining_time,

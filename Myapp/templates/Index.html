@@ -66,16 +66,18 @@
             <!-- Company Type (Full Width) -->
             <div class="form-group">
               <label for="company_type">Preferred Company Type:</label>
-              <select id="company_type" name="company_type">
-                  <option value="" selected>Please select a company type</option>
+              <select id="company_type" name="company_type" onchange="handleCompanyTypeChange(this)">
+                <option value="" selected>Please select a company type</option>
                   <option value="bank">Bank</option>
                   <option value="Healthcare">Healthcare</option>
                   <option value="LIC">LIC Company</option>
                   <option value="government">Government Schemes</option>
                   <option value="private">Private Financial Institution</option>
                   <option value="international">International Fund</option>
-                  <option value="other">Other</option>
+                  <option value="other">Other (Enter Manually)</option>
               </select>
+
+              <input type="text" id="manual_company_type" name="manual_company_type" style="display:none;" placeholder="Enter company type" />
             </div>          
       
               <!-- Risk Level & Investment Duration (Same Line) -->
@@ -177,10 +179,10 @@
           <p>No results yet. To get a personalized recommendation, click the <strong>"Get Recommendation"</strong> button above.</p>
         {% endif %}
     </div>
-        <!-- Footer -->
+        <!-- Footer
         <footer class='footer'>
             <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
-          </footer>
+          </footer> -->
           
     <script>
           //Show recommendation form only by clicking button
@@ -199,6 +201,17 @@
                   history.pushState(null, "", newUrl);
               }
           }
+
+          function handleCompanyTypeChange() {
+              var select = document.getElementById("company_type");
+              var input = document.getElementById("manual_company_type");
+              if (select.value === "other") {
+                  input.style.display = "block"; // Show input field when 'Other' is selected
+              } else {
+                  input.style.display = "none"; // Hide input field for other selections
+              }
+          }
+
 
               // Toggle function for profile button
               function toggleProfileMenu() {
@@ -226,14 +239,14 @@
               }
           }          
     
-    function toggleCustomProfit(select) {
-      const customProfitInput = document.getElementById('custom_profit');
-      if (select.value === 'other') {
-          customProfitInput.style.display = 'block';
-      } else {
-          customProfitInput.style.display = 'none';
-      }
-  }
+          function toggleCustomProfit(select) {
+            const customProfitInput = document.getElementById('custom_profit');
+            if (select.value === 'other') {
+                customProfitInput.style.display = 'block';
+            } else {
+                customProfitInput.style.display = 'none';
+            }
+        }
 
   let remainingTime = {{ remaining_time|default:0 }}; // Use Django variable in JS
     
