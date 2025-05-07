@@ -18,11 +18,11 @@ import os
 import random
 from datetime import datetime, timedelta
 from .models import Task
+from decouple import config
 
 import requests
-from dotenv import load_dotenv
-
-load_dotenv() 
+#from dotenv import load_dotenv
+#load_dotenv() 
 
 def task_list(request):
     tasks = Task.objects.all()
@@ -45,7 +45,7 @@ def default(request):
 def landing_page(request):
     return render(request,'Default.html')
 
-API_KEY = os.getenv("API_ACCESS_KEY")
+API_KEY = config("API_ACCESS_KEY")
 def get_fund_data_by_api(fund_type):
         
     url = "https://stock.indianapi.in/mutual_funds_details"
