@@ -69,8 +69,8 @@ def send_daily_notifications():
         time.sleep(60)  # Check every 10 seconds"""
 
 def notification_scheduler():
-    target_hour = 13    # Set to 9 for 9:00 AM
-    target_minute = 22  # Set to 0 for 9:00 AM
+    target_hour = 9    # Set to 9 for 9:00 AM
+    target_minute = 0  # Set to 0 for 9:00 AM
 
     while True:
         now = timezone.localtime(timezone.now())
