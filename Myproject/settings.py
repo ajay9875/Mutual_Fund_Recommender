@@ -14,7 +14,7 @@ SECRET_KEY = config("SECRET_KEY")
 #print(SECRET_KEY)
 
 # Ensure DEBUG is True for development not for deployment
-DEBUG = False
+DEBUG = True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #ALLOWED_HOSTS = []

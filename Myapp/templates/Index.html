@@ -191,14 +191,27 @@
               if (rec_form.style.display === "block") {
                   rec_form.style.display = "none";
                   // Remove query param if needed
-                  history.pushState(null, "", window.location.pathname);
+                  //history.pushState(null, "", window.location.pathname);
               } else {
                   rec_form.style.display = "block";
                   // Change URL without reloading
-                  const newUrl = window.location.pathname + "?menu=recommendation_form";
-                  history.pushState(null, "", newUrl);
+                  //const newUrl = window.location.pathname + "?menu=recommendation_form";
+                  //history.pushState(null, "", newUrl);
               }
           }
+
+              // Toggle function for profile button
+              function toggleProfileMenu() {
+                const dropdown = document.querySelector('.profile-dropdown');
+                
+                if (dropdown.style.display === 'block') {
+                    dropdown.style.display = 'none';  // Hide if visible
+                    
+                } else {
+                    dropdown.style.display = 'block'; // Show if hidden
+                }
+              }
+
 
           // Show custom input if user want to give Manually
           function toggleCustomProfit(selectElement) {
@@ -213,18 +226,6 @@
               }
           }          
     
-    // Toggle function for profile button
-    function toggleProfileMenu() {
-      const dropdown = document.querySelector('.profile-dropdown');
-      
-      if (dropdown.style.display === 'block') {
-          dropdown.style.display = 'none';  // Hide if visible
-          
-      } else {
-          dropdown.style.display = 'block'; // Show if hidden
-      }
-    }
-
     function toggleCustomProfit(select) {
       const customProfitInput = document.getElementById('custom_profit');
       if (select.value === 'other') {

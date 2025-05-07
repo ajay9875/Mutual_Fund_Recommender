@@ -212,10 +212,16 @@ html {
 }
 
 /* All recommendation style */
+/*table {
+    width: fit-content;
+    border-collapse: collapse;
+}*/
 table {
-    width: 100%;
+    margin: 0 auto; /* Center the table */
+    width: auto;    /* Ensure it wraps content */
     border-collapse: collapse;
 }
+
 th, td {
     border: 1px solid black;
     padding: 8px;
@@ -225,10 +231,15 @@ th {
     background-color: #007bff;
     color: white;
 }
-.greet{
+/*.greet{
     justify-self: center;
+}*/
+.greet {
+    text-align: center;
+    margin-top: 20px;
 }
-.recommendation {
+
+/*.recommendation {
     width: fit-content;
     padding: 20px;
     margin-top: 20px;
@@ -236,6 +247,17 @@ th {
     text-align: center;
     border: groove 2px black;
 }
+*/
+.recommendation {
+    max-width: 90%;
+    margin: 20px auto; /* Center horizontally */
+    padding: 20px;
+    text-align: center;
+    border: groove 2px black;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
+}
+
 .recommendation p {
     font-size: 16px;
     color: red;
