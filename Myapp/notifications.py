@@ -55,8 +55,8 @@ def send_daily_notifications():
     return sent_count
 
 def notification_scheduler():
-    target_hour = 21   # Set the target hour for notifications
-    target_minute = 30  # Set the target minute for notifications
+    target_hour = 9   # Set the target hour for notifications
+    target_minute = 0  # Set the target minute for notifications
 
     while True:
         # Get the current time in the timezone of the app
