@@ -160,7 +160,7 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Default email sender
 
-# Set session timeout to 10 minutes
+# Set session timeout to 60 minutes
 SESSION_COOKIE_AGE = 3600
 
 # Ensure sessions do not expire when the browser is closed
@@ -186,15 +186,4 @@ WHITENOISE_MAX_AGE = 31536000  # 1 year cache
 # Optional: Set the error pages explicitly
 ERROR_404_TEMPLATE = '404.html'
 
-#To send daily notifications to all users
-"""INSTALLED_APPS += ['django_crontab']
-
-CRONJOBS = [
-    # minute hour day month weekday, then call the management command
-    ('11 12 * * *',  # Run at 9:00 AM every day
-     'django.core.management.call_command',
-     ['send_daily_notifications'],
-     {'pythonpath': BASE_DIR, 'verbosity': 1}
-    ),
-]"""
 
