@@ -28,4 +28,6 @@ urlpatterns = [
     path("delete_account/", views.delete_account, name="delete_account"),
 
     path('tasks/', views.task_list, name='task_list'),
+    #To send daily notification to the every user
+    path("run-daily/", views.run_daily, name="run_daily"),
 ]

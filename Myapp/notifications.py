@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -55,8 +55,8 @@ def send_daily_notifications():
     return sent_count
 
 def notification_scheduler():
-    target_hour = 9   # Set the target hour for notifications
-    target_minute = 0  # Set the target minute for notifications
+    target_hour = 11   # Set the target hour for notifications
+    target_minute = 56  # Set the target minute for notifications
 
     while True:
         # Get the current time in the timezone of the app
@@ -88,6 +88,7 @@ def notification_scheduler():
 
         # Send the notification
         send_daily_notifications()
+        print("Notifications sent successfully!")
 
 """def notification_scheduler():
     sent_today = False

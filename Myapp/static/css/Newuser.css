@@ -1,59 +1,56 @@
-/* Header style */
-h3 {
-    color: deeppink;
-    text-align: center;
+h3{
+  color:deeppink;
 }
 
-/* Signup form style */
-.signup-page {
-    width: fit-content;
-    padding: 0px 50px 10px 50px;
-    border-radius: 10px;
-    border: solid 2px rgb(199, 197, 197);
-    background-color: white;
-    margin: 0 auto;
+/*signup form style*/
+.signup-page{
+  height: fit-content;
+  justify-self: center;
+  width: 320px;
+  padding: 0px 25px 0px 25px;
+  border-radius: 10px;
+  border:solid 2px rgb(199, 197, 197);
+  background-color: rgb(247, 250, 247);
 }
-
-/* Sign up icon */
-img {
-    width: 50px;
-    height: 50px;
-    border-radius: 20%;
+/*Sign up icon*/
+img{
+  width:75px;
+  height:75px;
 }
-
-.signup-icon {
-    text-align: center;
-    margin-bottom: 20px;
+.signup-icon{
+  text-align: center;
 }
-
 /* Style for the labels and inputs */
-label, input {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+label {
+    display: block; /* Ensure labels take up a full line */
+    margin-bottom: 5px; /* Space between label and input */
+    font-weight: bold; /* Optional: make labels bold */
 }
 
-/* Optional styling for error messages */
-.error label {
-    color: red;
+input {
+    display: block; /* Ensure inputs take up a full line */
+    width: 300px; /* Ensure inputs take the full width of the container */
+    padding: 5px; /* Add padding to input */
+    margin-bottom: 5px; /* Space between inputs */
+    border:groove 2px black;
+    border-radius: 2px;
 }
 
-/* Button styling */
+/* Optional: Button styling */
 .button {
-    display: block;
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+    display: block; /* Button on its own line */
+    margin-top: 20px; /* Space above the button */
+    padding: 10px; /* Button padding */
+    background-color: #007bff; /* Button color */
+    color: white; /* Button text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Button rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
     width: 100%;
 }
 
 .button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Darker button color on hover */
 }
 
 /* Mobile responsiveness */

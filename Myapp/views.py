@@ -24,6 +24,13 @@ import requests
 #from dotenv import load_dotenv
 #load_dotenv() 
 
+from django.http import HttpResponse
+from .notifications import send_daily_notifications
+
+def run_daily(request):
+    send_daily_notifications()
+    return HttpResponse("Daily notifications sent successfully!.")
+
 def task_list(request):
     tasks = Task.objects.all()
     return render(request, 'task_list.html', {'tasks': tasks})
@@ -633,11 +640,8 @@ def newuser(request):
         messages.success(request, "User registered successfully! You can log in now.")
         return redirect('login')  # Redirect to login page after success
     
-    context = {
-        'title': 'New User Registration',
-        'header': 'New User Registration',
-    }
-    return render(request, 'Newuser.html', context)
+
+    return render(request, 'Newuser.html')
 
 #---- All route to show about, services and contact page ---#
 
@@ -669,7 +673,7 @@ def contact(request):
         contact = Contact(name=name, email=email, phone=phone, message=message, date=datetime.now())
         contact.save()
         
-        messages.success(request, f"Dear {name}, Your message has been sent successfully! we will get back to you soon.") 
+        messages.success(request, f"Dear {name}, thank you for reaching out to us! We have received your message and will get back to you shortly.") 
         return redirect('contact')
     return render(request,'Contact.html', context)
 
