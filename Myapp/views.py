@@ -154,8 +154,6 @@ import requests
 from django.shortcuts import render
 from django.http import JsonResponse
 from decouple import config
-from thefuzz import process
-
 # List of all available exact fund names
 fund_list = [
     "Axis Nifty Midcap 50 Index Fund Regular Growth",
