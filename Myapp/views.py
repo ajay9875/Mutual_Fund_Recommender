@@ -52,22 +52,257 @@ def default(request):
 def landing_page(request):
     return render(request,'Default.html')
 
+"""
+from django.http import JsonResponse
+
+# Fetching NAV data from AMFI API
+import requests
+
+from django.http import JsonResponse
+from django.shortcuts import render
+import requests
+from django.views.decorators.csrf import csrf_exempt
+
+# Function to fetch NAV data from AMFI
+from django.http import JsonResponse
+import requests
+
+# Function to fetch NAV data from AMFI
+def fetch_amfi_nav_data():
+    url = "https://www.amfiindia.com/spages/NAVAll.txt"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        return []
+
+    lines = response.text.splitlines()
+    funds = []
+
+    for line in lines:
+        if line.strip() and line[0].isdigit():
+            parts = line.split(";")
+            if len(parts) == 6:
+                funds.append({
+                    "scheme_code": parts[0],
+                    "isin": parts[1],
+                    "scheme_name": parts[3],
+                    "nav": parts[4],
+                    "date": parts[5]
+                })
+    return funds
+
+# View to get NAV data for a specific scheme
+def nav_data_api(request):
+    scheme = request.GET.get('scheme')
+    if not scheme:
+        return JsonResponse({"error": "Scheme parameter is missing"}, status=400)
+    
+    # Fetch data from AMFI
+    data = fetch_amfi_nav_data()
+
+    # Filter the data based on the provided scheme name (case-insensitive)
+    filtered = [d for d in data if scheme.lower() in d["scheme_name"].lower()]
+
+    if not filtered:
+        return JsonResponse({"error": f"No NAV data found for scheme: {scheme}"}, status=404)
+
+    # Group by date and get the most recent NAV for each date
+    date_to_nav = {}
+    for entry in filtered:
+        if entry["date"] not in date_to_nav:
+            date_to_nav[entry["date"]] = []
+        date_to_nav[entry["date"]].append(float(entry["nav"]))
+
+    # Get the most recent 30 entries
+    dates = list(date_to_nav.keys())[-30:]
+    navs = [max(nav_list) for nav_list in date_to_nav.values()][-30:]
+
+    return JsonResponse({
+        "dates": dates,
+        "navs": navs
+    })
+
+# Example CSRF-exempt view for fetching NAV data history
+@csrf_exempt
+def nav_data_view(request):
+    scheme = request.GET.get('scheme')
+    if not scheme:
+        return JsonResponse({'error': 'Scheme parameter is missing'}, status=400)
+
+    # Example logic to fetch NAV data (replace with actual logic)
+    nav_history = fetch_nav_history_for_scheme(scheme)  # This should return a list of dicts with 'date' and 'nav'
+
+    return JsonResponse(nav_history, safe=False)
+
+def fetch_nav_history_for_scheme(scheme):
+    # Fetch the NAV data from AMFI
+    data = fetch_amfi_nav_data()
+
+    # Filter the data based on the provided scheme name (case-insensitive)
+    filtered = [d for d in data if scheme.lower() in d["scheme_name"].lower()]
+
+    # If no matching data is found, return an empty list
+    if not filtered:
+        return []
+
+    # Return the filtered data with 'date' and 'nav' as a list of dictionaries
+    nav_history = [{"date": entry["date"], "nav": float(entry["nav"])} for entry in filtered]
+    
+    return nav_history"""
+
+import requests
+from django.shortcuts import render
+from django.http import JsonResponse
+from decouple import config
+from thefuzz import process
+
+# List of all available exact fund names
+fund_list = [
+    "Axis Nifty Midcap 50 Index Fund Regular Growth",
+    "Aditya Birla Sun Life Nifty Midcap 150 Index Fund Regular Growth",
+    "SBI Small Cap Fund Regular Growth",
+    "ICICI Prudential Bluechip Fund Regular Growth",
+    # Add more as needed
+]
+
 API_KEY = config("API_ACCESS_KEY")
-def get_fund_data_by_api(fund_type):
-        
+
+"""# Fuzzy matching using fuzzywuzzy/thefuzz
+def find_best_match(user_input):
+
+    # Get the best match from the list
+    best_match, score = process.extractOne(user_input, fund_list)
+
+    # Threshold to ensure it's a reasonable match (optional)
+    if score >= 80:
+        print("Best match found:", best_match)
+        return best_match
+    else:
+        print("No reliable match found.")
+        return None"""
+
+def get_single_fund_data_by_api(fund_name):
     url = "https://stock.indianapi.in/mutual_funds_details"
-
-    querystring = {"stock_name":fund_type}
-
+    querystring = {"stock_name": fund_name}
     headers = {"X-Api-Key": API_KEY}
-
+    
     try:
         response = requests.get(url, headers=headers, params=querystring)
-        response.raise_for_status()  # Raise an error for bad status codes
-        return response.json()       # Return the data instead of printing
+        response.raise_for_status()  # Raises HTTPError for bad responses
+        return response.json()
+
+    except requests.exceptions.RequestException:
+        return None
     
-    except requests.exceptions.RequestException as e:
-        return None  # or return {} or [] depending on your use case
+# To show specific fund details using fund name
+@never_cache
+def fund_details(request):
+    if request.user.is_anonymous:
+        messages.info(request, "Session expired! Please login again.")
+        return redirect('landing_page')
+
+    context = {}  # Always define context to avoid UnboundLocalError
+
+    if request.method == "POST":
+        fund_name = request.POST.get('fund_name')  # Use .get() for safety
+       
+        if fund_name:
+            #best_matched_name = find_best_match(fund_name)
+            #print(f"Fund name received: {best_matched_name}")
+            fund_data = get_single_fund_data_by_api(fund_name)
+
+            if fund_data and fund_data.get('basic_info', {}).get('fund_name'):
+                processed_fund = {
+                    'fund_name': fund_data.get('basic_info', {}).get('fund_name', None),
+                    'category': fund_data.get('basic_info', {}).get('category', None),
+                    'risk_level': fund_data.get('basic_info', {}).get('risk_level', None),
+                    'plan_type': fund_data.get('basic_info', {}).get('plan_type', None),
+                    'scheme_type': fund_data.get('basic_info', {}).get('scheme_type', None),
+                    'inception_date': fund_data.get('basic_info', {}).get('inception_date', None),
+                    'benchmark': fund_data.get('basic_info', {}).get('benchmark', 'NA'),
+                    'benchmark_name': fund_data.get('basic_info', {}).get('benchmark_name', None),
+                    'fund_size': fund_data.get('basic_info', {}).get('fund_size', None),
+                    'fund_manager': fund_data.get('basic_info', {}).get('fund_manager', None),
+                    'registrar_agent': fund_data.get('basic_info', {}).get('registrar_agent', None),
+
+                    'current_nav': fund_data.get('nav_info', {}).get('current_nav', None),
+                    'nav_date': fund_data.get('nav_info', {}).get('nav_date', None),
+
+                    'absolute_returns': fund_data.get('returns', {}).get('absolute', {}),
+                    'cagr': fund_data.get('returns', {}).get('cagr', {}),
+                    'category_returns': fund_data.get('returns', {}).get('category_returns', {}),
+                    'index_returns': fund_data.get('returns', {}).get('index_returns', {}),
+
+                    'risk_metrics': fund_data.get('returns', {}).get('risk_metrics', {}),
+                    'expense_ratio': fund_data.get('expense_ratio', {}).get('current', None),
+                    'expense_history': fund_data.get('expense_ratio', {}).get('history', []),
+
+                    'debug': True,
+                    'all_data': fund_data,
+                }
+
+                context = {
+                    'fund_data': fund_data,
+                    'fund_name': processed_fund['fund_name'],
+                    'category': processed_fund['category'],
+                    'risk_level': processed_fund['risk_level'],
+                    'plan_type': processed_fund['plan_type'],
+                    'scheme_type': processed_fund['scheme_type'],
+                    'inception_date': processed_fund['inception_date'],
+                    'benchmark': processed_fund['benchmark'],
+                    'benchmark_name': processed_fund['benchmark_name'],
+                    'fund_size': processed_fund['fund_size'],
+                    'fund_manager': processed_fund['fund_manager'],
+                    'registrar_agent': processed_fund['registrar_agent'],
+
+                    'current_nav': processed_fund['current_nav'],
+                    'nav_date': processed_fund['nav_date'],
+
+                    'absolute_returns': processed_fund['absolute_returns'],
+                    'cagr': processed_fund['cagr'],
+                    'category_returns': processed_fund['category_returns'],
+                    'index_returns': processed_fund['index_returns'],
+
+                    'risk_metrics': processed_fund['risk_metrics'],
+                    'expense_ratio': processed_fund['expense_ratio'],
+                    'expense_history': processed_fund['expense_history'],
+
+                    'debug': processed_fund['debug'],
+                    'all_data': processed_fund['all_data'],
+                }
+                messages.success(request, "Fund details fetched successfully!")
+                return render(request, 'Fund_details.html', context)
+
+            else:
+                messages.warning(request, "Fund information is currently unavailable. Please try again later.")
+                return redirect('fund_details')
+        else:
+            messages.info(request, "Please input fund name first!")
+            return redirect('fund_details')
+
+    return render(request, 'Fund_details.html')
+
+#It's for all fund data using fund type
+def get_all_funds_data_by_indian_api(fund_type):
+    # URL for fetching mutual funds data
+    url = "https://stock.indianapi.in/mutual_funds"
+    
+    # Headers to pass the API key
+    headers = {"X-Api-Key": API_KEY}
+
+    # Add the fund_type as a query parameter to filter data
+    params = {
+        "fund_type": fund_type  # Assuming the API supports filtering by fund type
+    }
+
+    # Send GET request with the headers and params
+    response = requests.get(url, headers=headers, params=params)
+
+    # Return the JSON response if the request is successful
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return []
 
 @never_cache
 def userdashboard(request):
@@ -92,18 +327,74 @@ def userdashboard(request):
         profilepic = None  # No profile picture found
 
     if not full_name:
-            full_name = username
+        full_name = username
 
     recommended_funds = []
 
     if request.method == "POST":
-        fund_type = request.POST["company_type"] 
-        if fund_type == "other":
+        fund_type = request.POST["company_type"]
+ 
+        if fund_type == "manually":
             fund_type = request.POST["manual_company_type"]
-        raw_data = get_fund_data_by_api(fund_type)
-        if raw_data:
+        
+        if fund_type:
+            raw_fund_data = get_all_funds_data_by_indian_api(fund_type)
+
+            # Flatten and process nested structure
+            for main_category, subtypes in raw_fund_data.items():
+                for subtype, funds in subtypes.items():
+                    if main_category == fund_type or subtype == fund_type:
+                        for fund in funds:
+                            processed = {
+                                'fund_name': fund.get('fund_name', None),
+                                'investment_type': main_category,
+                                'category': subtype,
+                                'latest_nav': fund.get('latest_nav', None),
+                                'star_rating': fund.get('star_rating', None),
+                                'return_rate': (
+                                    fund.get('5_year_return')
+                                    or fund.get('3_year_return')
+                                    or fund.get('1_year_return')
+                                    or 'N/A'
+                                ),
+                                'duration': (
+                                    '5 years' if fund.get('5_year_return') else
+                                    '3 years' if fund.get('3_year_return') else
+                                    '1 year'
+                                )
+                            }
+                            recommended_funds.append(processed)
+        else:
+            raw_fund_data = get_all_funds_data_by_indian_api(fund_type)
+            # Flatten and process nested structure
+            for main_category, subtypes in raw_fund_data.items():
+                for subtype, funds in subtypes.items():
+                    #if main_category == fund_type or subtype == fund_type:
+                    for fund in funds:
+                        processed = {
+                            'fund_name': fund.get('fund_name', None),
+                            'investment_type': main_category,
+                            'category': subtype,
+                            'latest_nav': fund.get('latest_nav', None),
+                            'star_rating': fund.get('star_rating', None),
+                            'return_rate': (
+                                fund.get('5_year_return')
+                                or fund.get('3_year_return')
+                                or fund.get('1_year_return')
+                                or 'N/A'
+                            ),
+                            'duration': (
+                                '5 years' if fund.get('5_year_return') else
+                                '3 years' if fund.get('3_year_return') else
+                                '1 year'
+                            )
+                        }
+                        recommended_funds.append(processed)
+
+        """
+        fund = get_fund_data_by_api(fund_type)
+        if fund:
             try:
-                fund = raw_data
                 processed = {
                     'fund_name': fund['basic_info']['fund_name'],
                     'category': fund['basic_info']['category'],
@@ -120,8 +411,8 @@ def userdashboard(request):
                 
             except Exception as e:
                 messages.error(request, "An error occurred while processing fund data.")
-                # app.logger.error(f"Unexpected error processing fund: {str(e)} - Raw data: {raw_data}")
-            
+                # app.logger.error(f"Unexpected error processing fund: {str(e)} - Raw data: {raw_data}")"""
+        
     context = {
         "remaining_time": remaining_time,
         "full_name": full_name,
@@ -130,6 +421,38 @@ def userdashboard(request):
         "MEDIA_URL": settings.MEDIA_URL,  # Pass MEDIA_URL explicitly
     }
     return render(request, 'Index.html', context)
+
+# To calculate sip
+def sip_calculator(request):
+    if request.method == 'POST':
+        try:
+            monthly_investment = float(request.POST.get('monthly_investment'))
+            investment_duration = int(request.POST.get('investment_duration'))
+            annual_return = float(request.POST.get('annual_return'))
+
+            r = annual_return / 12 / 100  # monthly interest rate
+            n = investment_duration * 12  # total months
+
+            fv = monthly_investment * (((1 + r) ** n - 1) / r) * (1 + r)
+            fv = round(fv)
+            invested = round(monthly_investment * n)
+            gain = round(fv - invested)
+
+            context = {
+                'monthly_investment': monthly_investment,
+                'investment_duration': investment_duration,
+                'annual_return': annual_return,
+                'future_value': fv,
+                'invested_amount': invested,
+                'gain': gain,
+                'calculated': True,
+            }
+        except Exception as e:
+            context = {'error': "Invalid input. Please check your values."}
+    else:
+        context = {}
+
+    return render(request, 'Sip_calculator.html', context)
 
 # Handle login request by user
 def loginUser(request):

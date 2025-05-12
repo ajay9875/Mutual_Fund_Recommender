@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/Sip_calculator.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>SIP Calculator</title>
+</head>
+<body>
+    <div class="left">
+      <div class="form-container">
+        <h2 style="text-align: center; color: #333;">SIP Calculator</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label>Monthly Investment (₹)</label>
+            <input type="number" name="monthly_investment" placeholder="eg. 1000, 2000 or 3000..." required>
+
+            <label>Expected Annual Return (%)</label>
+            <input type="number" name="annual_return" step="0.1" placeholder="eg. 8 or 8.0..." required>
+
+            <label>Investment Duration (Years)</label>
+            <input type="number" name="investment_duration" placeholder="eg. 8 or 10...." required>
+
+            <button type="submit">Calculate</button>
+        </form>
+          <div class="home-btn">
+            <a href="/">← Back to Home</a>
+           </div>
+        </div>
+    </div>
+      <div class="right">
+        {% if calculated %}
+        <div class="result">
+            <p class="result-title">The total value of your investment after {{ investment_duration }} Years will be</p>
+            <p class="result-total">₹{{ future_value }}</p>
+            
+            <div class="result-details">
+                <div class="result-detail">
+                    <h3>Invested Amount</h3>
+                    <p>₹{{ invested_amount }}</p>
+                </div>
+                <div class="result-detail">
+                    <h3>Est. Returns</h3>
+                    <p>₹{{ gain }}</p>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="sipChart"></canvas>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const ctx = document.getElementById('sipChart').getContext('2d');
+                const invested = parseFloat("{{ invested_amount }}".replace(/,/g, ''));
+                const returns = parseFloat("{{ gain }}".replace(/,/g, ''));
+                
+                const sipChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Invested Amount', 'Estimated Returns'],
+                        datasets: [{
+                            data: [invested, returns],
+                            backgroundColor: [
+                                'rgb(247, 106, 6)',
+                                '#4bc0c0'
+                            ],
+                            borderColor: [
+                                '#ffffff',
+                                '#ffffff'
+                            ],
+                            borderWidth: 2,
+                            cutout: '70%'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 12,
+                                    padding: 20,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ₹${value.toLocaleString()} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+        {% elif error %}
+        <div class="error-message">{{ error }}</div>
+        {% else %}
+            <p>Your result will appear here once the calculation is complete.</p>
+        {% endif %}
+      </div>
+  </div>
+</body>
+</html>

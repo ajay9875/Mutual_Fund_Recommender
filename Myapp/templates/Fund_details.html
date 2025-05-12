@@ -1,0 +1,192 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ fund_name|default:"Mutual Fund" }} - Fund Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/Fund_details.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+</head>
+<body>
+    <!-- Flashed message will be appear here -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                <div class='msg'> {{ message }} </div>
+                </div> 
+            </div>
+        {% endfor %}
+    {% endif %}
+
+<div class="search-container">
+    <form action="{% url 'fund_details' %}" method="POST">
+      {% csrf_token %}
+
+      <input type="text" id="searchInput" name="fund_name" placeholder="Search for a mutual fund...">
+      <button type="submit">Search</button>
+    </form>
+</div>
+
+   <div class="container">
+    {% if fund_name %}
+    <h1>{{ fund_name }}</h1>
+
+    <!-- Basic Information Card -->
+    <div class="card {% if is_stale %}stale-data{% endif %}">
+        <div class="card-header">
+            <h2>Basic Information</h2>
+            <span class="badge risk-{{ risk_level|lower }}">{{ risk_level|default:"Risk data unavailable" }}</span>
+        </div>
+        <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+            <div>
+                <strong>Category:</strong> {{ category|default:"NA" }}
+            </div>
+            <div>
+                <strong>Plan Type:</strong> {{ plan_type|default:"NA" }}
+            </div>
+            <div>
+                <strong>Scheme Type:</strong> {{ scheme_type|default:"NA" }}
+            </div>
+            <div>
+                <strong>Inception Date:</strong> {{ inception_date|default:"NA" }}
+            </div>
+            <div>
+                <strong>Benchmark:</strong> {{ benchmark|default:"NA" }} ({{ benchmark_name|default:"NA" }})
+            </div>
+            <div>
+                <strong>Fund Size:</strong> ₹{{ fund_size|floatformat:2|default:"NA" }} Crores
+            </div>
+            <div>
+                <strong>Fund Manager:</strong> {{ fund_manager|default:"NA" }}
+            </div>
+            <div>
+                <strong>Registrar Agent:</strong> {{ registrar_agent|default:"NA" }}
+            </div>
+        </div>
+    </div>
+
+    <!-- NAV Card -->
+    <div class="card {% if is_stale %}stale-data{% endif %}">
+        <h2>Current NAV</h2>
+        <div class="nav-value">
+            ₹{{ current_nav|floatformat:4|default:"NA" }}
+            <span class="as-of-date">as of {{ nav_date|default:"NA" }}</span>
+        </div>
+        {% if is_stale %}
+        <p style="color: var(--warning-color); margin-top: 10px;">
+            <i class="fas fa-exclamation-triangle"></i> NAV data is more than 24 hours old
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Returns Card -->
+    <div class="card">
+        <h2>Returns</h2>
+        <table>
+            <tr>
+                <th>Period</th>
+                <th>Absolute Return</th>
+            </tr>
+            {% for period, value in absolute_returns.items %}
+            <tr>
+                <td>{{ period|upper }}</td>
+                <td class="{% if value >= 0 %}return-positive{% else %}return-negative{% endif %}">
+                    {% if value %}
+                      {{ value|floatformat:2}}%
+                    {% else %}
+                      <p id="NA">NA</p>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center;">Return data not available</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <table>
+            <tr>
+                <th>Annualized Return</th>
+            </tr>
+            {% for period, value in cagr.items %}
+            <tr>
+                <td>{{ period|upper }}</td>
+                <td class="{% if value >= 0 %}return-positive{% else %}return-negative{% endif %}">
+                    {% if value %}
+                      {{ value|floatformat:2}}%
+                    {% else %}
+                      <p id="NA">NA</p>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+                <p id="NA">NA</p>
+            {% endfor %}
+        </table>
+    </div>
+
+
+    <!-- Risk Metrics Card -->
+    <div class="card">
+        <h2>Risk Metrics</h2>
+        <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+            <div>
+                <strong>Alpha:</strong> {{ risk_metrics.alpha|floatformat:2|default:"NA" }}
+            </div>
+            <div>
+                <strong>Beta:</strong> {{ risk_metrics.beta|floatformat:2|default:"NA" }}
+            </div>
+            <div>
+                <strong>Sharpe Ratio:</strong> {{ risk_metrics.sharpe_ratio|floatformat:2|default:"NA" }}
+            </div>
+            <div>
+                <strong>Sortino Ratio:</strong> {{ risk_metrics.sortino_ratio|floatformat:2|default:"NA" }}
+            </div>
+            <div>
+                <strong>Standard Deviation:</strong> {{ risk_metrics.standard_deviation|floatformat:2|default:"NA" }}%
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense Ratio Card -->
+    <div class="card">
+        <h2>Expense Ratio</h2>
+        <div>Current Expense Ratio: {{ expense_ratio|default:"-" }}%</div>
+        <div>Expense History:</div>
+        <ul>
+            {% for record in expense_history %}
+            <li>{{ record.date }} - Ratio: {{ record.ratio }}%</li>
+            {% empty %}
+            <li>No expense history available</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Debug View (Visible only in development) -->
+    {% if debug %}
+    <div class="card hidden">
+        <h2>Debug Information</h2>
+        <pre>{{ all_data|pprint }}</pre>
+    </div>
+    {% endif %}
+{% else %}
+   <p id="no-result">No results available at the moment. To view fund details, please enter the fund name and click the <strong>"Search"</strong> button above.</p>
+{% endif %}
+</div>
+
+<script>
+    function handleSearch() {
+        const query = document.getElementById('searchInput').value;
+        if (query.trim()) {
+            // You can change this to redirect or fetch API
+            alert("Searching for: " + query);
+            // Example: window.location.href = `/search?query=${encodeURIComponent(query)}`;
+        }
+    }
+</script>
+</body>
+</html>

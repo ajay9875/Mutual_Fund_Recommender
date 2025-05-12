@@ -66,7 +66,14 @@ body {
 html {
     scroll-behavior: smooth;
 }
-
+.recommendation .view-details-btn{
+    background:none;
+    color:#007bff;
+    border: none;
+}
+.recommendation .view-details-btn:hover{
+    cursor: pointer;
+}
 /* Profile Button Style */
 .profile-btn img{
     height: 50px;
@@ -224,11 +231,11 @@ th {
 }
 
 .recommendation {
-    max-width: 90%;
+    max-width: 98%;
     margin: 10px auto; /* Center horizontally */
     padding: 20px;
     text-align: center;
-    border: groove 2px black;
+    border: groove 2px blue;
     background-color: white;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
 }
@@ -238,7 +245,7 @@ th {
 
 .recommendation p {
     font-size: 16px;
-    color: red;
+    color: black;
 }
 
 /* --- Responsive Design --- */
