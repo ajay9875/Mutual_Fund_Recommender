@@ -5,11 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/Sip_calculator.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
     <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
     <title>SIP Calculator</title>
 </head>
 <body>
+    <!-- Reusable Header -->
+    <header class="header">
+        SIP Calculator
+    </header>
+
+    <div class="home">
+        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+      </div>
+        
     <div class="left">
       <div class="form-container">
         <h2 style="text-align: center; color: #333;">SIP Calculator</h2>
@@ -33,6 +44,12 @@
     </div>
       <div class="right">
         {% if calculated %}
+        {% for message in messages %}
+            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                <div class='msg'> {{ message }} </div>
+              </div> 
+            </div>
+            {% endfor %}
         <div class="result">
             <p class="result-title">The total value of your investment after {{ investment_duration }} Years will be</p>
             <p class="result-total">₹{{ future_value }}</p>
@@ -108,11 +125,21 @@
             });
         </script>
         {% elif error %}
-        <div class="error-message">{{ error }}</div>
-        {% else %}
+        <!-- Flashed message will be appear here -->
+        {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                   <div class='msg'> {{ message }} </div>
+                  </div> 
+                </div>
+            {% endfor %}
+       {% else %}
             <p>Your result will appear here once the calculation is complete.</p>
         {% endif %}
       </div>
   </div>
+          <!-- Footer -->
+            <footer class="footer">
+                <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+            </footer>
 </body>
 </html>

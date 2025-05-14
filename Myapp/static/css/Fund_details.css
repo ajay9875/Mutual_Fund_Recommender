@@ -10,7 +10,7 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #f5f7fa;
-}
+    margin: 60px 0px 50px 0px ;}
 .container {
     width: 97%;
     max-width: 1200px;
@@ -143,4 +143,43 @@ tr:hover {
 }
 .NA{
     color: red;
+}
+
+.header {
+    position:fixed;
+    width:100%;
+    top:0;
+    left:0;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    place-items: center;
+}
+/* Home button Style */
+.home {
+    height: 30px;
+    width: 30px;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+}
+.home img {
+    height: 25px;
+    width: 25px;
+    border-radius: 100%;
+}
+/* Footer Styles */
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: white;
+    color: rgb(160, 160, 160); /* Black text */
+    text-align: center; /* Centered text */
+    font-size: 12px; /* Slightly larger for readability */
+    padding: 0px 0px 2px 0px; /* Reduced padding for a strip-like appearance */
+    font-weight: 500;
+    height: 25px;
 }

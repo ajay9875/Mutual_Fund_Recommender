@@ -12,6 +12,15 @@
     <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
 </head>
 <body>
+
+    <!-- Reusable Header -->
+    <header class="header">
+        Fund Details
+    </header>
+
+    <div class="home">
+        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+      </div>
     <!-- Flashed message will be appear here -->
     {% if messages %}
         {% for message in messages %}
@@ -177,6 +186,9 @@
    <p id="no-result">No results available at the moment. To view fund details, please enter the fund name and click the <strong>"Search"</strong> button above.</p>
 {% endif %}
 </div>
+    <footer class="footer">
+        <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+    </footer>
 
 <script>
     function handleSearch() {
