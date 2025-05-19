@@ -252,12 +252,20 @@ th {
     position: fixed;
     bottom: 0;
     width: 100%;
+    background: white;
     color: rgb(160, 160, 160); /* Black text */
     text-align: center; /* Centered text */
     font-size: 12px; /* Slightly larger for readability */
-    padding: 8px 0; /* Reduced padding for a strip-like appearance */
+    padding: 0px 0px 2px 0px; /* Reduced padding for a strip-like appearance */
     font-weight: 500;
     height: 25px;
+}
+
+#save_fund_btn{
+    margin-top: 5px;
+}
+.recommendation button:hover{
+    cursor: pointer;
 }
 
 /* --- Responsive Design --- */

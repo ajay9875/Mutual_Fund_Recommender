@@ -1,0 +1,101 @@
+.container {
+    max-width: 90%;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.messages {
+    margin-bottom: 20px;
+}
+
+.message {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.message.info {
+    background-color: #e7f4ff;
+    color: #31708f;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.fund-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.fund-list th, .fund-list td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.fund-list th {
+    background-color: #f8f8f8;
+}
+
+.add-fund-form {
+    margin-top: 40px;
+}
+
+.add-fund-form h2 {
+    margin-bottom: 20px;
+}
+
+.add-fund-form .form-group {
+    margin-bottom: 15px;
+}
+
+.add-fund-form label {
+    display: block;
+    font-weight: bold;
+}
+
+.add-fund-form input, .add-fund-form select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#delete_btn {
+    display: inline-block;
+    background-color: red;
+    color: white;
+    border: groove 1px black;
+    cursor: pointer;
+    border-radius: 3px;
+    text-align: center;
+    margin-top: 5px;
+}
+#show_btn {
+    border: groove 1px black;
+    cursor: pointer;
+    border-radius: 3px;
+    text-align: center;
+    margin-top: 5px;
+}
+
+
+
+

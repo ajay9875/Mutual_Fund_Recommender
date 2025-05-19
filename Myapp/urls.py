@@ -26,13 +26,11 @@ urlpatterns = [
     path("account_settings/", views.account_settings, name="account_settings"),
     path("delete_account/", views.delete_account, name="delete_account"),
 
-    path('tasks/', views.task_list, name='task_list'),
-
     path('fund-details/', views.fund_details, name='fund_details'),
     path('sip-calculator/', views.sip_calculator, name='sip_calculator'),
-
-    # If you want to use `nav_data_api`
-    #path('api/nav-data/', views.nav_data_api, name='nav_data_api'),  
+    path('fund_result/', views.fund_result, name='fund_result'),
+    
+    path('your_funds/', views.your_funds, name='your_funds'),  
 
     # Or, if you want to use `nav_data_view`
     # path('api/nav-data/', views.nav_data_view, name='nav-data'),

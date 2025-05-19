@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard: Mutual Fund Recommendations</title>
   <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
-  <link rel="stylesheet" href="{% static 'css/Index.css' %}">
   <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
   <script src="{% static 'javascript/allmessage.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/Index.css' %}">
 </head>
 
 <body>
@@ -19,17 +19,14 @@
         <li><a href="{% url 'sip_calculator' %}">SIP Calculator</a></li>
         <li><a href="{% url 'fund_details' %}">Fund Details</a></li>
         <li><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;">Get Recommendation</a></li>
+        <li><a href="{% url 'your_funds' %}">Your Funds</a></li>
         <li><a href="\contact">Contact</a></li>
 
-        <!-- Session Timer -->
-        {% if remaining_time %}
-          <div id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
-        {% endif %} 
           <a href="?menu=profile" onclick="toggleProfileMenu(); return false;" class="profile-btn">
             {% if profilepic %}
               <img src="{{ profilepic }}" class="profile-icon">
             {% else %}
-              <img src="{% static 'favicon/favicon.webp' %}" class="profile-icon" style="background-color: gray;">
+              <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
             {% endif %}
         
           </a>
@@ -38,11 +35,16 @@
 
     <div class="profile-dropdown">
       <a href="/profile">Your Info</a>
-      <a href="/your-funds">Your Funds</a>
+      <a href="{% url 'your_funds' %}">Your Funds</a>
       <a href="{% url 'account_settings' %}">Settings</a>
       <a href="/logout">Logout</a>
     </div>
   </header>
+
+        <!-- Session Timer -->
+        {% if remaining_time %}
+          <div id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
+        {% endif %} 
        
         <!-- Flashed message will be appear here -->
         {% if messages %}
@@ -162,10 +164,8 @@
                     <th>Fund Name</th>
                     <th>Investment Type</th>
                     <th>Subcategory</th>
-                    <th>Annual Return</th>
                     <th>Current Price (NAV)</th>
-                    <th>Duration</th>
-                    <th>Rating (1 to 5)</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -175,29 +175,25 @@
                         <td>{{ fund.fund_name }}</td>
                         <td>{{ fund.investment_type }}</td>
                         <td>{{ fund.category }}</td>
-                        <td>{% if fund.return_rate %}
-                            {{ fund.return_rate }}%
-                            {% else %}
-                              NA
-                            {% endif%}
-
-                        </td>
                         <td>₹{{ fund.latest_nav }}</td>
-                        <td>{{ fund.duration }}</td>
                         <td>
-                            {% if fund.star_rating == 5 %}
-                                5 ★
-                            {% elif fund.star_rating == 4 %}
-                                4 ★
-                            {% elif fund.star_rating == 3 %}
-                                3 ★
-                            {% elif fund.star_rating == 2 %}
-                                2 ★
-                            {% elif fund.star_rating == 1 %}
-                                1 ★
-                            {% else %}
-                                NA
-                            {% endif %}
+                            <form action="{% url 'fund_result' %}" method="POST">
+                               {% csrf_token %}
+
+                               <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                               
+                               <button type="submit" id="show_detail_btn">See More</button>
+                            </form>
+
+                            <form action="{% url 'your_funds' %}" method="POST">
+                               {% csrf_token %}
+                               <input type="hidden" name="form_type" value="add-fund">
+                               <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                               <input type="hidden" name="investment_type" value="{{ fund.investment_type }}">
+                               <input type="hidden" name="subcategory" value="{{ fund.category }}">
+
+                               <button type="submit" id="save_fund_btn">Save Fund</button>
+                            </form>
                         </td>
                     </tr>
                 {% endfor %}

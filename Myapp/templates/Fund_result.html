@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ fund.fund_name }}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f6f8fa;
+            margin: 0;
+            padding: 20px;
+        }
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1a53ff;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* Two columns */
+            gap: 20px;
+        }
+
+        .info-item {
+            font-size: 16px;
+        }
+
+        .info-item strong {
+            color: #000;
+        }
+        .nav-section {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a53ff;
+        }
+        .nav-date {
+            font-size: 14px;
+            color: #777;
+            margin-left: 10px;
+        }
+        .returns-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .returns-table th, .returns-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .returns-table th {
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .returns-table td {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    {% if fund %}
+    <div class="container">
+        <div class="title">{{ fund.fund_name }}</div>
+
+        <div class="card">
+            <div class="section-title">Basic Information</div>
+            <div class="info-grid">
+                <div class="info-item"><strong>Category:</strong> {{ fund.category }}</div>
+                <div class="info-item"><strong>Sub-Category:</strong> {{ fund.sub_category }}</div>
+                <div class="info-item"><strong>Fund Size:</strong> ₹{{ fund.asset_size }} Crores</div>
+                <div class="info-item"><strong>Change in Value (%):</strong> ₹{{ fund.percentage_change }}</div>
+                <div class="info-item"><strong>Rating:</strong> {{ fund.star_rating }}🌟</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">Latest NAV(₹)</div>
+            <div class="nav-section">
+                ₹{{ fund.latest_nav }}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">Returns</div>
+            <table class="returns-table">
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Return(%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for period, return_value in fund.returns.items %}
+                        <tr>
+                            <td>{{ period }}</td>
+                            <td>{{ return_value|default:'NA' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+        <p>No fund data available.</p>
+    {% endif %}
+</body>
+</html>

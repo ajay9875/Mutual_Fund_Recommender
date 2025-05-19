@@ -17,8 +17,9 @@ from .models import ProfilePic
 import os
 import random
 from datetime import datetime, timedelta
-from .models import Task
 from decouple import config
+from Myapp.models import MutualFund
+
 
 import requests
 #from dotenv import load_dotenv
@@ -30,10 +31,6 @@ from .notifications import send_daily_notifications
 def run_daily(request):
     send_daily_notifications()
     return HttpResponse("Daily notifications sent successfully!.")
-
-def task_list(request):
-    tasks = Task.objects.all()
-    return render(request, 'task_list.html', {'tasks': tasks})
 
 def my_view(request):
     try:
@@ -52,118 +49,10 @@ def default(request):
 def landing_page(request):
     return render(request,'Default.html')
 
-"""
-from django.http import JsonResponse
-
-# Fetching NAV data from AMFI API
-import requests
-
-from django.http import JsonResponse
-from django.shortcuts import render
-import requests
-from django.views.decorators.csrf import csrf_exempt
-
-# Function to fetch NAV data from AMFI
-from django.http import JsonResponse
-import requests
-
-# Function to fetch NAV data from AMFI
-def fetch_amfi_nav_data():
-    url = "https://www.amfiindia.com/spages/NAVAll.txt"
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        return []
-
-    lines = response.text.splitlines()
-    funds = []
-
-    for line in lines:
-        if line.strip() and line[0].isdigit():
-            parts = line.split(";")
-            if len(parts) == 6:
-                funds.append({
-                    "scheme_code": parts[0],
-                    "isin": parts[1],
-                    "scheme_name": parts[3],
-                    "nav": parts[4],
-                    "date": parts[5]
-                })
-    return funds
-
-# View to get NAV data for a specific scheme
-def nav_data_api(request):
-    scheme = request.GET.get('scheme')
-    if not scheme:
-        return JsonResponse({"error": "Scheme parameter is missing"}, status=400)
-    
-    # Fetch data from AMFI
-    data = fetch_amfi_nav_data()
-
-    # Filter the data based on the provided scheme name (case-insensitive)
-    filtered = [d for d in data if scheme.lower() in d["scheme_name"].lower()]
-
-    if not filtered:
-        return JsonResponse({"error": f"No NAV data found for scheme: {scheme}"}, status=404)
-
-    # Group by date and get the most recent NAV for each date
-    date_to_nav = {}
-    for entry in filtered:
-        if entry["date"] not in date_to_nav:
-            date_to_nav[entry["date"]] = []
-        date_to_nav[entry["date"]].append(float(entry["nav"]))
-
-    # Get the most recent 30 entries
-    dates = list(date_to_nav.keys())[-30:]
-    navs = [max(nav_list) for nav_list in date_to_nav.values()][-30:]
-
-    return JsonResponse({
-        "dates": dates,
-        "navs": navs
-    })
-
-# Example CSRF-exempt view for fetching NAV data history
-@csrf_exempt
-def nav_data_view(request):
-    scheme = request.GET.get('scheme')
-    if not scheme:
-        return JsonResponse({'error': 'Scheme parameter is missing'}, status=400)
-
-    # Example logic to fetch NAV data (replace with actual logic)
-    nav_history = fetch_nav_history_for_scheme(scheme)  # This should return a list of dicts with 'date' and 'nav'
-
-    return JsonResponse(nav_history, safe=False)
-
-def fetch_nav_history_for_scheme(scheme):
-    # Fetch the NAV data from AMFI
-    data = fetch_amfi_nav_data()
-
-    # Filter the data based on the provided scheme name (case-insensitive)
-    filtered = [d for d in data if scheme.lower() in d["scheme_name"].lower()]
-
-    # If no matching data is found, return an empty list
-    if not filtered:
-        return []
-
-    # Return the filtered data with 'date' and 'nav' as a list of dictionaries
-    nav_history = [{"date": entry["date"], "nav": float(entry["nav"])} for entry in filtered]
-    
-    return nav_history"""
-
-import requests
-from django.shortcuts import render
-from django.http import JsonResponse
-from decouple import config
-# List of all available exact fund names
-fund_list = [
-    "Axis Nifty Midcap 50 Index Fund Regular Growth",
-    "Aditya Birla Sun Life Nifty Midcap 150 Index Fund Regular Growth",
-    "SBI Small Cap Fund Regular Growth",
-    "ICICI Prudential Bluechip Fund Regular Growth",
-    # Add more as needed
-]
-
+#By IndianAPI.in
 API_KEY = config("API_ACCESS_KEY")
+#At Rapidapi by indian market api
+API_AUTH_TOKEN = config("API_AUTH_TOKEN")
 
 """# Fuzzy matching using fuzzywuzzy/thefuzz
 def find_best_match(user_input):
@@ -302,6 +191,43 @@ def get_all_funds_data_by_indian_api(fund_type):
     else:
         return []
 
+def fund_result(request):
+    if request.user.is_anonymous:
+        messages.info(request, "Session expired! Please login again.")
+        return redirect('landing_page')
+    
+    processed_fund = None
+    if request.method == "POST":
+        fund_name = request.POST["fund_name"]
+    
+        if fund_name:
+            fund_data = get_all_funds_data_by_indian_api(fund_name)
+            if fund_data:
+            # Flatten first matching fund
+                for main_category, subtypes in fund_data.items():
+                    for subtype, funds in subtypes.items():
+                        for fund in funds:
+                            if fund.get('fund_name') == fund_name:
+                                processed_fund = {
+                                    'fund_name': fund.get('fund_name'),
+                                    'category': main_category,
+                                    'sub_category': subtype,                                    'latest_nav': fund.get('latest_nav'),
+                                    'percentage_change': fund.get('percentage_change'),
+                                    'asset_size': fund.get('asset_size'),
+                                    'star_rating': fund.get('star_rating'),
+                                    'returns': {
+                                        '1 Month': fund.get('1_month_return'),
+                                        '3 Months': fund.get('3_month_return'),
+                                        '6 Months': fund.get('6_month_return'),
+                                        '1 Year': fund.get('1_year_return'),
+                                        '3 Years': fund.get('3_year_return'),
+                                        '5 Years': fund.get('5_year_return')
+                                    }
+                                }
+                                break
+
+    return render(request, 'Fund_result.html',{'fund': processed_fund})
+
 @never_cache
 def userdashboard(request):
     if request.user.is_anonymous:
@@ -388,28 +314,6 @@ def userdashboard(request):
                             )
                         }
                         recommended_funds.append(processed)
-
-        """
-        fund = get_fund_data_by_api(fund_type)
-        if fund:
-            try:
-                processed = {
-                    'fund_name': fund['basic_info']['fund_name'],
-                    'category': fund['basic_info']['category'],
-                    'risk': fund['basic_info']['risk_level'],
-                    'return_rate': fund['returns']['cagr'].get('5y', 'N/A'),  # or any time period
-                    'investment_type': fund['basic_info']['scheme_type'],
-                    'duration': "5 years",  # You can adjust this logic
-                }
-                recommended_funds.append(processed)
-            except KeyError as e:
-                messages.error(request, f"Data is not present.")
-                # Optionally log the error for debugging
-                # app.logger.error(f"KeyError processing fund data: {str(e)} - Raw data: {raw_data}")
-                
-            except Exception as e:
-                messages.error(request, "An error occurred while processing fund data.")
-                # app.logger.error(f"Unexpected error processing fund: {str(e)} - Raw data: {raw_data}")"""
         
     context = {
         "remaining_time": remaining_time,
@@ -419,6 +323,61 @@ def userdashboard(request):
         "MEDIA_URL": settings.MEDIA_URL,  # Pass MEDIA_URL explicitly
     }
     return render(request, 'Index.html', context)
+
+@never_cache
+def your_funds(request):
+    if request.user.is_anonymous:
+        messages.info(request, "Session expired! Please login again.")
+        return redirect('landing_page')
+    
+    username = request.session.get('username', '')
+
+    if request.method == "POST":
+        form_type = request.POST['form_type']
+        
+        if form_type == "delete-fund":
+            try:
+                fund_name = request.POST['fund_name']
+                if fund_name:
+                    fund = MutualFund.objects.get(username=username, fund_name=fund_name)
+                    fund.delete()
+                    messages.success(request, f"The fund '{fund_name}' has been deleted.")
+                    return redirect('your_funds')
+            except MutualFund.DoesNotExist:
+                messages.error(request, "Fund not found or already deleted.")
+                return redirect('your_funds')
+            
+        elif form_type == "add-fund":
+            fund_name = request.POST['fund_name']
+            investment_type = request.POST['investment_type']
+            subcategory = request.POST['subcategory']
+            if not fund_name or not investment_type or not subcategory:
+                messages.error(request, "All fields are required.")
+                return redirect('your_funds')
+            
+            existing_fund = MutualFund.objects.filter(username=username, fund_name=fund_name)
+            if existing_fund:
+                messages.error(request, "Looks like this fund is already added, no need to do it twice!")
+                return redirect('dashboard')
+
+            fund_data = MutualFund.objects.create(
+                        username=username,
+                        fund_name=fund_name,
+                        investment_type=investment_type,
+                        subcategory=subcategory
+                        )
+            fund_data.save()
+            messages.success(request, " Your fund details have been saved with care and precision.")
+            return redirect('dashboard')
+
+    try:
+        if username:
+            fund_details = MutualFund.objects.filter(username=username)
+
+    except Exception as e:
+        messages.error(request, "Unable to fetch your fund right now!")
+
+    return render(request, 'Your_funds.html', {'fund_details':fund_details})
 
 # Calculate sip
 def sip_calculator(request):

@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Funds</title>
+    <link rel="stylesheet" href="{% static 'css/Your_funds.css' %}">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Header.css' %}">
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
+</head>
+<body>
+    <!-- Reusable Header -->
+    <header class="header">
+        Your Funds
+    </header>
+
+    <div class="home">
+        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+      </div>
+
+        <!-- Display messages -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    <div class="container">
+        <h1>Your Mutual Funds</h1>
+
+        <!-- Fund Details Section -->
+        <div class="fund-list">
+            {% if fund_details %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fund Name</th>
+                            <th>Investment Type</th>
+                            <th>Subcategory</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fund in fund_details %}
+                        <tr>
+                            <td>{{ fund.fund_name }}</td>
+                            <td>{{ fund.investment_type }}</td>
+                            <td>{{ fund.subcategory }}</td>
+                            <td>
+                                <form action="{% url 'fund_result' %}" method="POST">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                
+                                <button type="submit" id="show_btn">See More</button>
+                                </form>
+                                <form action="{% url 'your_funds' %}" method="POST">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="form_type" value="delete-fund">
+                                <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                
+                                <button type="submit" id="delete_btn">Delete Funds</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No funds added yet. Please add some funds.</p>
+            {% endif %}
+        </div>
+    </div>
+              <!-- Footer -->
+            <footer class="footer">
+                <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+            </footer>
+</body>
+</html>

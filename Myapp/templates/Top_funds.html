@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Top Mutual Funds</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: #2e7d32;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #2e7d32;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f3f3f3;
+        }
+        .timestamp {
+            font-size: 14px;
+            color: gray;
+            margin-top: 10px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Top Mutual Funds</h1>
+
+    {% if error %}
+        <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <div class="timestamp">
+        Last Updated: {{ timestamp }}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fund Name</th>
+                <th>NAV</th>
+                <th>1Y Return (%)</th>
+                <th>3Y Return (%)</th>
+                <th>5Y Return (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for fund in funds %}
+                <tr>
+                    <td>{{ fund.name }}</td>
+                    <td>{{ fund.nav }}</td>
+                    <td>{{ fund.returns.1y }}</td>
+                    <td>{{ fund.returns.3y }}</td>
+                    <td>{{ fund.returns.5y }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
