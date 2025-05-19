@@ -52,7 +52,7 @@ def landing_page(request):
 #By IndianAPI.in
 API_KEY = config("API_ACCESS_KEY")
 #At Rapidapi by indian market api
-API_AUTH_TOKEN = config("API_AUTH_TOKEN")
+#API_AUTH_TOKEN = config("API_AUTH_TOKEN")
 
 """# Fuzzy matching using fuzzywuzzy/thefuzz
 def find_best_match(user_input):
