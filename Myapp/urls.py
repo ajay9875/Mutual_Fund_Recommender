@@ -28,9 +28,9 @@ urlpatterns = [
 
     path('fund-details/', views.fund_details, name='fund_details'),
     path('sip-calculator/', views.sip_calculator, name='sip_calculator'),
-    path('fund_result/', views.fund_result, name='fund_result'),
+    path('fund-result/', views.fund_result, name='fund_result'),
     
-    path('your_funds/', views.your_funds, name='your_funds'),  
+    path('your-funds/', views.your_funds, name='your_funds'),  
 
     # Or, if you want to use `nav_data_view`
     # path('api/nav-data/', views.nav_data_view, name='nav-data'),

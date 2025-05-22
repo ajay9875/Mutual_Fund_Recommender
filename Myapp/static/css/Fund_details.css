@@ -5,87 +5,130 @@
     --warning-color: #ffab00;
     --danger-color: #ff5252;
 }
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     color: #333;
     background-color: #f5f7fa;
-    margin: 60px 0px 50px 0px ;}
+    width: 95%;
+    margin: 50px auto;
+}
+
 .container {
     width: 97%;
     max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     background: white;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
-#no-result{
+.data-item{
+    display: flex;
+}
+.data-label, .data-value{
+    width: 50%;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 15px;
+}
+
+#no-result {
     text-align: center;
 }
+.sub-section-title{
+    font-weight: bolder;
+    border-bottom: 1px solid #e0e0e0;
+    margin-top: 25px;
+}
+
 h1, h2 {
     color: var(--secondary-color);
     border-bottom: 1px solid #eee;
     padding-bottom: 10px;
 }
+
 h1 {
     color: var(--primary-color);
     margin-top: 0;
 }
+
 .card {
     border: 1px solid #e0e0e0;
     margin: 15px 0;
     padding: 20px;
     border-radius: 8px;
     background: white;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
+
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
 }
+
 .badge {
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: large;
     font-weight: bold;
 }
-.badge.risk-high { background: var(--danger-color); color: white; }
-.badge.risk-medium { background: var(--warning-color); color: black; }
-.badge.risk-low { background: var(--success-color); color: white; }
+
+.badge.risk-high {
+    background: var(--danger-color);
+    color: white;
+}
+
+.badge.risk-medium {
+    background: var(--warning-color);
+    color: black;
+}
+
+.badge.risk-low {
+    background: var(--success-color);
+    color: white;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
 }
+
 th, td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
 }
+
 th {
     background-color: #f5f7fa;
     font-weight: 600;
 }
+
 tr:hover {
     background-color: #f9f9f9;
 }
+
 .nav-value {
     font-size: 24px;
     font-weight: bold;
     color: var(--primary-color);
 }
+
 .as-of-date {
     font-size: 14px;
     color: #757575;
     margin-left: 10px;
 }
+
 .stale-data {
     opacity: 0.7;
     position: relative;
 }
+
 .stale-data::after {
     content: "Data may be outdated";
     position: absolute;
@@ -97,11 +140,17 @@ tr:hover {
     border-radius: 4px;
     font-size: 12px;
 }
-.return-positive { color: var(--success-color); }
-.return-negative { color: var(--danger-color); }
-.hidden { display: none; }
-.badge{
-    font-size: large;
+
+.return-positive {
+    color: var(--success-color);
+}
+
+.return-negative {
+    color: var(--danger-color);
+}
+
+.hidden {
+    display: none;
 }
 
 .search-container {
@@ -111,8 +160,9 @@ tr:hover {
     background-color: #fff;
     border-radius: 25px;
     padding: 10px 15px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
 .search-container input[type="text"] {
     border: none;
     outline: none;
@@ -121,6 +171,7 @@ tr:hover {
     padding: 10px;
     border-radius: 25px;
 }
+
 .search-container button {
     background-color: #007bff;
     border: none;
@@ -132,54 +183,18 @@ tr:hover {
     justify-content: center;
     transition: background-color 0.3s;
 }
+
 .search-container button:hover {
     background-color: #0056b3;
 }
+
 .search-container form {
     display: flex;
-    justify-content: space-between; /* Pushes button to right */
+    justify-content: space-between;
     align-items: center;
-    gap: 10px; /* Space between input and button */
-}
-.NA{
-    color: red;
+    gap: 10px;
 }
 
-.header {
-    position:fixed;
-    width:100%;
-    top:0;
-    left:0;
-    padding: 10px;
-    background-color: #333;
-    color: white;
-    text-align: center;
-    place-items: center;
-}
-/* Home button Style */
-.home {
-    height: 30px;
-    width: 30px;
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-}
-.home img {
-    height: 25px;
-    width: 25px;
-    border-radius: 100%;
-}
-/* Footer Styles */
-.footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: white;
-    color: rgb(160, 160, 160); /* Black text */
-    text-align: center; /* Centered text */
-    font-size: 12px; /* Slightly larger for readability */
-    padding: 0px 0px 2px 0px; /* Reduced padding for a strip-like appearance */
-    font-weight: 500;
-    height: 25px;
+.NA {
+    color: red;
 }
