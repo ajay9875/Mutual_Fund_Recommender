@@ -68,22 +68,9 @@ def find_best_match(user_input):
         print("No reliable match found.")
         return None"""
 
-def get_single_fund_data_by_api(fund_name):
-    url = "https://stock.indianapi.in/mutual_funds_details"
-    querystring = {"stock_name": fund_name}
-    headers = {"X-Api-Key": API_KEY}
-    
-    try:
-        response = requests.get(url, headers=headers, params=querystring)
-        response.raise_for_status()  # Raises HTTPError for bad responses
-        return response.json()
-
-    except requests.exceptions.RequestException:
-        return None
-    
 # To show specific fund details using fund name
 @never_cache
-def fund_details(request):
+def fund_result(request):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")
         return redirect('landing_page')
@@ -191,42 +178,112 @@ def get_all_funds_data_by_indian_api(fund_type):
     else:
         return []
 
+"""@never_cache
 def fund_result(request):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")
         return redirect('landing_page')
-    
-    processed_fund = None
-    if request.method == "POST":
-        fund_name = request.POST["fund_name"]
-    
-        if fund_name:
-            fund_data = get_all_funds_data_by_indian_api(fund_name)
-            if fund_data:
-            # Flatten first matching fund
-                for main_category, subtypes in fund_data.items():
-                    for subtype, funds in subtypes.items():
-                        for fund in funds:
-                            if fund.get('fund_name') == fund_name:
-                                processed_fund = {
-                                    'fund_name': fund.get('fund_name'),
-                                    'category': main_category,
-                                    'sub_category': subtype,                                    'latest_nav': fund.get('latest_nav'),
-                                    'percentage_change': fund.get('percentage_change'),
-                                    'asset_size': fund.get('asset_size'),
-                                    'star_rating': fund.get('star_rating'),
-                                    'returns': {
-                                        '1 Month': fund.get('1_month_return'),
-                                        '3 Months': fund.get('3_month_return'),
-                                        '6 Months': fund.get('6_month_return'),
-                                        '1 Year': fund.get('1_year_return'),
-                                        '3 Years': fund.get('3_year_return'),
-                                        '5 Years': fund.get('5_year_return')
-                                    }
-                                }
-                                break
 
-    return render(request, 'Fund_result.html',{'fund': processed_fund})
+    all_processed_funds = []
+    search_query = None
+
+    if request.method == "POST":
+        search_query = request.POST.get('fund_name', '').strip()
+
+    # Fetch all funds (or filtered funds if search_query is present)
+    # The API call should return data in the nested format as per your example.
+    fund_data_from_api = get_all_funds_data_by_indian_api(search_query)
+
+    if fund_data_from_api:
+        # Iterate through the nested structure to flatten all funds
+        for main_category, subtypes in fund_data_from_api.items():
+            for subtype, funds_list in subtypes.items():
+                for fund in funds_list:
+                    # Process each fund to match the HTML's expected keys
+                    processed_fund = {
+                        'fund_name': fund.get('fund_name'),
+                        'category': main_category, # Main category from API structure
+                        'sub_category': subtype, # Sub-category from API structure
+                        'latest_nav': fund.get('latest_nav'),
+                        'percentage_change': fund.get('percentage_change'),
+                        'asset_size': fund.get('asset_size'),
+                        'star_rating': fund.get('star_rating'),
+                        'returns': {
+                            '1 Month': fund.get('1_month_return'),
+                            '3 Months': fund.get('3_month_return'),
+                            '6 Months': fund.get('6_month_return'),
+                            '1 Year': fund.get('1_year_return'),
+                            '3 Years': fund.get('3_year_return'),
+                            '5 Years': fund.get('5_year_return')
+                        }
+                    }
+                    all_processed_funds.append(processed_fund)
+        
+        if not all_processed_funds and search_query:
+            messages.warning(request, f"No funds found matching '{search_query}'. Please try a different name.")
+        elif all_processed_funds:
+            messages.success(request, f"Displaying {len(all_processed_funds)} fund(s) found.")
+        else:
+            messages.info(request, "Displaying all available funds.")
+
+    else:
+        messages.error(request, "Could not retrieve fund data. Please try again later.")
+
+    return render(request, 'Fund_result.html', {'funds': all_processed_funds})"""
+
+def get_single_fund_data_by_api(fund_name):
+    url = "https://stock.indianapi.in/mutual_funds_details"
+    querystring = {"stock_name": fund_name}
+    headers = {"X-Api-Key": API_KEY}
+    
+    try:
+        response = requests.get(url, headers=headers, params=querystring)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+        return response.json()
+
+    except requests.exceptions.RequestException:
+        return None
+    
+@never_cache
+def fund_details(request):
+    """
+    Handles the display of detailed mutual fund information.
+    It retrieves the fund name from the request and fetches
+    the full data using get_fund_data_from_api.
+    """
+    context = {}
+
+    if request.method == "POST":
+        fund_name = request.POST.get('fund_name')
+        if not fund_name:
+            messages.error(request, "Fund name is missing.")
+            return redirect('fund_result')
+
+        fund_data = get_single_fund_data_by_api(fund_name)
+        if fund_data:
+            returns = fund_data.get('returns', {})
+            expense_ratio = fund_data.get('expense_ratio', {})
+            context = {
+                'basic_info': fund_data.get('basic_info', {}),
+                'nav_info': fund_data.get('nav_info', {}),
+                'absolute_returns': returns.get('absolute', {}),
+                'cagr_returns': returns.get('cagr', {}),
+                'category_returns': returns.get('category_returns', {}),
+                'index_returns': returns.get('index_returns', {}),
+                'risk_matrics': fund_data.get('risk_matrics', {}),
+                'exit_load': fund_data.get('exit_load', []),
+                'investment_info': fund_data.get('investment_info', {}),
+                'fund_house_info': fund_data.get('fund_house', {}),
+                'additional_info': fund_data.get('additional_info', {}),
+                'holdings': fund_data.get('holdings', []),
+                'current_expense_ratio': expense_ratio.get('current', "NA"),
+                'expense_ratio_history': expense_ratio.get('history', []),
+            }
+            messages.success(request, "Mutual Fund data fetched successfully.")
+            return render(request, 'Fund_details.html', context)
+
+    # Always return at least empty context
+    return render(request, 'Fund_details.html', context)
 
 @never_cache
 def userdashboard(request):

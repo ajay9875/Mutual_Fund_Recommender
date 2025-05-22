@@ -3,131 +3,390 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ fund.fund_name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fund Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+    <script src="{% static 'javascript/allmessage.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/Header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/Fund_result.css' %}">
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f6f8fa;
-            margin: 0;
-            padding: 20px;
-        }
-        .title {
-            font-size: 32px;
-            font-weight: bold;
-            color: #1a53ff;
-            margin-bottom: 20px;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        .card {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        .section-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 5px;
-            margin-bottom: 15px;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* Two columns */
-            gap: 20px;
-        }
-
-        .info-item {
-            font-size: 16px;
-        }
-
-        .info-item strong {
-            color: #000;
-        }
-        .nav-section {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1a53ff;
-        }
-        .nav-date {
-            font-size: 14px;
-            color: #777;
-            margin-left: 10px;
-        }
-        .returns-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        .returns-table th, .returns-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-        .returns-table th {
-            background-color: #f9f9f9;
-            color: #333;
-        }
-        .returns-table td {
-            color: #2ecc71;
-            font-weight: bold;
-        }
-    </style>
 </head>
-<body>
-    {% if fund %}
+<body class="bg-gray-100 min-h-screen p-4">
     <div class="container">
-        <div class="title">{{ fund.fund_name }}</div>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }} rounded-lg p-3 mb-4 shadow-sm">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-8">{{ fund.fund_name }}</h1>
 
         <div class="card">
-            <div class="section-title">Basic Information</div>
-            <div class="info-grid">
-                <div class="info-item"><strong>Category:</strong> {{ fund.category }}</div>
-                <div class="info-item"><strong>Sub-Category:</strong> {{ fund.sub_category }}</div>
-                <div class="info-item"><strong>Fund Size:</strong> ₹{{ fund.asset_size }} Crores</div>
-                <div class="info-item"><strong>Change in Value (%):</strong> ₹{{ fund.percentage_change }}</div>
-                <div class="info-item"><strong>Rating:</strong> {{ fund.star_rating }}🌟</div>
+            <h2 class="section-title">Basic Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="data-item">
+                    <span class="data-label">Category:</span>
+                    <span class="data-value">{{ basic_info.category }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Plan Type:</span>
+                    <span class="data-value">{{ basic_info.plan_type }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Scheme Type:</span>
+                    <span class="data-value">{{ basic_info.scheme_type }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Risk Level:</span>
+                    <span class="data-value">{{ basic_info.risk_level }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Benchmark:</span>
+                    <span class="data-value">{{ basic_info.benchmark }} ({{ benchmark_name }})</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Fund Size:</span>
+                    <span class="data-value">₹{{ basic_info.fund_size|floatformat:2 }} Cr</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Fund Manager:</span>
+                    <span class="data-value">{{ basic_info.fund_manager }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Registrar Agent:</span>
+                    <span class="data-value">{{ basic_info.registrar_agent }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Face Value:</span>
+                    <span class="data-value">{{ basic_info.face_value|default:"N/A" }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">NFO Risk:</span>
+                    <span class="data-value">{{ basic_info.nfo_risk }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Inception Date:</span>
+                    <span class="data-value">{{ basic_info.inception_date }}</span>
+                </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="section-title">Latest NAV(₹)</div>
-            <div class="nav-section">
-                ₹{{ fund.latest_nav }}
+            <h2 class="section-title">NAV Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="data-item">
+                    <span class="data-label">Current NAV:</span>
+                    <span class="data-value">₹{{ current_nav|floatformat:2 }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">NAV Date:</span>
+                    <span class="data-value">{{ nav_date }}</span>
+                </div>
             </div>
         </div>
 
         <div class="card">
-            <div class="section-title">Returns</div>
-            <table class="returns-table">
-                <thead>
-                    <tr>
-                        <th>Period</th>
-                        <th>Return(%)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for period, return_value in fund.returns.items %}
-                        <tr>
-                            <td>{{ period }}</td>
-                            <td>{{ return_value|default:'NA' }}</td>
+            <h2 class="section-title">Returns</h2>
+            <div class="sub-section-title">Absolute Returns</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% for key, value in absolute_returns.items %}
+                <div class="data-item">
+                    <span class="data-label">{{ key|upper }}:</span>
+                    <span class="data-value {% if value >= 0 %}positive-return{% else %}negative-return{% endif %}">{{ value|floatformat:2 }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="sub-section-title">CAGR Returns</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% for key, value in cagr_returns.items %}
+                <div class="data-item">
+                    <span class="data-label">{{ key|upper }}:</span>
+                    <span class="data-value {% if value >= 0 %}positive-return{% else %}negative-return{% endif %}">{{ value|floatformat:2 }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="sub-section-title">Category Returns</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% for key, value in category_returns.items %}
+                <div class="data-item">
+                    <span class="data-label">{{ key|upper }}:</span>
+                    <span class="data-value {% if value >= 0 %}positive-return{% else %}negative-return{% endif %}">{{ value|floatformat:2 }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="sub-section-title">Index Returns</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {% for key, value in index_returns.items %}
+                <div class="data-item">
+                    <span class="data-label">{{ key|upper }}:</span>
+                    <span class="data-value {% if value >= 0 %}positive-return{% else %}negative-return{% endif %}">{{ value|floatformat:2|default:"N/A" }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="sub-section-title">Risk Metrics</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="data-item">
+                    <span class="data-label">Alpha:</span>
+                    <span class="data-value">{{ risk_metrics.alpha|floatformat:2 }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Beta:</span>
+                    <span class="data-value">{{ risk_metrics.beta|floatformat:2 }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Sharpe Ratio:</span>
+                    <span class="data-value">{{ risk_metrics.sharpe_ratio|floatformat:2 }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Sortino Ratio:</span>
+                    <span class="data-value">{{ risk_metrics.sortino_ratio|floatformat:2 }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Standard Deviation:</span>
+                    <span class="data-value">{{ risk_metrics.standard_deviation|floatformat:2 }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Risk Rating:</span>
+                    <span class="data-value">{{ risk_metrics.risk_rating }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Expense Ratio</h2>
+            <div class="data-item">
+                <span class="data-label">Current Expense Ratio:</span>
+                <span class="data-value">{{ current_expense_ratio|floatformat:2 }}%</span>
+            </div>
+            <div class="sub-section-title">Expense Ratio History</div>
+            {% if expense_ratio_history %}
+            <div class="overflow-x-auto rounded-lg shadow">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="table-header">
+                            <th>Date</th>
+                            <th>Ratio</th>
+                            <th>Turnover Ratio</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for entry in expense_ratio_history %}
+                        <tr class="table-row">
+                            <td>{{ entry.date|date:"d M Y" }}</td>
+                            <td>{{ entry.ratio|floatformat:2 }}%</td>
+                            <td>{{ entry.turnover_ratio|default:"N/A" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-600">No expense ratio history available.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Exit Load</h2>
+            {% if exit_load %}
+                {% for load in exit_load %}
+                <div class="data-item">
+                    <span class="data-label">Description:</span>
+                    <span class="data-value">{{ load.description|default:"N/A" }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">As On Date:</span>
+                    <span class="data-value">{{ load.as_on_date|date:"d M Y"|default:"N/A" }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-gray-600">No exit load information available.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Investment Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="data-item">
+                    <span class="data-label">Minimum SIP:</span>
+                    <span class="data-value">₹{{ minimum_sip|floatformat:2 }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Maximum SIP:</span>
+                    <span class="data-value">{% if maximum_sip %}&#8377;{{ maximum_sip|floatformat:2 }}{% else %}No Max{% endif %}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Minimum Lumpsum:</span>
+                    <span class="data-value">₹{{ minimum_lumpsum|floatformat:2 }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Maximum Lumpsum:</span>
+                    <span class="data-value">{% if maximum_lumpsum %}&#8377;{{ maximum_lumpsum|floatformat:2 }}{% else %}No Max{% endif %}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Stamp Duty:</span>
+                    <span class="data-value">{{ stamp_duty }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">SIP Multiplier:</span>
+                    <span class="data-value">{{ sip_multiplier }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Mini Additional Investment:</span>
+                    <span class="data-value">₹{{ mini_additional_investment|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Fund House Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="data-item">
+                    <span class="data-label">Fund House Name:</span>
+                    <span class="data-value">{{ fund_house_name }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">AMC Code:</span>
+                    <span class="data-value">{{ amc_code|default:"N/A" }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">RTA Name:</span>
+                    <span class="data-value">{{ rta_name }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Custodian:</span>
+                    <span class="data-value">{{ custodian }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Address:</span>
+                    <span class="data-value">{{ address }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Email:</span>
+                    <span class="data-value">{{ email }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Website:</span>
+                    <span class="data-value"><a href="{{ website }}" target="_blank" class="text-blue-600 hover:underline">{{ website }}</a></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Additional Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="data-item">
+                    <span class="data-label">ISIN:</span>
+                    <span class="data-value">{{ isin }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Fund Type:</span>
+                    <span class="data-value">{{ fund_type|default:"N/A" }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">SID URL:</span>
+                    <span class="data-value"><a href="{{ sid_url }}" target="_blank" class="text-blue-600 hover:underline">{{ sid_url }}</a></span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Closed Ended:</span>
+                    <span class="data-value">{{ is_closed_ended|yesno:"Yes,No" }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Closure Date:</span>
+                    <span class="data-value">{{ closure_date|default:"N/A" }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">CRISIL Rating:</span>
+                    <span class="data-value">{{ crisil_rating|default:"N/A" }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">RTA Scheme Code:</span>
+                    <span class="data-value">{{ rta_scheme_code }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Super Category:</span>
+                    <span class="data-value">{{ super_category }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Sub Category:</span>
+                    <span class="data-value">{{ sub_category }}</span>
+                </div>
+                <div class="data-item col-span-full">
+                    <span class="data-label block mb-2">Description:</span>
+                    <span class="data-value block text-justify">{{ description }}</span>
+                </div>
+            </div>
+            <div class="sub-section-title">Analysis</div>
+            {% if analysis %}
+            <div class="overflow-x-auto rounded-lg shadow">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="table-header">
+                            <th>Type</th>
+                            <th>Subject</th>
+                            <th>Description</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in analysis %}
+                        <tr class="table-row">
+                            <td>{{ item.analysis_type|default:"N/A" }}</td>
+                            <td>{{ item.analysis_subject|default:"N/A" }}</td>
+                            <td>{{ item.analysis_desc|default:"N/A" }}</td>
+                            <td>{{ item.analysis_data|default:"N/A" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-600">No analysis available.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Holdings</h2>
+            {% if holdings %}
+            <div class="overflow-x-auto rounded-lg shadow">
+                <table class="min-w-full bg-white">
+                    <thead>
+                        <tr class="table-header">
+                            <th>Company Name</th>
+                            <th>Nature</th>
+                            <th>Sector</th>
+                            <th>Instrument</th>
+                            <th>Market Value (₹)</th>
+                            <th>Corpus (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for holding in holdings %}
+                        <tr class="table-row">
+                            <td>{{ holding.company_name }}</td>
+                            <td>{{ holding.nature_name }}</td>
+                            <td>{{ holding.sector_name }}</td>
+                            <td>{{ holding.instrument_name }}</td>
+                            <td>{{ holding.market_value|floatformat:2 }}</td>
+                            <td>{{ holding.corpus_percentage|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-gray-600">No holdings data available.</p>
+            {% endif %}
         </div>
     </div>
-    {% else %}
-        <p>No fund data available.</p>
-    {% endif %}
 </body>
 </html>
