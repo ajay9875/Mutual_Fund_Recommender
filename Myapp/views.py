@@ -261,26 +261,35 @@ def fund_details(request):
 
         fund_data = get_single_fund_data_by_api(fund_name)
         if fund_data:
-            returns = fund_data.get('returns', {})
-            expense_ratio = fund_data.get('expense_ratio', {})
-            context = {
-                'basic_info': fund_data.get('basic_info', {}),
-                'nav_info': fund_data.get('nav_info', {}),
-                'absolute_returns': returns.get('absolute', {}),
-                'cagr_returns': returns.get('cagr', {}),
-                'category_returns': returns.get('category_returns', {}),
-                'index_returns': returns.get('index_returns', {}),
-                'risk_matrics': fund_data.get('risk_matrics', {}),
-                'exit_load': fund_data.get('exit_load', []),
-                'investment_info': fund_data.get('investment_info', {}),
-                'fund_house_info': fund_data.get('fund_house', {}),
-                'additional_info': fund_data.get('additional_info', {}),
-                'holdings': fund_data.get('holdings', []),
-                'current_expense_ratio': expense_ratio.get('current', "NA"),
-                'expense_ratio_history': expense_ratio.get('history', []),
-            }
-            messages.success(request, "Mutual Fund data fetched successfully.")
-            return render(request, 'Fund_details.html', context)
+            try:
+                basic_info = fund_data.get('basic_info', {})
+                name_of_fund = basic_info.get('fund_name')
+                if not name_of_fund:
+                    raise ValueError("Fund data not found, please try again.")
+                    
+                returns = fund_data.get('returns', {})
+                expense_ratio = fund_data.get('expense_ratio', {})
+                context = {
+                    'basic_info': fund_data.get('basic_info', {}),
+                    'nav_info': fund_data.get('nav_info', {}),
+                    'absolute_returns': returns.get('absolute', {}),
+                    'cagr_returns': returns.get('cagr', {}),
+                    'category_returns': returns.get('category_returns', {}),
+                    'index_returns': returns.get('index_returns', {}),
+                    'risk_metrics': returns.get('risk_metrics', {}),
+                    'exit_load': fund_data.get('exit_load', []),
+                    'investment_info': fund_data.get('investment_info', {}),
+                    'fund_house_info': fund_data.get('fund_house', {}),
+                    'additional_info': fund_data.get('additional_info', {}),
+                    'holdings': fund_data.get('holdings', []),
+                    'current_expense_ratio': expense_ratio.get('current', "NA"),
+                    'expense_ratio_history': expense_ratio.get('history', []),
+                }
+
+                messages.success(request, "Mutual Fund data fetched successfully.")
+                return render(request, 'Fund_details.html', context)
+            except ValueError as e:
+                messages.error(request, str(e))
 
     # Always return at least empty context
     return render(request, 'Fund_details.html', context)

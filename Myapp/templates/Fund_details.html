@@ -40,7 +40,7 @@
       <button type="submit">Search</button>
     </form>
 </div>
-
+      {% if basic_info.fund_name %}
         <h1>{{ basic_info.fund_name }}</h1>
 
         <div class="card">
@@ -148,8 +148,9 @@
                 </div>
                 {% endfor %}
             </div>
-
-            <div class="sub-section-title">Risk Metrics</div>
+        </div>
+           <div class="card">
+            <div class="section-title">Risk Metrics</div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="data-item">
                     <div class="data-label">Alpha:</div>
@@ -177,7 +178,7 @@
                 </div>
             </div>
         </div>
-
+          
         <div class="card">
             <h2 class="section-title">Investment Information</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -353,6 +354,9 @@
             {% endif %}
         </div>
     </div>
+    {% else %}
+        <p id="nothing">No fund results available. Kindly type a fund name and press the "Search" button above.</p>
+    {% endif %}
         <!-- Reusable Footer -->
         <footer class='footer'>
             <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
