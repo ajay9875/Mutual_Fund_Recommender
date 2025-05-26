@@ -28,3 +28,10 @@ class ProfilePic(models.Model):
 
     def __str__(self):
         return self.username.username
+
+class AllMutualFund(models.Model):
+    fund_name = models.CharField(max_length=300, unique=True, null=True, blank=True)
+
+    def __str__(self):
+        return self.fund_name
+    

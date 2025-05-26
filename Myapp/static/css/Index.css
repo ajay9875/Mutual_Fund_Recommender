@@ -29,7 +29,7 @@ body {
     text-decoration: none;
     color: lightgrey;
     font-weight: bold;
-    font-size: 18px;
+    font-size: 14px;
     padding: 10px 15px;
 }
 
@@ -47,22 +47,7 @@ body {
     margin-right: 20px;
     cursor: default;
 }
-/* Footer Styles 
-.footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: white;
-    color: rgb(160, 160, 160); 
-    text-align: center; 
-    font-size: 12px; 
-    padding: 2px 0; 
-    font-weight: 500;
-    height: 25px;
-    left: 0;
-    z-index: 1000;
-}
-*/
+
 html {
     scroll-behavior: smooth;
 }
@@ -235,8 +220,8 @@ th {
     margin: 10px auto; /* Center horizontally */
     padding: 20px;
     text-align: center;
-    border: groove 2px blue;
-    background-color: white;
+    /*border: groove 2px blue;
+    background-color: white;*/
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.05);
 }
 .recommendation h3 {

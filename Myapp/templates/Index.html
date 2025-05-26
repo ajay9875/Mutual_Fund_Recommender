@@ -17,8 +17,9 @@
       <ul>
         <li><a href="/">Home</a></li>
         <li><a href="{% url 'sip_calculator' %}">SIP Calculator</a></li>
-        <li><a href="{% url 'fund_details' %}">Fund Details</a></li>
+        <li><a href="{% url 'fund_details' %}">Fund Detail Search</a></li>
         <li><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;">Get Recommendation</a></li>
+        <li><a href="{% url 'fund_result' %}">All Mutual Funds</a></li>
         <li><a href="{% url 'your_funds' %}">Your Funds</a></li>
         <li><a href="\contact">Contact</a></li>
 
@@ -28,7 +29,6 @@
             {% else %}
               <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
             {% endif %}
-        
           </a>
       </ul>  
     </nav>
@@ -65,8 +65,8 @@
             <input type="hidden" name="recommendation" value="recommendation">
             <!-- Company Type (Full Width) -->
             <div class="form-group">
-              <label for="company_type">Preferred Company Type:</label>
-              <select id="company_type" name="company_type" onchange="handleCompanyTypeChange(this)">
+              <label for="fund_type">Fund Type:</label>
+              <select id="fund_type" name="fund_type" onchange="handleCompanyTypeChange(this)">
                 <option value="" selected>Please select a mutual fund type</option>
                 <option value="Debt">Debt Funds</option>
                 <option value="Equity">Equity Funds</option>
@@ -74,18 +74,74 @@
                 <option value="Solutions Oriented">Solution Oriented Funds</option>
                 <option value="Global Fund of Funds">Fund of Funds(FoFs)</option>
                 <option value="Index Funds">Index Funds</option>
-                <option value="Liquid">Liquid Funds</option>
-                <option value="Overnight">Overnight Funds</option>
-                <option value="Arbitrage Fund">Arbitrage Funds</option>
-                <option value="Sector - Energy">Energy/Thematic Funds</option>
-                <option value="manually">Other (Enter Manually)</option>
+                <option value="Other">Other Funds</option>
+                <!--<option value="manually">Enter Manually</option>-->
               </select>
 
               <input type="text" id="manual_company_type" name="manual_company_type" style="display:none;" placeholder="Enter company type" />
             </div>          
+
+            <div class="form-group">
+                <label for="fund_subtype">Fund Subtype:</label>
+                <select id="fund_subtype" name="fund_subtype">
+                    <option value="" selected>Please Select a mutual fund subtype</option>
+                    <option value="Floating Rate">Floating Rate</option>
+                    <option value="Fixed Maturity Intermediate-Term Bond">Fixed Maturity Intermediate-Term Bond</option>
+                    <option value="Dynamic Bond">Dynamic Bond</option>
+                    <option value="Ultra Short Duration">Ultra Short Duration</option>
+                    <option value="Corporate Bond">Corporate Bond</option>
+                    <option value="Short Duration">Short Duration</option>
+                    <option value="10 yr Government Bond">10 yr Government Bond</option>
+                    <option value="Government Bond">Government Bond</option>
+                    <option value="Money Market">Money Market</option>
+                    <option value="Long Duration">Long Duration</option>
+                    <option value="Other Bond">Other Bond</option>
+                    <option value="Low Duration">Low Duration</option>
+                    <option value="Credit Risk">Credit Risk</option>
+                    <option value="Banking & PSU">Banking & PSU</option>
+                    <option value="Medium to Long Duration">Medium to Long Duration</option>
+                    <option value="Fixed Maturity Short-Term Bond">Fixed Maturity Short-Term Bond</option>
+                    <option value="Medium Duration">Medium Duration</option>
+                    <option value="Fixed Maturity Ultrashort Bond">Fixed Maturity Ultrashort Bond</option>
+                    <option value="Children">Children</option>
+                    <option value="Retirement">Retirement</option>
+                    <option value="Focused Fund">Focused Fund</option>
+                    <option value="Equity - Other">Equity - Other</option>
+                    <option value="Contra">Contra</option>
+                    <option value="Flexi Cap">Flexi Cap</option>
+                    <option value="Equity - Consumption">Equity - Consumption</option>
+                    <option value="Sector - FMCG">Sector - FMCG</option>
+                    <option value="Sector - Financial Services">Sector - Financial Services</option>
+                    <option value="Mid-Cap">Mid-Cap</option>
+                    <option value="Equity - Infrastructure">Equity - Infrastructure</option>
+                    <option value="Multi-Cap">Multi-Cap</option>
+                    <option value="Large-Cap">Large-Cap</option>
+                    <option value="Small-Cap">Small-Cap</option>
+                    <option value="Dividend Yield">Dividend Yield</option>
+                    <option value="ELSS (Tax Savings)">ELSS (Tax Savings)</option>
+                    <option value="Large & Mid-Cap">Large & Mid-Cap</option>
+                    <option value="Sector - Healthcare">Sector - Healthcare</option>
+                    <option value="Value">Value</option>
+                    <option value="Equity - ESG">Equity - ESG</option>
+                    <option value="Sector - Technology">Sector - Technology</option>
+                    <option value="Fund of Funds">Fund of Funds</option>
+                    <option value="Multi Asset Allocation">Multi Asset Allocation</option>
+                    <option value="Equity Savings">Equity Savings</option>
+                    <option value="Balanced Allocation">Balanced Allocation</option>
+                    <option value="Dynamic Asset Allocation">Dynamic Asset Allocation</option>
+                    <option value="Aggressive Allocation">Aggressive Allocation</option>
+                    <option value="Conservative Allocation">Conservative Allocation</option>
+                    <option value="Global - Other">Global - Other</option>
+                    <option value="Index Funds">Index Funds</option>
+                    <option value="Index Funds - Fixed Income">Index Funds - Fixed Income</option>
+                    <option value="Liquid">Liquid</option>
+                    <option value="Overnight">Overnight</option>
+                    <option value="Arbitrage Fund">Arbitrage Fund</option>
+                </select>
+                </div>
       
-              <!-- Risk Level & Investment Duration (Same Line) -->
               <div class="form-row">
+                <!-- Risk Level & Investment Duration (Same Line)
                   <div class="form-group">
                       <label for="risk">Select Risk Level:</label>
                       <select id="risk" name="risk">
@@ -94,34 +150,27 @@
                           <option value="medium">Medium</option>
                           <option value="high">High</option>
                       </select>
-                  </div>
+                  </div>-->
       
                   <div class="form-group">
-                      <label for="duration">Investment Duration:</label>
-                      <select id="duration" name="duration">
-                        <option value="" selected>Please select a duration</option>
-                          <option value="1_year">1 Year</option>
-                          <option value="3_years">3 Years</option>
-                          <option value="5_years">5+ Years</option>
-                      </select>
-                  </div>
-              </div>
-      
-              <!-- Investment Type & Profit Type (Same Line) -->
-              <div class="form-row">
-                  <div class="form-group">
-                      <label for="investment_type">Investment Type:</label>
-                      <select id="investment_type" name="investment_type">
-                        <option value="" selected>Please select a investment type</option>
-                          <option value="lump_sum">Lump Sum</option>
-                          <option value="sip">SIP (Installments)</option>
+                      <label for="tenure">Investment Tenure:</label>
+                      <select id="tenure" name="tenure">
+                        <option value="" selected>Please select a investment tenure</option>
+                          <option value="1_month_return">1 Month</option>
+                          <option value="3_month_return">3 Months</option>
+                          <option value="6_month_return">6 Months</option>
+
+                          <option value="1_year_return">1 Year</option>
+                          <option value="3_year_return">3 Years</option>
+                          <option value="5_year_return">5+ Years</option>
                       </select>
                   </div>
       
+              <!-- Profit Type -->
                   <div class="form-group">
-                      <label for="profit_type">Expected Profit Type:</label>
-                      <select id="profit_type" name="profit_type">
-                        <option value="" selected>Please select a profit type</option>
+                      <label for="return_type">Expected Return Type:</label>
+                      <select id="return_type" name="return_type">
+                        <option value="" selected>Please select a return type</option>
                           <option value="high">High</option>
                           <option value="medium">Medium</option>
                           <option value="low">Low</option>
@@ -129,7 +178,7 @@
                   </div>
               </div>
       
-              <!-- Profit Percentage (Full Width) -->
+              <!-- Profit Percentage (Full Width) 
               <div class="form-group">
                 <label for="profit_percentage">Expected Profit Percentage:</label>
                 <select id="profit_percentage" name="profit_percentage" onchange="toggleCustomProfit(this)">
@@ -142,10 +191,9 @@
                     <option value="other">Other (Enter Manually)</option>
                 </select>
                 
-                <!-- Hidden input field for manual entry -->
                 <input type="number" id="custom_profit" name="custom_profit" placeholder="Enter custom % (e.g., 7.5, 11)" style="display: none;">
             </div>
-            
+                 -->
               <!-- Submit Button -->
               <button class="get-recommendation-btn" type="submit">Get Recommendation</button>
           </form>
@@ -156,55 +204,96 @@
       <div class="greet"><h4>Welcome back, {{ full_name }}! 👋</h4></div>
       <div class='recommendation'>
         <h3>All Recommended Mutual Funds</h3>
-        {% if recommended_funds %}
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Fund Name</th>
-                    <th>Investment Type</th>
-                    <th>Subcategory</th>
-                    <th>Current Price (NAV)</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for fund in recommended_funds %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ fund.fund_name }}</td>
-                        <td>{{ fund.investment_type }}</td>
-                        <td>{{ fund.category }}</td>
-                        <td>₹{{ fund.latest_nav }}</td>
-                        <td>
-                            <form action="{% url 'fund_result' %}" method="POST">
-                               {% csrf_token %}
+            {% if recommended_funds %}
+                <table class="fund-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fund Name</th>
+                            <th>Plan Type</th>
+                            <th>Scheme Type</th>
+                            <th>NAV (₹)</th>
+                            <th>    
+                                {% if form_data.tenure == "5_year_return" %}
+                                    5-Year Return (%)
+                                {% elif form_data.tenure == "3_year_return" %}
+                                    3-Year Return (%)
+                                {% elif form_data.tenure == "1_month_return" %}
+                                    1-Month Return (%)
+                                {% elif form_data.tenure == "3_month_return" %}
+                                    3-Month Return (%)
+                                {% elif form_data.tenure == "6_month_return" %}
+                                    6-Month Return (%)
+                                {% else %}
+                                    1-Year Return (%)
+                                {% endif %}
+                            </th>
+                            <th>Risk</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fund in recommended_funds %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ fund.fund_name }}</td>
+                                <td>{{ fund.category|default:"-" }}</td>
+                                <td>{{ fund.sub_category|default:"-" }}</td> {# not returned, but placeholder okay #}
+                                <td>{{ fund.nav|default:"-" }}</td>
+                                <td>
+                                    {% if form_data.tenure == "5_year_return" %}
+                                        {{ fund.5_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "3_year_return" %}
+                                        {{ fund.3_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "1_month_return" %}
+                                        {{ fund.1_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "3_month_return" %}
+                                        {{ fund.3_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "6_month_return" %}
+                                        {{ fund.6_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% else %}
+                                        {{ fund.1_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% endif %}
+                                </td>
+                                <td class="risk-{{ fund.risk|lower|slugify }}">
+                                    {{ fund.risk|default:"NA" }}
+                                </td>
+                                <td>{% if fund.star_rating %}
+                                       {{ fund.star_rating }}/5 ⭐
+                                    {% else %}
+                                        NA
+                                    {% endif %}
+                                </td>
+                                <td class="action-buttons">
+                                    <form action="{% url 'fund_result' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                        <input type="hidden" name="nav" value="{{ fund.NAV }}">
+                                        <input type="hidden" name="category" value="{{ fund.category }}">
+                                        <button type="submit" class="action-btn view-btn">View</button>
+                                    </form>
+                                    <form action="{% url 'your_funds' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="form_type" value="add-fund">
+                                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                        <input type="hidden" name="investment_type" value="{{ fund.investment_type|default:"-" }}">
+                                        <input type="hidden" name="category" value="{{ fund.category }}">
+                                        <input type="hidden" name="nav" value="{{ fund.NAV }}">
+                                        <input type="hidden" name="risk" value="{{ fund.risk }}">
+                                        <button type="submit" class="action-btn save-btn">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
 
-                               <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                               
-                               <button type="submit" id="show_detail_btn">See More</button>
-                            </form>
+                    {% else %}
+                        <p>No results yet. To get a personalized recommendation, click the <strong>"Get Recommendation"</strong> button above.</p>
+                    {% endif %}
 
-                            <form action="{% url 'your_funds' %}" method="POST">
-                               {% csrf_token %}
-                               <input type="hidden" name="form_type" value="add-fund">
-                               <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                               <input type="hidden" name="investment_type" value="{{ fund.investment_type }}">
-                               <input type="hidden" name="subcategory" value="{{ fund.category }}">
-
-                               <button type="submit" id="save_fund_btn">Save Fund</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        {% else %}
-            <p>No results yet. To get a personalized recommendation, click the <strong>"Get Recommendation"</strong> button above.</p>
-        {% endif %}
-
-    </div>
+              </div>
         <!-- Footer -->
             <footer class="footer">
                 <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
@@ -238,16 +327,20 @@
               }
           }
 
-
               // Toggle function for profile button
               function toggleProfileMenu() {
                 const dropdown = document.querySelector('.profile-dropdown');
                 
                 if (dropdown.style.display === 'block') {
                     dropdown.style.display = 'none';  // Hide if visible
+                    // Remove query param if needed
+                    history.pushState(null, "", window.location.pathname);
                     
                 } else {
                     dropdown.style.display = 'block'; // Show if hidden
+                    // Change URL without reloading
+                    const newUrl = window.location.pathname + "?menu=profile";
+                    history.pushState(null, "", newUrl);
                 }
               }
 

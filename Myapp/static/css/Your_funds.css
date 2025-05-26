@@ -12,31 +12,6 @@ h1 {
     color: #333;
 }
 
-.messages {
-    margin-bottom: 20px;
-}
-
-.message {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-}
-
-.message.info {
-    background-color: #e7f4ff;
-    color: #31708f;
-}
-
-.message.error {
-    background-color: #f8d7da;
-    color: #842029;
-}
-
-.message.success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
 .fund-list table {
     width: 100%;
     border-collapse: collapse;
@@ -79,23 +54,24 @@ h1 {
 }
 
 #delete_btn {
-    display: inline-block;
-    background-color: red;
+    background-color: rgb(249, 45, 45);
     color: white;
-    border: groove 1px black;
     cursor: pointer;
     border-radius: 3px;
     text-align: center;
-    margin-top: 5px;
+    border: none;
+    padding: 5px 8px;
 }
 #show_btn {
-    border: groove 1px black;
     cursor: pointer;
+    background-color: rgb(102, 102, 248);
     border-radius: 3px;
     text-align: center;
-    margin-top: 5px;
+    color: white;
+    border: none;
+    padding: 5px 10px;
 }
-
-
-
-
+.button-group {
+    display: flex;
+    gap: 10px; /* Adds space between buttons */
+}

@@ -1,7 +1,7 @@
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
-    margin: 70px 0px 85px 0px;
+    margin: 50px 0px 50px 0px;
     padding: 0;
 }
 .header {
@@ -17,8 +17,8 @@ body {
 }
 /* Home button Style */
 .home {
-    height: 30px;
-    width: 30px;
+    height: 25px;
+    width: 25px;
     position: fixed;
     top: 10px;
     left: 10px;
@@ -28,6 +28,30 @@ body {
     height: 25px;
     width: 25px;
     border-radius: 100%;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    background-color: grey;
+    color: #fff;
+    margin: 5px 0 0 15px;
+    text-align: center;
+    padding: 5px 10px;
+    border-radius: 4px;
+    position: relative;
+    z-index: 1000;
+    bottom: 120%; /* Position above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    font-size: 14px;
+}
+
+.home:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
 }
 /* Footer Styles */
 .footer {

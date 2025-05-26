@@ -16,30 +16,48 @@
 
     <!-- Reusable Header -->
     <header class="header">
-        Fund Details
+        <div class="fund-dropdown">
+          <form action="{% url 'fund_details' %}" method="POST">
+            {% csrf_token %}
+
+            <label for="fund_name">Select Fund:</label>
+            <select name="fund_name" id="fund_name">
+                <option value="">-- Please Select a Fund --</option>
+                {% for fund in all_funds %}
+                    <option value="{{ fund.fund_name }}">{{ fund.fund_name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Search</button>
+          </form>
+        </div>
+        <div class="search-container">
+          <form action="{% url 'fund_details' %}" method="POST">
+            {% csrf_token %}
+
+            <input type="text" id="searchInput" name="fund_name" placeholder="Search for a mutual fund...">
+            <button type="submit">Search</button>
+          </form>
+        </div>
     </header>
 
     <div class="home">
-        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
-      </div>
-    <!-- Flashed message will be appear here -->
-    {% if messages %}
+        <a href="/" class="btn">
+            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
+        </a>
+        <span class="tooltip-text">
+            Clicking this button will refresh the page. Any unsaved data might be lost.
+        </span>
+    </div>
+        {% if messages %}
+        <div class="messages-container"> {# Added a container for messages for better styling/grouping #}
         {% for message in messages %}
             <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
                 <div class='msg'> {{ message }} </div>
-                </div> 
-            </div>
+            </div> {# Corrected: Removed extra closing div here #}
         {% endfor %}
-    {% endif %}
+        </div> {# Close messages-container #}
+        {% endif %}
 
-<div class="search-container">
-    <form action="{% url 'fund_details' %}" method="POST">
-      {% csrf_token %}
-
-      <input type="text" id="searchInput" name="fund_name" placeholder="Search for a mutual fund...">
-      <button type="submit">Search</button>
-    </form>
-</div>
       {% if basic_info.fund_name %}
         <h1>{{ basic_info.fund_name }}</h1>
 
@@ -150,7 +168,7 @@
             </div>
         </div>
            <div class="card">
-            <div class="section-title">Risk Metrics</div>
+            <div class="section-title"><strong>Risk Metrics</strong></div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="data-item">
                     <div class="data-label">Alpha:</div>
@@ -226,8 +244,8 @@
                     <tbody>
                         {% for load in exit_load %}
                         <tr>
-                            <td>{{ load.description|default:"N/A" }}</td>
-                            <td>{{ load.as_on_date|slice:":10"|default:"N/A" }}</td>
+                            <td>{{ load.description|default:"NA" }}</td>
+                            <td>{{ load.as_on_date|slice:":10"|default:"NA" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -357,6 +375,19 @@
     {% else %}
         <p id="nothing">No fund results available. Kindly type a fund name and press the "Search" button above.</p>
     {% endif %}
+    <!--
+    {% if all_funds %}
+       {% for fund in all_funds %}
+        <div class="card">
+        <h2 class="section-title">All Mutual Funds</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="data-item">
+                <div class="data-label">Fund Name</div>
+                <div class="data-value">{{ fund.fund_name }}</div>
+            </div>
+        {% endfor %}
+    {% endif %}
+       -->
         <!-- Reusable Footer -->
         <footer class='footer'>
             <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>

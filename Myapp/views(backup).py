@@ -20,6 +20,7 @@ from datetime import datetime, timedelta
 from decouple import config
 from Myapp.models import MutualFund
 
+
 import requests
 #from dotenv import load_dotenv
 #load_dotenv() 
@@ -75,6 +76,11 @@ def get_all_funds_data_by_indian_api():
     # Headers to pass the API key
     headers = {"X-Api-Key": API_KEY}
 
+    """# Add the fund_type as a query parameter to filter data
+        params = {
+            "fund_type": fund_type  # Assuming the API supports filtering by fund type
+        }"""
+
     # Send GET request with the headers and params
     response = requests.get(url, headers=headers)
 
@@ -84,28 +90,21 @@ def get_all_funds_data_by_indian_api():
     else:
         return []
 
-def get_single_fund_data_by_indian_api(fund_name):
+def get_single_fund_data_by_api(fund_name):
     url = "https://stock.indianapi.in/mutual_funds_details"
     querystring = {"stock_name": fund_name}
     headers = {"X-Api-Key": API_KEY}
     
     try:
         response = requests.get(url, headers=headers, params=querystring)
+        response.raise_for_status()  # Raises HTTPError for bad responses
+        return response.json()
 
-        if response.status_code == 200:
-            data = response.json()
-
-            # Check if 'error' is in response
-            if 'error' in data or 'basic_info' not in data:
-                return None
-
-            return data
-        else:
-            return None
-    except Exception:
+    except requests.exceptions.RequestException:
         return None
-
+    
 # To show specific fund details using fund name
+@never_cache
 def fund_result(request):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")
@@ -178,18 +177,14 @@ def fund_result(request):
 
     # Default return for GET requests or invalid POST
     return render(request, 'Fund_result.html', context)
-
-from Myapp.models import AllMutualFund
+    
+@never_cache
 def fund_details(request):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")
         return redirect('login')
 
-    #context = {}
-    all_funds = AllMutualFund.objects.all()
-    context = {
-        'all_funds': all_funds,
-    }
+    context = {}
 
     if request.method == "POST":
         fund_name = request.POST.get('fund_name').strip()
@@ -197,9 +192,8 @@ def fund_details(request):
             messages.error(request, "Fund name is missing.")
             return redirect('fund_details')
 
-        fund_data = get_single_fund_data_by_indian_api(fund_name)
+        fund_data = get_single_fund_data_by_api(fund_name)
         if fund_data:
-            print(fund_data)
             try:
                 basic_info = fund_data.get('basic_info', {})
                 name_of_fund = basic_info.get('fund_name')
@@ -208,7 +202,7 @@ def fund_details(request):
                     
                 returns = fund_data.get('returns', {})
                 expense_ratio = fund_data.get('expense_ratio', {})
-                context.update({
+                context = {
                     'basic_info': fund_data.get('basic_info', {}),
                     'nav_info': fund_data.get('nav_info', {}),
                     'absolute_returns': returns.get('absolute', {}),
@@ -223,28 +217,17 @@ def fund_details(request):
                     'holdings': fund_data.get('holdings', []),
                     'current_expense_ratio': expense_ratio.get('current', "NA"),
                     'expense_ratio_history': expense_ratio.get('history', []),
-                })
-                try:
-                    new_fund = AllMutualFund(fund_name=name_of_fund)
-                    new_fund.save()
-                except Exception as e:
-                    pass
-                    #messages.success(request, "Mutual Fund Name already present.")
+                }
 
                 messages.success(request, "Mutual Fund data fetched successfully.")
                 return render(request, 'Fund_details.html', context)
-            
             except ValueError as e:
                 messages.error(request, str(e))
-        else:
-            messages.info(request, "No data is available for the selected fund at the moment.")
+
     # Always return at least empty context
     return render(request, 'Fund_details.html', context)
 
-import numpy as np
-from datetime import datetime
-import requests
-
+@never_cache
 def userdashboard(request):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")
@@ -258,7 +241,7 @@ def userdashboard(request):
     remaining_time = max(0, int(expiry_time - current_time))
 
     full_name = request.session.get('full_name', '').upper().strip()
-    username = request.session.get('username', '').strip()
+    username = request.session.get('username', '')
     # Check if the user has a ProfilePic object and fetch the filename
     
     try:
@@ -269,461 +252,78 @@ def userdashboard(request):
     if not full_name:
         full_name = username
 
-    # Initial context
+    recommended_funds = []
+
+    if request.method == "POST":
+        fund_type = request.POST["company_type"]
+ 
+        if fund_type == "manually":
+            fund_type = request.POST["manual_company_type"]
+        
+        if fund_type:
+            raw_fund_data = get_all_funds_data_by_indian_api()
+
+            # Flatten and process nested structure
+            for main_category, subtypes in raw_fund_data.items():
+                for subtype, funds in subtypes.items():
+                    if main_category == fund_type or subtype == fund_type:
+                        for fund in funds:
+                            processed = {
+                                'fund_name': fund.get('fund_name', None),
+                                'investment_type': main_category,
+                                'category': subtype,
+                                'latest_nav': fund.get('latest_nav', None),
+                                'star_rating': fund.get('star_rating', None),
+                                'return_rate': (
+                                    fund.get('5_year_return')
+                                    or fund.get('3_year_return')
+                                    or fund.get('1_year_return')
+                                    or 'N/A'
+                                ),
+                                'duration': (
+                                    '5 years' if fund.get('5_year_return') else
+                                    '3 years' if fund.get('3_year_return') else
+                                    '1 year'
+                                )
+                            }
+                            recommended_funds.append(processed)
+        else:
+            raw_fund_data = get_all_funds_data_by_indian_api()
+            # Flatten and process nested structure
+            for main_category, subtypes in raw_fund_data.items():
+                for subtype, funds in subtypes.items():
+                    #if main_category == fund_type or subtype == fund_type:
+                    for fund in funds:
+                        processed = {
+                            'fund_name': fund.get('fund_name', None),
+                            'investment_type': main_category,
+                            'category': subtype,
+                            'latest_nav': fund.get('latest_nav', None),
+                            'star_rating': fund.get('star_rating', None),
+                            'return_rate': (
+                                fund.get('5_year_return')
+                                or fund.get('3_year_return')
+                                or fund.get('1_year_return')
+                                or 'N/A'
+                            ),
+                            'duration': (
+                                '5 years' if fund.get('5_year_return') else
+                                '3 years' if fund.get('3_year_return') else
+                                '1 year'
+                            )
+                        }
+                        recommended_funds.append(processed)
+        
     context = {
         "remaining_time": remaining_time,
         "full_name": full_name,
-        "profilepic": profilepic,
-        "recommended_funds": [],
-        "form_data": {},
-        "MEDIA_URL": settings.MEDIA_URL
+        "profilepic": profilepic,  # Pass profile picture URL
+        "recommended_funds": recommended_funds,
+        "MEDIA_URL": settings.MEDIA_URL,  # Pass MEDIA_URL explicitly
     }
-
-    # Handle POST submission
-    if request.method == "POST":
-        # Extract and normalize form data with default values for missing fields
-        fund_type = request.POST.get("fund_type").strip()
-        if fund_type.lower() == "manually":
-            fund_type = request.POST.get("manual_company_type").strip()
-        
-        fund_subtype = request.POST.get("fund_subtype").strip()
-        investment_tenure = request.POST.get("tenure").strip()
-        return_type = request.POST.get("return_type").strip()
-
-        #profit_percentage = request.POST.get("profit_percentage", "")
-        #if profit_percentage.lower() == "other":
-        #    profit_percentage = request.POST.get("custom_profit", "")
-        """
-        # Print all form values
-        print("\n=== FORM VALUES ===")
-        print(f"Fund Type (Original): {request.POST.get('company_type', 'Not provided')}")
-        print(f"Fund Type (Processed): {fund_type}")
-        #print(f"Risk Level: {risk}")
-        print(f"Investment Tenure: {tenure}")
-        print(f"Investment Type: {fund_subtype}")
-        print(f"Return Type: {return_type}")
-        #print(f"Expected Return (Original): {request.POST.get('profit_percentage', 'Not provided')}")
-        #print(f"Expected Return: {profit_percentage}")
-        """
-        # Reassemble form data for rendering
-        form_data = {
-            "fund_type": fund_type,
-            "fund_subtype": fund_subtype,
-            "tenure": investment_tenure,
-            "return_type": return_type,
-        }
-
-        context['form_data'] = form_data
-        
-        print(form_data)
-
-        try:
-            # Get fund data with special case flag
-            raw_fund_data, is_special_case = get_funds_data_from_api(form_data)
-            
-            if raw_fund_data:
-                print(f"Successfully fetched {len(raw_fund_data)} funds")
-                
-                if is_special_case is not None:
-                    # Case 1: Special case (no filters or empty categories)
-                    print("Displaying all funds (no filters applied)")
-                    context["recommended_funds"] = raw_fund_data
-                    messages.success(request, f"{len(raw_fund_data)} funds fetched successfully.")
-                
-                elif is_special_case is None:
-                    # Case 2: Normal filtered case
-                    print(f"Processing {len(raw_fund_data)} filtered funds")
-                    recommended_funds = process_recommendations(form_data, raw_fund_data)
-                    
-                    if recommended_funds:
-                        messages.success(request, f"{len(recommended_funds)} funds recommended successfully.")
-                        context["recommended_funds"] = recommended_funds
-                    else:
-                        # Fallback to showing filtered results if no recommendations
-                        messages.info(request, "No specific recommendations available. Showing all matching funds.")
-            else:
-                messages.error(request, "Could not fetch fund data.")
-
-        except Exception as e:
-            print(f"Recommendation processing error: {e}")
-            messages.error(request, "System error during processing")
-
     return render(request, 'Index.html', context)
-   
-def get_funds_data_from_api(form_data):
-    print(form_data)
-    tenure = form_data.get('tenure', None)
-    fund_type = form_data.get('fund_type', None)
-    fund_subtype = form_data.get('fund_subtype', None)
-    
-    print("Fetching fresh data from API...")
-    api_response = get_all_funds_data_by_indian_api()
-    
-    # Handle case where both filters are None
-    if fund_type in [None, ''] and fund_subtype in [None, '']:
-        processed_data = []
-        for category, funds_data in api_response.items():
-            if not isinstance(funds_data, dict):
-                continue
-            for sub_category, fund_list in funds_data.items():
-                if not isinstance(fund_list, list):
-                    continue
-                for fund_item in fund_list:
-                    try:
-                        processed_data.append({
-                            'fund_name': fund_item.get('fund_name', '').strip(),
-                            'nav': round(float(fund_item.get('latest_nav')), 2),
-                            'category': str(category) if category else "",
-                            'sub_category': str(sub_category) if sub_category else "",
-                            '1_month_return': float_or_none(fund_item.get('1_month_return')),
-                            '3_month_return': float_or_none(fund_item.get('3_month_return')),
-                            '6_month_return': float_or_none(fund_item.get('6_month_return')),
-                            '1_year_return': float_or_none(fund_item.get('1_year_return')),
-                            '3_year_return': float_or_none(fund_item.get('3_year_return')),
-                            '5_year_return': float_or_none(fund_item.get('5_year_return')),
-                            'asset_size': float_or_none(fund_item.get('asset_size')),
-                            'star_rating': float_or_none(fund_item.get('star_rating')),
-                            'return_type': estimate_return_type_using_tenure(tenure, fund_item.get(tenure)),
-                            'risk': estimate_risk_from_return_profile(fund_item),
-                            'is_special_case': True  # Mark special case funds
-                        })
-                    except Exception as e:
-                        print(f"Error processing fund: {str(e)}")
-                        continue
-        print(f"Successfully processed {len(processed_data)} funds (special case)")
-        return processed_data, "10"
-    
-    try:  
-        if not api_response or not isinstance(api_response, dict):
-            print("API returned empty or invalid response")
-            return []
 
-        #print(f"API contains categories: {list(api_response.keys())}")
-        processed_data = []
-
-        for category, funds_data in api_response.items():
-            
-            # Skip if funds_data is not a dict
-            if not isinstance(funds_data, dict):
-                #print(f"  Invalid funds data structure in {category}")
-                continue
-
-            # Process each sub-category in this category
-            for sub_category, fund_list in funds_data.items():
-                if not isinstance(fund_list, list):
-                    #print(f"Skipping invalid sub-category {sub_category}")
-                    continue
-                
-                if (category is not None and category ==  fund_type) or (sub_category is not None and sub_category == fund_subtype):
-                    #print(f"Processing sub-category: {sub_category}")
-                    for fund_item in fund_list:
-                        try:
-                            if not isinstance(fund_item, dict):
-                                #print(f"    Skipping invalid fund data structure")
-                                continue
-                            
-                            processed_data.append({
-                                'fund_name': fund_item.get('fund_name', '').strip(),  # Rename to expected key
-                                'nav': round(float(fund_item.get('latest_nav')), 2),
-                                'category': category,
-                                'sub_category': sub_category,
-                                '1_month_return': float_or_none(fund_item.get('1_month_return')),
-                                '3_month_return': float_or_none(fund_item.get('3_month_return')),
-                                '6_month_return': float_or_none(fund_item.get('6_month_return')),
-
-                                '1_year_return': float_or_none(fund_item.get('1_year_return')),
-                                '3_year_return': float_or_none(fund_item.get('3_year_return')),
-                                '5_year_return': float_or_none(fund_item.get('5_year_return')),
-                                'asset_size': float_or_none(fund_item.get('asset_size')),
-                                'star_rating': float_or_none(fund_item.get('star_rating')),
-                                'return_type': estimate_return_type_using_tenure(tenure, fund_item.get(tenure, '1_year_return')),
-                                'risk': estimate_risk_from_return_profile(fund_item),  # Optional: ensure risk is included
-                            })
-        
-                        except Exception as e:
-                            print(f"Error processing fund: {str(e)}")
-                            continue
-
-        print(f"Successfully processed {len(processed_data)} funds in category: {fund_type or 'All'}")
-        return processed_data, None
-        
-    except Exception as e:
-        print(f"Critical error: {str(e)}")
-        return [], False
-
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import TfidfVectorizer
-
-def process_recommendations(form_data, all_funds):
-    if not all_funds or not form_data:
-        print("Error: No fund data or form data provided.")
-        return []
-
-    try:
-        # Extract filter parameters (case-insensitive)
-        tenure = form_data.get('tenure', '1_year_return').strip()
-        return_type = form_data.get('return_type').strip().lower()  # high/medium/low/negative
-
-        # No need to filter by fund_type/subtype here - already done in get_funds_data_from_api()
-        final_funds = []
-        for fund in all_funds:
-            # Get return value for the selected tenure
-            fund_return = float_or_none(fund.get(tenure))
-            if fund_return is None:
-                continue
-
-            # Classify return type
-            classified_return = estimate_return_type_using_tenure(tenure, fund_return).lower()
-            
-            # Skip if return type doesn't match (when specified)
-            if return_type and classified_return != return_type:
-                continue
-
-            final_funds.append({
-                **fund,
-                'return_value': fund_return,
-                'return_class': classified_return
-            })
-
-        if not final_funds:
-            print(f"No funds match the return type criteria: {return_type or 'Any'}")
-            return []
-
-        # Prepare data for similarity scoring
-        texts, return_values = [], []
-        for fund in final_funds:
-            # Use fund characteristics for similarity
-            combined_text = ' '.join([
-                str(fund.get('fund_name', '')).lower(),
-                str(fund.get('category', '')).lower(),
-                str(fund.get('sub_category', '')).lower(),
-                str(fund.get('return_class', '')).lower()
-            ])
-            texts.append(combined_text)
-            return_values.append([fund['return_value']])
-
-        # TF-IDF and scaling
-        tfidf = TfidfVectorizer()
-        tfidf_matrix = tfidf.fit_transform(texts)
-        
-        scaler = MinMaxScaler()
-        numeric_features = scaler.fit_transform(return_values)
-        
-        # Combine features
-        full_feature_matrix = np.hstack([tfidf_matrix.toarray(), numeric_features])
-
-        # User query features
-        user_text = ' '.join([
-            form_data.get('fund_type', '').lower(),
-            form_data.get('fund_subtype', '').lower(),
-            return_type
-        ]).strip()
-
-        user_tfidf = tfidf.transform([user_text])
-        user_numeric = scaler.transform([[np.median(return_values) if return_values else 0]])
-        user_vector = np.hstack([user_tfidf.toarray(), user_numeric])
-
-        # Calculate similarity
-        similarities = cosine_similarity(user_vector, full_feature_matrix)[0]
-
-        # Get top matches (lower threshold since we pre-filtered)
-        matched_funds = []
-        for idx, sim_score in enumerate(similarities):
-            if sim_score >= 0.01:  # Lower threshold since we already filtered
-                fund = final_funds[idx]
-                fund['similarity'] = round(sim_score, 4)
-                matched_funds.append(fund)
-
-        # Return sorted results (max 10)
-        matched_funds.sort(key=lambda x: x['similarity'], reverse=True)
-        return matched_funds[:10]
-
-    except Exception as e:
-        print(f"Error in process_recommendations: {str(e)}")
-        return []
-    
-"""def fetch_all_fund_special_case(api_response, form_data):
-    try:  
-        condition = True
-        tenure = form_data.get('tenure', "1_year_return")
-        if not api_response or not isinstance(api_response, dict):
-            print("API returned empty or invalid response")
-            return []
-
-        #print(f"API contains categories: {list(api_response.keys())}")
-        processed_data = []
-        for category, funds_data in api_response.items():
-            
-            # Skip if funds_data is not a dict
-            if not isinstance(funds_data, dict):
-                #print(f"  Invalid funds data structure in {category}")
-                continue
-
-            # Process each sub-category in this category
-            for sub_category, fund_list in funds_data.items():
-                if not isinstance(fund_list, list):
-                    #print(f"Skipping invalid sub-category {sub_category}")
-                    continue
-                
-                #if category == fund_type or sub_category == fund_subtype:
-
-                #print(f"Processing sub-category: {sub_category}")
-                for fund_item in fund_list:
-                    try:
-                        if not isinstance(fund_item, dict):
-                            #print(f"    Skipping invalid fund data structure")
-                            continue
-                        
-                        processed_data.append({
-                            'fund_name': fund_item.get('fund_name', '').strip(),  # Rename to expected key
-                            'nav': round(float(fund_item.get('latest_nav')), 2),
-                            'category': category,
-                            'sub_category': sub_category,
-                            '1_month_return': float_or_none(fund_item.get('1_month_return')),
-                            '3_month_return': float_or_none(fund_item.get('3_month_return')),
-                            '6_month_return': float_or_none(fund_item.get('6_month_return')),
-
-                            '1_year_return': float_or_none(fund_item.get('1_year_return')),
-                            '3_year_return': float_or_none(fund_item.get('3_year_return')),
-                            '5_year_return': float_or_none(fund_item.get('5_year_return')),
-                            'asset_size': float_or_none(fund_item.get('asset_size')),
-                            'star_rating': float_or_none(fund_item.get('star_rating')),
-                            'return_type': estimate_return_type_using_tenure(tenure, fund_item.get(tenure, '1_year_return')),
-                            'risk': estimate_risk_from_return_profile(fund_item),  # Optional: ensure risk is included
-                        })
-    
-                    except Exception as e:
-                        print(f"Error processing fund: {str(e)}")
-                        continue
-
-        print(f"Successfully processed {len(processed_data)} funds in category: All")
-        return processed_data,condition
-        
-    except Exception as e:
-        print(f"Critical error: {str(e)}")
-        return []
-"""
-def estimate_return_type_using_tenure(tenure, return_rate):
-    try:
-        # Handle case where return_rate is None or not a number
-        if return_rate is None:
-            return "NA"
-        
-        # Ensure return_rate is a valid number
-        try:
-            return_rate = float(return_rate)
-        except (TypeError, ValueError):
-            return "NA"
-        
-        # Return type classification based on return_rate
-        if tenure == "1_month_return":
-            if return_rate >= 5:
-                return "High"
-            elif 2 <= return_rate < 5:
-                return "Medium"
-            elif 0 <= return_rate < 2:
-                return "Low"
-            else:  # Negative returns
-                return "Negative"
-            
-        elif tenure == "3_month_return":
-            if return_rate >= 8:
-                return "High"
-            elif 4 <= return_rate < 8:
-                return "Medium"
-            elif 0 <= return_rate < 4:
-                return "Low"
-            else:  # Negative returns
-                return "Negative"
-            
-        elif tenure == "6_month_return":
-            if return_rate >= 10:
-                return "High"
-            elif 6 <= return_rate < 10:
-                return "Medium"
-            elif 0 <= return_rate < 6:
-                return "Low"
-            else:  # Negative returns
-                return "Negative"
-        
-        elif tenure == "1_year_return":
-            if return_rate >= 12:
-                return "High"
-            elif 8 <= return_rate < 12:
-                return "Medium"
-            elif 0 <= return_rate < 8:
-                return "Low"
-            else:  # Negative returns
-                return "Negative"
-            
-        elif tenure == "3_year_return":
-            if return_rate >= 10:
-                return "High"
-            elif 6 <= return_rate < 10:
-                return "Medium"
-            elif 0 <= return_rate < 6:
-                return "Low"
-            else:  # Negative returns
-                return "Negative"
-            
-        elif tenure == "5_year_return":
-            if return_rate >= 8:
-                return "High"
-            elif 4 <= return_rate < 8:
-                return "Medium"
-            elif 0 <= return_rate < 4:
-                return "Low"
-            else:  # Negative returns
-                return "Negative"
-        
-        else:
-            return "NA"
-        
-    except Exception as e:
-        print(f"Error estimating return type: {e}")
-        return "NA"
-
-def estimate_risk_from_return_profile(fund_data):
-    try:
-        # Extract valid returns
-        returns = []
-        for key in ['1_month_return', '3_month_return', '6_month_return', '1_year_return', '3_year_return', '5_year_return']:
-            value = fund_data.get(key)
-            if value is not None:
-                try:
-                    returns.append(float(value))
-                except ValueError:
-                    continue
-
-        if len(returns) < 2:
-            return "NA"
-
-        # Calculate average
-        avg_return = sum(returns) / len(returns)
-
-        # Calculate standard deviation (manual)
-        variance = sum((x - avg_return) ** 2 for x in returns) / (len(returns) - 1)
-        std_dev = variance ** 0.5
-
-        # Risk classification based on volatility
-        if std_dev < 2:
-            return "Low"
-        elif std_dev < 4:
-            return "Medium"
-        else:
-            return "High"
-
-    except Exception as e:
-        print(f"Risk estimation error: {e}")
-        return "NA"
-
-def float_or_none(value):
-    try:
-        return round(float(value), 2)
-    except:
-        return None
-
+@never_cache
 def your_funds(request):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")

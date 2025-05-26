@@ -13,6 +13,10 @@
 {% block header %} {{ header }} {% endblock %}
 
 {% block content %} 
+    <div class="home">
+        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+    </div>
+
         <!-- Flashed message will be appear here -->
         {% if messages %}
             {% for message in messages %}

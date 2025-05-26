@@ -17,9 +17,14 @@
         Your Funds
     </header>
 
-    <div class="home">
-        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
-      </div>
+        <div class="home">
+            <a href="/" class="btn">
+                <img src="{% static 'icons/homeicon.png' %}" alt="Home">
+            </a>
+            <span class="tooltip-text">
+                Clicking this button will refresh the page. Any unsaved data might be lost.
+            </span>
+        </div>
 
         <!-- Display messages -->
         {% if messages %}
@@ -54,21 +59,24 @@
                             <td>{{ fund.investment_type }}</td>
                             <td>{{ fund.subcategory }}</td>
                             <td>
+                              <div class="button-group">
                                 <form action="{% url 'fund_result' %}" method="POST">
                                 {% csrf_token %}
 
                                 <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
                                 
-                                <button type="submit" id="show_btn">See More</button>
+                                  <button type="submit" id="show_btn">View</button>
                                 </form>
-                                <form action="{% url 'your_funds' %}" method="POST">
+                            
+                                <form action="{% url 'your_funds' %}" method="POST" onsubmit="return confirmDelete()">
                                 {% csrf_token %}
 
                                 <input type="hidden" name="form_type" value="delete-fund">
                                 <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
                                 
-                                <button type="submit" id="delete_btn">Delete Funds</button>
+                                <button type="submit" id="delete_btn">Delete</button>
                                 </form>
+                              </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -79,9 +87,14 @@
             {% endif %}
         </div>
     </div>
-              <!-- Footer -->
-            <footer class="footer">
-                <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
-            </footer>
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+        </footer>
+        <script>
+            function confirmDelete() {
+                return confirm("Are you sure you want to delete this fund?");
+            }
+        </script>
 </body>
 </html>
