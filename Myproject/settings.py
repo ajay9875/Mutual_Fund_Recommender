@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # Ensure DEBUG is True for development not for deployment
-DEBUG = True
+DEBUG = False
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #ALLOWED_HOSTS = []
