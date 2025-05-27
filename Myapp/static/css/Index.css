@@ -8,6 +8,7 @@ body {
 /* Header Style */
 .header {
     position:fixed;
+    justify-content: space-evenly;
     width: 100%;
     top:0;
     left:0;
@@ -15,7 +16,7 @@ body {
     background-color: rgb(51, 51, 51);
 }
 .nav-links ul {
-    display: flex;
+    display:flex;
     align-items: center;
     list-style: none;
     gap:10px;
@@ -37,11 +38,7 @@ body {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 5px;
 }
-.logo img{
-    height: 50px;
-    width: 50px;
-    border-radius: 100%;
-}
+
 .logo{
     margin-left: auto;
     margin-right: 20px;
@@ -61,8 +58,8 @@ html {
 }
 /* Profile Button Style */
 .profile-btn img{
-    height: 50px;
-    width: 50px;
+    height: 40px;
+    width: 40px;
     border-radius: 100%;
 }
 .profile-btn{
@@ -232,6 +229,46 @@ th {
     font-size: 16px;
     color: black;
 }
+
+#save_fund_btn{
+    margin-top: 5px;
+}
+.recommendation button:hover{
+    cursor: pointer;
+}
+.tooltip-text {
+    display: none;
+    width: fit-content;
+    color: #fff;
+    border-radius: 4px;
+    position: relative;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    font-size: 14px;
+}
+.tooltip-text pre{
+    padding: 5px;
+    background: grey;
+}
+
+.home:hover .tooltip-text {
+    display: block;
+    opacity: 1;
+}
+/* Home button Style */
+.home {
+    height: 25px;
+    width: 25px;
+    top: 10px;
+    left: 10px;
+}
+.home img {
+    margin-left: 5px;
+    height: 25px;
+    width: 25px;
+    border-radius: 100%;
+}
 /* Footer Styles */
 .footer {
     position: fixed;
@@ -244,13 +281,6 @@ th {
     padding: 0px 0px 2px 0px; /* Reduced padding for a strip-like appearance */
     font-weight: 500;
     height: 25px;
-}
-
-#save_fund_btn{
-    margin-top: 5px;
-}
-.recommendation button:hover{
-    cursor: pointer;
 }
 
 /* --- Responsive Design --- */

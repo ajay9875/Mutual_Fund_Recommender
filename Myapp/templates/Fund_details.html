@@ -18,6 +18,15 @@
         Fund Details
     </header>
 
+    <div class="home">
+        <a href="/" class="btn">
+            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
+        </a>
+        <div class="tooltip-text">
+            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
+        </div>
+    </div>
+
     <div class="fund-search">
         <div class="fund-dropdown">
           <form action="{% url 'fund_details' %}" method="POST">
@@ -43,14 +52,6 @@
         </div>
     </div>
 
-    <div class="home">
-        <a href="/" class="btn">
-            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
-        </a>
-        <div class="tooltip-text">
-            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
-        </div>
-    </div>
         {% if messages %}
         <div class="messages-container"> {# Added a container for messages for better styling/grouping #}
         {% for message in messages %}
@@ -364,7 +365,7 @@
                         <tr class="table-row">
                             <td>{{ entry.date|slice:":10" }}</td>
                             <td>{{ entry.ratio|floatformat:2 }}%</td>
-                            <td>{{ entry.turnover_ratio|default:"N/A" }}</td>
+                            <td>{{ entry.turnover_ratio|default:"None" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

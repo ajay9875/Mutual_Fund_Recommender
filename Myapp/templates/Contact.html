@@ -14,7 +14,12 @@
 
 {% block content %} 
     <div class="home">
-        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+        <a href="/" class="btn">
+            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
+        </a>
+        <div class="tooltip-text">
+            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
+        </div>
     </div>
 
         <!-- Flashed message will be appear here -->
