@@ -155,16 +155,9 @@ tr:hover {
     color: var(--danger-color);
 }
 
-.hidden {
-    display: none;
-}
-
 .search-container {
     background-color: white;
-    max-width: 400px;
-    margin-left: auto;
-    align-items: center;
-    margin-right: 3%;
+    width: fit-content;
     border-radius: 5px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -197,7 +190,6 @@ button {
 
 .search-container form {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 10px;
 }
@@ -207,9 +199,6 @@ button {
     max-width: 600px;
     padding: 3px;
 }
-.fund-dropdown select:hover{
-    cursor: pointer;
-}
 .fund-dropdown select option:nth-child(1) {
     text-align: center;
 }
@@ -217,14 +206,11 @@ button {
 .header {
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-evenly;
     flex-wrap: wrap;
     padding: 10px;
 }
-
-.fund-dropdown {
-    margin-left: 100px;
-    display: flex;
-    flex-shrink: 0;
+.fund-dropdown select:hover{
+    cursor: pointer;
 }
 

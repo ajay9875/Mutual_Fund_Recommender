@@ -31,26 +31,23 @@ body {
 }
 
 .tooltip-text {
-    visibility: hidden;
-    background-color: grey;
+    display: none;
+    width: fit-content;
     color: #fff;
-    margin: 5px 0 0 15px;
-    text-align: center;
-    padding: 5px 10px;
     border-radius: 4px;
     position: relative;
     z-index: 1000;
-    bottom: 120%; /* Position above the icon */
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
     opacity: 0;
     transition: opacity 0.3s ease, visibility 0.3s ease;
     font-size: 14px;
 }
+.tooltip-text pre{
+    padding: 5px;
+    background: grey;
+}
 
 .home:hover .tooltip-text {
-    visibility: visible;
+    display: block;
     opacity: 1;
 }
 /* Footer Styles */
