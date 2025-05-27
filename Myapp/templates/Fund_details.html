@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ basic_info.fund_name|default:"Mutual Fund" }} - Fund Details</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/Header.css' %}">
     <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
     <script src="{% static 'javascript/allmessage.js' %}"></script>
@@ -16,6 +15,10 @@
 
     <!-- Reusable Header -->
     <header class="header">
+        Fund Details
+    </header>
+
+    <div class="fund-search">
         <div class="fund-dropdown">
           <form action="{% url 'fund_details' %}" method="POST">
             {% csrf_token %}
@@ -38,7 +41,7 @@
             <button type="submit">Search</button>
           </form>
         </div>
-    </header>
+    </div>
 
     <div class="home">
         <a href="/" class="btn">
@@ -288,7 +291,7 @@
             <p class="text-gray-600">No holdings data available.</p>
             {% endif %}
         </div>
-                <div class="card">
+        <div class="card">
             <h2 class="section-title">Fund House Information</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="data-item">
@@ -372,9 +375,11 @@
             {% endif %}
         </div>
     </div>
+
     {% else %}
         <p id="nothing">No fund results available. Kindly type a fund name and press the "Search" button above.</p>
     {% endif %}
+
     <!--
     {% if all_funds %}
        {% for fund in all_funds %}

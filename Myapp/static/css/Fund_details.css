@@ -12,7 +12,7 @@ body {
     color: #333;
     background-color: #f5f7fa;
     width: 95%;
-    margin: 100px auto;
+    margin: 50px auto;
 }
 #nothing{
     max-width: 98%;
@@ -155,6 +155,19 @@ tr:hover {
     color: var(--danger-color);
 }
 
+.fund-search{
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    border: 1px solid #e0e0e0;
+    margin: 15px 0;
+    padding: 5px;
+    border-radius: 8px;
+    background: rgb(240, 239, 239);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
 .search-container {
     background-color: white;
     width: fit-content;
@@ -203,13 +216,6 @@ button {
     text-align: center;
 }
 
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-    padding: 10px;
-}
 .fund-dropdown select:hover{
     cursor: pointer;
 }
