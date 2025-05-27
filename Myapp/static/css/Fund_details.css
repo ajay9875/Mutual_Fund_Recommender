@@ -202,15 +202,6 @@ button {
     gap: 10px;
 }
 
-.NA {
-    color: red;
-}
-.header{
-    display: flex;
-}
-.fund-dropdown{
-    margin-left: auto;
-}
 .fund-dropdown select{
     width: 350px;
     max-width: 600px;
@@ -222,3 +213,18 @@ button {
 .fund-dropdown select option:nth-child(1) {
     text-align: center;
 }
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 10px;
+}
+
+.fund-dropdown {
+    margin-left: 100px;
+    display: flex;
+    flex-shrink: 0;
+}
+
