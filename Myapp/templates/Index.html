@@ -26,7 +26,7 @@
    
         <li><a href="{% url 'sip_calculator' %}">SIP Calculator</a></li>
         <li><a href="{% url 'fund_details' %}">Fund Detail Search</a></li>
-        <li><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;">Get Recommendation</a></li>
+        <li><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;" id='rec'>Get Recommendation</a></li>
         <li><a href="{% url 'fund_result' %}">All Mutual Funds</a></li>
         <li><a href="{% url 'your_funds' %}">Your Funds</a></li>
         <li><a href="\contact">Contact</a></li>
@@ -309,6 +309,11 @@
             </footer>
                 
     <script>
+          // Show/Hide recommendation with mouseover/mouseout
+            document.getElementById('rec').addEventListener('mouseover', () => {
+            document.querySelector('.form-container').style.display = 'block';
+            });
+
           //Show recommendation form only by clicking button
           function showRecommendationForm() {
               let rec_form = document.querySelector('.form-container');

@@ -14,22 +14,31 @@ from django.core.mail import send_mail
 from django.http import HttpResponseServerError
 from Myapp.models import Contact
 from .models import ProfilePic
+from django.core.cache import cache
 import os
 import random
 from datetime import datetime, timedelta
 from decouple import config
 from Myapp.models import MutualFund
-
+import time
 import requests
+import csv
+from io import StringIO
+CACHE_DURATION = 60 * 60 * 6  # 5 hours in seconds
+import requests
+from io import StringIO
+from Myapp.models import AllMutualFund
 #from dotenv import load_dotenv
 #load_dotenv() 
 
 from django.http import HttpResponse
 from .notifications import send_daily_notifications
 
+"""
 def run_daily(request):
     send_daily_notifications()
     return HttpResponse("Daily notifications sent successfully!.")
+"""
 
 def my_view(request):
     try:
@@ -53,7 +62,8 @@ API_KEY = config("API_ACCESS_KEY")
 #At Rapidapi by indian market api
 #API_AUTH_TOKEN = config("API_AUTH_TOKEN")
 
-"""# Fuzzy matching using fuzzywuzzy/thefuzz
+"""
+# Fuzzy matching using fuzzywuzzy/thefuzz
 def find_best_match(user_input):
 
     # Get the best match from the list
@@ -65,7 +75,8 @@ def find_best_match(user_input):
         return best_match
     else:
         print("No reliable match found.")
-        return None"""
+        return None
+"""
 
 #It's for all fund data using fund type
 def get_all_funds_data_by_indian_api():
@@ -148,49 +159,79 @@ def fund_result(request):
 
             return render(request, 'Fund_result.html', context)
     
-    raw_fund_data = get_all_funds_data_by_indian_api()
-    categorized_funds = []
-    
-    # Organize funds by category and scheme type
-    for main_category, subtypes in raw_fund_data.items():
-        for subtype, funds in subtypes.items():
-            for fund in funds:
-                categorized_funds.append({
-                    'fund_name': fund.get('fund_name'),
-                    'latest_nav': fund.get('latest_nav'),
-                    'percentage_change': fund.get('percentage_change'),
-                    'asset_size': fund.get('asset_size'),
-                    '1_month_return': fund.get('1_month_return'),
-                    '3_month_return': fund.get('3_month_return'),
-                    '6_month_return': fund.get('6_month_return'),
-                    '1_year_return': fund.get('1_year_return'),
-                    '3_year_return': fund.get('3_year_return'),
-                    '5_year_return': fund.get('5_year_return'),
-                    'star_rating': fund.get('star_rating'),
-                    'investment_type': main_category,  # Debt/Equity/etc
-                    'category': subtype  # Floating Rate/Dynamic Bond/etc
-                })
+    current_time = time.time()
+    # Try getting from Django cache
+    cached_data = cache.get('cached_fund_result')
+    last_fetched_time = cache.get('last_fetched_time', 0)
 
-    context = {
-        'categorized_funds': categorized_funds,
-        'show_table': True
-    }
+    print(f"LAST_FETCHED_TIME: {last_fetched_time}")
+    print(f"CACHE_DURATION: {CACHE_DURATION}")
+    print(f"Time since last fetch: {current_time - last_fetched_time}")
 
+    if cached_data is not None and (current_time - last_fetched_time) < CACHE_DURATION and len(cached_data) > 1:
+        print("✅ Using cached fund data.")
+        context.update({
+            'categorized_funds': cached_data,
+            'show_table': True
+        })
+        print(f"✅ Fetched cached funds data")
+
+    else:
+        raw_fund_data = get_all_funds_data_by_indian_api()
+        categorized_funds = []
+        
+        # Organize funds by category and scheme type
+        for main_category, subtypes in raw_fund_data.items():
+            for subtype, funds in subtypes.items():
+                for fund in funds:
+                    categorized_funds.append({
+                        'fund_name': fund.get('fund_name'),
+                        'latest_nav': fund.get('latest_nav'),
+                        'percentage_change': fund.get('percentage_change'),
+                        'asset_size': fund.get('asset_size'),
+                        '1_month_return': fund.get('1_month_return'),
+                        '3_month_return': fund.get('3_month_return'),
+                        '6_month_return': fund.get('6_month_return'),
+                        '1_year_return': fund.get('1_year_return'),
+                        '3_year_return': fund.get('3_year_return'),
+                        '5_year_return': fund.get('5_year_return'),
+                        'star_rating': fund.get('star_rating'),
+                        'investment_type': main_category,  # Debt/Equity/etc
+                        'category': subtype  # Floating Rate/Dynamic Bond/etc
+                    })
+
+        context = {
+            'categorized_funds': categorized_funds,
+            'show_table': True
+        }
+        # Save to Django cache
+        cache.set('cached_fund_result', categorized_funds, timeout=CACHE_DURATION)
+        cache.set('last_fetched_time', current_time, timeout=CACHE_DURATION)
+
+        print(f"✅ Fetched and cached new data. Total Funds: {len(categorized_funds)}")
+    messages.success(request, "Fund result fetched successfully")
     # Default return for GET requests or invalid POST
     return render(request, 'Fund_result.html', context)
 
-from Myapp.models import AllMutualFund
 def fund_details(request):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")
         return redirect('login')
-
+    
+    # Try getting from Django cache
+    """
+    cached_data = cache.get('all_funds_data')
+    last_fetched_time = cache.get('last_fetched_time', 0)
+    print(f"Cached Data:{cached_data}")
+    print(f"Last Fetched Data:{last_fetched_time}")
+    """
     #context = {}
     all_funds = AllMutualFund.objects.all()
     context = {
         'all_funds': all_funds,
     }
 
+    filtered_funds = None
     if request.method == "POST":
         fund_name = request.POST.get('fund_name').strip()
         if not fund_name:
@@ -198,14 +239,12 @@ def fund_details(request):
             return redirect('fund_details')
 
         fund_data = get_single_fund_data_by_indian_api(fund_name)
-        if fund_data:
-            print(fund_data)
+        if (fund_data and isinstance(fund_data, dict) and 
+            'basic_info' in fund_data and isinstance(fund_data['basic_info'], dict) and 
+            fund_data['basic_info'].get('fund_name')):  
             try:
                 basic_info = fund_data.get('basic_info', {})
                 name_of_fund = basic_info.get('fund_name')
-                if not name_of_fund:
-                    raise ValueError("Fund data not found, please try again.")
-                    
                 returns = fund_data.get('returns', {})
                 expense_ratio = fund_data.get('expense_ratio', {})
                 context.update({
@@ -235,11 +274,148 @@ def fund_details(request):
                 return render(request, 'Fund_details.html', context)
             
             except ValueError as e:
-                messages.error(request, str(e))
+                print(f"Error:{e}")
+                pass
+
         else:
-            messages.info(request, "No data is available for the selected fund at the moment.")
+            filtered_funds = get_matching_funds(fund_name, 0.20)
+            print(fund_name)
+            if filtered_funds is not None and len(filtered_funds) > 0:
+                #print(filtered_funds)
+                # ✅ Convert keys to template-friendly format
+                for fund in filtered_funds:
+                    fund['scheme_name'] = fund.pop('Scheme Name', '')
+                    fund['scheme_code'] = fund.get('Scheme Code', '')
+                    fund['nav'] = fund.get('NAV', '')
+                    fund['date'] = fund.get('Date', '')
+                    fund['plan_type'] = fund.get('Plan Type', '')
+                    fund['category'] = fund.get('Category', '')
+                    fund['duration'] = fund.get('Duration', '')
+                    fund['match_score'] = fund.get('Match Score', '')*100
+                    try:
+                        new_fund = AllMutualFund(fund_name=fund["scheme_name"])
+                        new_fund.save()
+                    except Exception as e:
+                        pass
+                messages.success(request, f"Recommended {len(filtered_funds)} Fund data successfully.")
+                context.update({ 'filtered_funds': filtered_funds })
+            else:
+                messages.info(request, "No matching fund data available at the moment. Please try a different name or check back later.")
+
+            #messages.info(request, "No data is available for the selected fund at the moment.")
     # Always return at least empty context
     return render(request, 'Fund_details.html', context)
+
+def get_fund_data_from_amfi_using_web_scraping():
+    current_time = time.time()
+    #cache.delete('all_funds_data')
+    # Try getting from Django cache
+    cached_data = cache.get('all_funds_data')
+    last_fetched_time = cache.get('last_fetched_time', 0)
+
+    print(f"LAST_FETCHED_TIME: {last_fetched_time}")
+    print(f"CACHE_DURATION: {CACHE_DURATION}")
+    print(f"Time since last fetch: {current_time - last_fetched_time}")
+
+    if cached_data is not None and (current_time - last_fetched_time) < CACHE_DURATION and len(cached_data) > 1:
+        print("✅ Using cached fund data.")
+        return cached_data
+
+    # Fetch from AMFI
+    url = "https://www.amfiindia.com/spages/NAVAll.txt"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        print("❌ Failed to fetch data from AMFI.")
+        return []
+
+    data = response.text.strip().splitlines()
+    start_idx = next(i for i, line in enumerate(data) if line.startswith("Scheme Code"))
+    csv_data = "\n".join(data[start_idx:])
+    f = StringIO(csv_data)
+    reader = csv.DictReader(f, delimiter=';')
+
+    funds = []
+    for row in reader:
+        if row.get('Scheme Name'):
+            funds.append({
+                'Scheme Name': row['Scheme Name'].strip(),
+                'Scheme Code': row['Scheme Code'].strip(),
+                'ISIN': row['ISIN Div Payout/ ISIN Growth'].strip(),
+                'NAV': row['Net Asset Value'].strip(),
+                'Date': row['Date'].strip(),
+                'Plan Type': infer_plan_type(row['Scheme Name'].strip()),
+                'Duration': infer_duration(row['Scheme Name'].strip()),
+                'Category': infer_category(row['Scheme Name'].strip()),
+            })
+
+    # Save to Django cache
+    cache.set('all_funds_data', funds, timeout=CACHE_DURATION)
+    cache.set('last_fetched_time', current_time, timeout=CACHE_DURATION)
+
+    print(f"✅ Fetched and cached new data. Total Funds: {len(funds)}")
+    return funds
+
+def infer_plan_type(name):
+    name = name.lower()
+    if 'direct' in name:
+        return 'Direct'
+    if 'regular' in name:
+        return 'Regular'
+    return 'Regular'  # Default to Regular if nothing is matched
+
+def infer_duration(name):
+    name = name.lower()
+    if 'short' in name:
+        return 'Short Term'
+    if 'long' in name:
+        return 'Long Term'
+    if 'ultra' in name or 'overnight' in name:
+        return 'Very Short Term'
+    return 'Medium Term'
+
+def infer_category(name):
+    name = name.lower()
+    if 'equity' in name:
+        return 'Equity'
+    if 'debt' in name or 'bond' in name:
+        return 'Debt'
+    if 'hybrid' in name:
+        return 'Hybrid'
+    if 'index' in name:
+        return 'Index Fund'
+    return 'Other'
+
+def get_matching_funds(search_term, threshold=0.20):
+    """Find funds with similar names using cosine similarity"""
+    funds = get_fund_data_from_amfi_using_web_scraping()
+    if not funds:
+        print("Error: Funds data not fetched from amfiindia.")
+        return []
+
+    # Prepare data for similarity comparison
+    vectorizer = TfidfVectorizer()
+    fund_names = [
+        f['Scheme Name'].lower()
+        for f in funds
+        if isinstance(f, dict) and 'Scheme Name' in f
+    ]
+
+    tfidf_matrix = vectorizer.fit_transform([search_term.lower()] + fund_names)
+    
+    # Calculate similarities
+    similarities = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:])[0]
+    
+    # Return matches above threshold, sorted by Match Score descending
+    matched_funds = [
+        {**fund, 'Match Score': float(score)}
+        for fund, score in zip(funds, similarities)
+        if score >= threshold
+    ]
+
+    matched_funds.sort(key=lambda x: x['Match Score'], reverse=True)
+    
+    return matched_funds[:20]
 
 import numpy as np
 from datetime import datetime
@@ -355,10 +531,30 @@ def get_funds_data_from_api(form_data):
     tenure = form_data.get('tenure', None)
     fund_type = form_data.get('fund_type', None)
     fund_subtype = form_data.get('fund_subtype', None)
-    
-    print("Fetching fresh data from API...")
-    api_response = get_all_funds_data_by_indian_api()
-    
+    current_time = time.time()
+
+    # Try getting from Django cache
+    cached_data = cache.get('all_funds_data_to_recommend')
+    last_fetched_time = cache.get('last_fetched_time', 0)
+
+    print(f"LAST_FETCHED_TIME: {last_fetched_time}")
+    print(f"CACHE_DURATION: {CACHE_DURATION}")
+    print(f"Time since last fetch: {current_time - last_fetched_time}")
+
+    if cached_data is not None and (current_time - last_fetched_time) < CACHE_DURATION and len(cached_data) > 1:
+        print("Fetching cached data from django...")
+        api_response = cached_data
+        print("✅ Using cached fund data.")
+    else:
+        print("Fetching fresh data from API...")
+        api_response = get_all_funds_data_by_indian_api()
+        if api_response:
+            # Save to Django cache
+            cache.set('all_funds_data_to_recommend', api_response, timeout=CACHE_DURATION)
+            cache.set('last_fetched_time', current_time, timeout=CACHE_DURATION)
+
+        print(f"✅ Fetched and cached new data.")
+
     # Handle case where both filters are None
     if fund_type in [None, ''] and fund_subtype in [None, '']:
         processed_data = []

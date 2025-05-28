@@ -376,27 +376,50 @@
             {% endif %}
         </div>
     </div>
+    {% elif filtered_funds %}
+        <h2 class="section-title">Matching Mutual Funds</h2>
+        {% for fund in filtered_funds %}
+        <div class="card p-4 mb-4 shadow rounded-lg border border-gray-200 bg-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="data-item">
+                    <div class="data-label">Fund Name</div>
+                    <div class="data-value">{{ fund.scheme_name }}</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Plan Type</div>
+                    <div class="data-value">{{ fund.plan_type }}</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Scheme Type</div>
+                    <div class="data-value">{{ fund.category }}</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">NAV</div>
+                    <div class="data-value">₹{{ fund.nav|floatformat:2 }} as of {{ fund.date }}</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Duration</div>
+                    <div class="data-value">{{ fund.duration }}</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Scheme Code</div>
+                    <div class="data-value">{{ fund.scheme_code }}</div>
+                </div>
+                <div class="data-item">
+                    <div class="data-label">Match Score</div>
+                    <div class="data-value">{{ fund.match_score|floatformat:2 }}%</div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
 
     {% else %}
         <p id="nothing">No fund results available. Kindly type a fund name and press the "Search" button above.</p>
     {% endif %}
 
-    <!--
-    {% if all_funds %}
-       {% for fund in all_funds %}
-        <div class="card">
-        <h2 class="section-title">All Mutual Funds</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="data-item">
-                <div class="data-label">Fund Name</div>
-                <div class="data-value">{{ fund.fund_name }}</div>
-            </div>
-        {% endfor %}
-    {% endif %}
-       -->
-        <!-- Reusable Footer -->
-        <footer class='footer'>
-            <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
-        </footer>
+    <!-- Reusable Footer -->
+    <footer class='footer'>
+        <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+    </footer>
 </body>
 </html>
