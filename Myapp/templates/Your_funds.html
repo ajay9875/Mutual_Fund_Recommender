@@ -43,50 +43,57 @@
 
         <!-- Fund Details Section -->
         <div class="fund-list">
-            {% if fund_details %}
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fund Name</th>
-                            <th>Investment Type</th>
-                            <th>Subcategory</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for fund in fund_details %}
-                        <tr>
+        {% if fund_details %}
+            <table class="fund-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fund Name</th>
+                        <th>Plan Type</th>
+                        <th>Scheme Type</th>
+                        <th>NAV (₹)</th>
+                        <th>Rating</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fund in fund_details %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
                             <td>{{ fund.fund_name }}</td>
                             <td>{{ fund.investment_type }}</td>
                             <td>{{ fund.subcategory }}</td>
-                            <td>
-                              <div class="button-group">
+                            <td>{{ fund.nav }}</td>
+                        <td>
+                            {% if fund.rating == 'None' %}
+                                NA
+                            {% else %}
+                                {{fund.rating }}/5⭐
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-btns">
                                 <form action="{% url 'fund_result' %}" method="POST">
-                                {% csrf_token %}
-
-                                <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                
-                                  <button type="submit" id="show_btn">View</button>
+                                    {% csrf_token %}
+                                    <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                    <button type="submit" class="action-btn view-btn">View</button>
                                 </form>
-                            
                                 <form action="{% url 'your_funds' %}" method="POST" onsubmit="return confirmDelete()">
-                                {% csrf_token %}
-
-                                <input type="hidden" name="form_type" value="delete-fund">
-                                <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                
-                                <button type="submit" id="delete_btn">Delete</button>
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_type" value="delete-fund">
+                                    <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                    <button type="submit" class="action-btn save-btn">Delete</button> 
                                 </form>
-                              </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p>No funds added yet. Please add some funds.</p>
-            {% endif %}
-        </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-data">No funds added yet. Please add some funds.</p>
+        {% endif %}
+    </div>
     </div>
         <!-- Footer -->
         <footer class="footer">

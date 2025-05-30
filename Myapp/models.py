@@ -7,9 +7,12 @@ class MutualFund(models.Model):
     fund_name = models.CharField(max_length=255)
     investment_type = models.CharField(max_length=100, null=True, blank=True)
     subcategory = models.CharField(max_length=100, null=True, blank=True)
+    nav = models.FloatField(null=True, blank=True)
+    #return_1 = models.FloatField(null=True, blank=True)
+    rating = models.CharField(null=True, blank=True)
 
     def __str__(self):
-        return self.fund_name
+        return f"{self.fund_name} ({self.username})"   
         
 # Create your models here.
 class Contact(models.Model):
@@ -31,7 +34,7 @@ class ProfilePic(models.Model):
 
 class AllMutualFund(models.Model):
     fund_name = models.CharField(max_length=300, unique=True, null=True, blank=True)
-
+   
     def __str__(self):
         return self.fund_name
     

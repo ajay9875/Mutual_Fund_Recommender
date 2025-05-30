@@ -532,7 +532,7 @@ def get_funds_data_from_api(form_data):
     fund_type = form_data.get('fund_type', None)
     fund_subtype = form_data.get('fund_subtype', None)
     current_time = time.time()
-
+    #cache.delete('all_funds_data_to_recommend')
     # Try getting from Django cache
     cached_data = cache.get('all_funds_data_to_recommend')
     last_fetched_time = cache.get('last_fetched_time', 0)
@@ -578,7 +578,7 @@ def get_funds_data_from_api(form_data):
                             '3_year_return': float_or_none(fund_item.get('3_year_return')),
                             '5_year_return': float_or_none(fund_item.get('5_year_return')),
                             'asset_size': float_or_none(fund_item.get('asset_size')),
-                            'star_rating': float_or_none(fund_item.get('star_rating')),
+                            'star_rating': fund_item.get('star_rating'),
                             'return_type': estimate_return_type_using_tenure(tenure, fund_item.get(tenure)),
                             'risk': estimate_risk_from_return_profile(fund_item),
                             'is_special_case': True  # Mark special case funds
@@ -946,24 +946,30 @@ def your_funds(request):
             fund_name = request.POST['fund_name']
             investment_type = request.POST['investment_type']
             subcategory = request.POST['subcategory']
-            if not fund_name or not investment_type or not subcategory:
+            latest_nav = request.POST['nav']
+            star_rating = request.POST['rating']
+            print(f"Fund Name: {fund_name}, Investment Type: {investment_type}, Subcategory: {subcategory}, NAV:{latest_nav}, Rating:{star_rating}")
+            #yearly_return = request.POST['yearly_return']
+            if not fund_name or not investment_type or not subcategory or not latest_nav or not star_rating:
                 messages.error(request, "All fields are required.")
-                return redirect('your_funds')
-            
-            existing_fund = MutualFund.objects.filter(username=username, fund_name=fund_name)
-            if existing_fund:
-                messages.error(request, "Looks like this fund is already added, no need to do it twice!")
-                return redirect('dashboard')
 
-            fund_data = MutualFund.objects.create(
-                        username=username,
-                        fund_name=fund_name,
-                        investment_type=investment_type,
-                        subcategory=subcategory
-                        )
-            fund_data.save()
-            messages.success(request, " Your fund details have been saved with care and precision.")
-            return redirect('dashboard')
+            else:            
+                existing_fund = MutualFund.objects.filter(username=username, fund_name=fund_name)
+                if existing_fund:
+                    messages.error(request, "Looks like this fund is already added, no need to do it twice!")
+
+                else:
+                    fund_data = MutualFund.objects.create(
+                            username=username,
+                            fund_name=fund_name,
+                            investment_type=investment_type,
+                            subcategory=subcategory,
+                            nav=latest_nav,
+                            rating=star_rating
+                            )
+                    
+                    fund_data.save()
+                    messages.success(request, "Your fund details have been saved with care and precision.")
 
     try:
         if username:
@@ -971,7 +977,6 @@ def your_funds(request):
 
     except Exception as e:
         messages.error(request, "Unable to fetch your fund right now!")
-
     return render(request, 'Your_funds.html', {'fund_details':fund_details})
 
 # Calculate sip

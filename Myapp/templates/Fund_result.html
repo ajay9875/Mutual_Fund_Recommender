@@ -158,7 +158,7 @@
                         </td>
                         <td>
                             {% if fund.star_rating %}
-                                    {{fund.star_rating }}⭐
+                                    {{fund.star_rating }}/5⭐
                             {% else %}
                                 NA
                             {% endif %}
@@ -176,6 +176,9 @@
                                     <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
                                     <input type="hidden" name="investment_type" value="{{ fund.investment_type }}">
                                     <input type="hidden" name="subcategory" value="{{ fund.category }}">
+                                    <input type="hidden" name="nav" value="{{ fund.latest_nav }}">
+                                    <input type="hidden" name="rating" value="{{ fund.star_rating }}">
+
                                     <button type="submit" class="action-btn save-btn">Save</button>
                                 </form>
                             </div>

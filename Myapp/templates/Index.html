@@ -278,18 +278,20 @@
                                     <form action="{% url 'fund_result' %}" method="POST">
                                         {% csrf_token %}
                                         <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                        <input type="hidden" name="nav" value="{{ fund.NAV }}">
+                                        <input type="hidden" name="NAV" value="{{ fund.nav }}">
                                         <input type="hidden" name="category" value="{{ fund.category }}">
                                         <button type="submit" class="action-btn view-btn">View</button>
                                     </form>
                                     <form action="{% url 'your_funds' %}" method="POST">
                                         {% csrf_token %}
+                                        <input type="hidden" name="page_name" value="dashboard">
                                         <input type="hidden" name="form_type" value="add-fund">
                                         <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                        <input type="hidden" name="investment_type" value="{{ fund.investment_type|default:"-" }}">
-                                        <input type="hidden" name="category" value="{{ fund.category }}">
-                                        <input type="hidden" name="nav" value="{{ fund.NAV }}">
-                                        <input type="hidden" name="risk" value="{{ fund.risk }}">
+                                        <input type="hidden" name="investment_type" value="{{ fund.category }}">
+                                        <input type="hidden" name="subcategory" value="{{ fund.sub_category }}">
+                                        <input type="hidden" name="nav" value="{{ fund.nav }}">
+                                        <input type="hidden" name="rating" value="{{ fund.star_rating }}">
+
                                         <button type="submit" class="action-btn save-btn">Save</button>
                                     </form>
                                 </td>
