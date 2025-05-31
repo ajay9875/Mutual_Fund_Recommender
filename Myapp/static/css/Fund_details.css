@@ -37,6 +37,9 @@ h1{
 .data-item{
     display: flex;
 }
+.data-item:hover{
+    background-color: #e6f2ff;
+}
 .data-label, .data-value{
     width: 50%;
     border-bottom: 1px solid #e0e0e0;

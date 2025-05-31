@@ -1,0 +1,290 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile | WealthHub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/Header.css' %}">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .profile-card {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .profile-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profile-body {
+            padding: 2rem;
+        }
+        
+        .info-group {
+            margin-bottom: 1.5rem;
+            animation: slideIn 0.5s ease-out;
+        }
+        .profile-icon{
+            width: 80px;
+            height: 80px;
+            border-radius: 100%;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .info-value {
+            background: var(--light);
+            padding: 0.8rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stats-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .edit-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .edit-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        /* Toast message styling */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(200%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        @media (max-width: 768px) {
+            .profile-card {
+                margin: 1rem;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Reusable Header -->
+    <header class="header">
+        Your Info
+    </header>
+
+    <div class="home">
+        <a href="/" class="btn">
+            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
+        </a>
+        <div class="tooltip-text">
+            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
+        </div>
+    </div>
+
+    <div class="profile-card">
+        <div class="profile-header">
+            <button class="edit-btn" onclick="toggleEditMode()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+            </button>
+            
+            {% if profilepic %}
+              <img src="{{ profilepic }}" alt="Profile" class="avatar">
+            {% else %}
+              <span style="font-size: 3rem;"> <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;"></span>
+            {% endif %}
+              <h1>{{ user_info.get_full_name|default:user_info.username }}</h1>
+              <p>{{ user_info.email }}</p>
+        </div>
+        
+        <div class="profile-body">
+            <div class="info-group">
+                <span class="info-label">Username</span>
+                <div class="info-value">{{ user_info.username }}</div>
+            </div>
+            
+            <div class="info-group">
+                <span class="info-label">Email</span>
+                <div class="info-value">{{ user_info.email }}</div>
+            </div>
+            
+            <div class="info-group">
+                <span class="info-label">Account Created</span>
+                <div class="info-value">{{ user_info.date_joined|date:"F j, Y" }}</div>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Investments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">₹1,42,000</div>
+                    <div class="stat-label">Portfolio Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">14.5%</div>
+                    <div class="stat-label">Avg. Returns</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    {% if messages %}
+    <div class="toast" id="toast">
+        {% for message in messages %}
+        <div>{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+        </footer>
+    
+    <script>
+        // Show toast notification
+        document.addEventListener('DOMContentLoaded', function() {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Animate info groups sequentially
+            const infoGroups = document.querySelectorAll('.info-group');
+            infoGroups.forEach((group, index) => {
+                group.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+        
+        function toggleEditMode() {
+            // Implement edit functionality here
+            alert('Edit mode will be implemented here!');
+            // You would typically show a modal with a form to edit profile
+        }
+    </script>
+</body>
+</html>

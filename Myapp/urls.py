@@ -31,6 +31,7 @@ urlpatterns = [
     path('fund-result/', views.fund_result, name='fund_result'),
     
     path('your-funds/', views.your_funds, name='your_funds'),  
+    path('your-info/', views.your_info, name='your_info'),  
 
     # Or, if you want to use `nav_data_view`
     # path('api/nav-data/', views.nav_data_view, name='nav-data'),

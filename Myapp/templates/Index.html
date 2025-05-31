@@ -28,7 +28,7 @@
         <li><a href="{% url 'fund_details' %}">Fund Detail Search</a></li>
         <li><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;" id='rec'>Get Recommendation</a></li>
         <li><a href="{% url 'fund_result' %}">All Mutual Funds</a></li>
-        <li><a href="{% url 'your_funds' %}">Your Funds</a></li>
+        <li><a href="{% url 'your_funds' %}">Your Mutual Funds</a></li>
         <li><a href="\contact">Contact</a></li>
 
           <a href="?menu=profile" onclick="toggleProfileMenu(); return false;" class="profile-btn">
@@ -42,7 +42,7 @@
     </nav>
 
     <div class="profile-dropdown">
-      <a href="/profile">Your Info</a>
+      <a href="{% url 'your_info' %}">Your Info</a>
       <a href="{% url 'your_funds' %}">Your Funds</a>
       <a href="{% url 'account_settings' %}">Settings</a>
       <a href="/logout">Logout</a>
