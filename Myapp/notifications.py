@@ -55,8 +55,8 @@ def send_daily_notifications():
     return sent_count
 
 def notification_scheduler():
-    target_hour = 11   # Set the target hour for notifications
-    target_minute = 56  # Set the target minute for notifications
+    target_hour = 22   # 10 PM in 24-hour format
+    target_minute = 0  # 00 minutes
 
     while True:
         # Get the current time in the timezone of the app
@@ -89,72 +89,3 @@ def notification_scheduler():
         # Send the notification
         send_daily_notifications()
         print("Notifications sent successfully!")
-
-"""def notification_scheduler():
-    sent_today = False
-    while True:
-        now = timezone.localtime(timezone.now())  # Use Django's timezone to handle the time properly
-        # Check if it's the set time (e.g., 9:00 AM or 12:10 PM)
-        if now.hour == 19 and now.minute == 20:  # Change to your desired time
-            if not sent_today:
-                send_daily_notifications()  # Send email notifications
-                print("Message sent successfully!")
-                sent_today = True
-        else:
-            print("Waiting for right time to send message!")
-            sent_today = False  # Reset the flag
-
-        time.sleep(86370)  # Check only 30 seconds before target time on next day
-"""
-"""def notification_scheduler():
-    target_hour = 9    # Set to 9 for 9:00 AM
-    target_minute = 0  # Set to 0 for 9:00 AM
-
-    while True:
-        now = timezone.localtime(timezone.now())
-        today_target = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
-
-        if now >= today_target:
-            # Target time for today passed, schedule for tomorrow
-            next_target = today_target + timedelta(days=1)
-        else:
-            # Still before today's target time
-            next_target = today_target
-
-        seconds_until_next = (next_target - now).total_seconds()
-
-        # Sleep until 30 seconds before next_target
-        sleep_time = max(1, seconds_until_next - 30)
-        time.sleep(sleep_time)
-
-        # Wait until exact time
-        while timezone.localtime(timezone.now()) < next_target:
-            time.sleep(1)
-
-        # Time to send notification
-        send_daily_notifications()
-"""
-"""def notification_scheduler():
-    target_hour = 9
-    target_minute = 0
-
-    while True:
-        now = timezone.localtime()
-        today_target = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
-
-        if now >= today_target:
-            # Schedule for next day
-            next_target = today_target + timedelta(days=1)
-        else:
-            # Schedule for today
-            next_target = today_target
-
-        sleep_seconds = max(1, (next_target - now).total_seconds() - 30)
-        print(f"[Scheduler] Sleeping for {int(sleep_seconds)} seconds until {next_target}")
-        time.sleep(sleep_seconds)
-
-        # Wait until the exact target second
-        while timezone.localtime() < next_target:
-            time.sleep(1)
-
-        send_daily_notifications()"""

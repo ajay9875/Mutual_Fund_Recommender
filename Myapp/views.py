@@ -62,22 +62,6 @@ API_KEY = config("API_ACCESS_KEY")
 #At Rapidapi by indian market api
 #API_AUTH_TOKEN = config("API_AUTH_TOKEN")
 
-"""
-# Fuzzy matching using fuzzywuzzy/thefuzz
-def find_best_match(user_input):
-
-    # Get the best match from the list
-    best_match, score = process.extractOne(user_input, fund_list)
-
-    # Threshold to ensure it's a reasonable match (optional)
-    if score >= 80:
-        print("Best match found:", best_match)
-        return best_match
-    else:
-        print("No reliable match found.")
-        return None
-"""
-
 #It's for all fund data using fund type
 def get_all_funds_data_by_indian_api():
     # URL for fetching mutual funds data
@@ -737,67 +721,6 @@ def estimate_return_type_using_tenure(tenure, return_rate):
         print(f"Classification error: {e}")
         return "na"
 
-"""def fetch_all_fund_special_case(api_response, form_data):
-    try:  
-        condition = True
-        tenure = form_data.get('tenure', "1_year_return")
-        if not api_response or not isinstance(api_response, dict):
-            print("API returned empty or invalid response")
-            return []
-
-        #print(f"API contains categories: {list(api_response.keys())}")
-        processed_data = []
-        for category, funds_data in api_response.items():
-            
-            # Skip if funds_data is not a dict
-            if not isinstance(funds_data, dict):
-                #print(f"  Invalid funds data structure in {category}")
-                continue
-
-            # Process each sub-category in this category
-            for sub_category, fund_list in funds_data.items():
-                if not isinstance(fund_list, list):
-                    #print(f"Skipping invalid sub-category {sub_category}")
-                    continue
-                
-                #if category == fund_type or sub_category == fund_subtype:
-
-                #print(f"Processing sub-category: {sub_category}")
-                for fund_item in fund_list:
-                    try:
-                        if not isinstance(fund_item, dict):
-                            #print(f"    Skipping invalid fund data structure")
-                            continue
-                        
-                        processed_data.append({
-                            'fund_name': fund_item.get('fund_name', '').strip(),  # Rename to expected key
-                            'nav': round(float(fund_item.get('latest_nav')), 2),
-                            'category': category,
-                            'sub_category': sub_category,
-                            '1_month_return': float_or_none(fund_item.get('1_month_return')),
-                            '3_month_return': float_or_none(fund_item.get('3_month_return')),
-                            '6_month_return': float_or_none(fund_item.get('6_month_return')),
-
-                            '1_year_return': float_or_none(fund_item.get('1_year_return')),
-                            '3_year_return': float_or_none(fund_item.get('3_year_return')),
-                            '5_year_return': float_or_none(fund_item.get('5_year_return')),
-                            'asset_size': float_or_none(fund_item.get('asset_size')),
-                            'star_rating': float_or_none(fund_item.get('star_rating')),
-                            'return_type': estimate_return_type_using_tenure(tenure, fund_item.get(tenure, '1_year_return')),
-                            'risk': estimate_risk_from_return_profile(fund_item),  # Optional: ensure risk is included
-                        })
-    
-                    except Exception as e:
-                        print(f"Error processing fund: {str(e)}")
-                        continue
-
-        print(f"Successfully processed {len(processed_data)} funds in category: All")
-        return processed_data,condition
-        
-    except Exception as e:
-        print(f"Critical error: {str(e)}")
-        return []
-"""
 def estimate_risk_from_return_profile(fund_data):
     try:
         # Extract valid returns
