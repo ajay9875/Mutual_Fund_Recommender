@@ -850,12 +850,12 @@ def your_info(request, username=None):
         }
         
         messages.success(request, "Profile data loaded successfully")
-        
+        return render(request, 'Your_info.html', context)
+
     except Exception as e:
         messages.error(request, f"Error loading profile: {str(e)}")
+        return redirect('dashboard')
     
-    return render(request, 'your_info.html', context)
-
 # Calculate sip
 def sip_calculator(request):
     if request.method != 'POST':
