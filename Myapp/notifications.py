@@ -55,7 +55,7 @@ def send_daily_notifications():
     return sent_count
 
 def notification_scheduler():
-    target_hour = 22   # 10 PM in 24-hour format
+    target_hour = 9   # 09 AM in 24-hour format
     target_minute = 0  # 00 minutes
 
     while True:
