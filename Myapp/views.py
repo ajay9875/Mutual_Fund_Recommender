@@ -848,16 +848,14 @@ def your_info(request, username=None):
             'profilepic': profilepic,
             'is_own_profile': (target_username == request.user.username)
         }
-        # Add additional user-specific data here
-        # context['portfolio'] = Portfolio.objects.filter(user=user_info)
         
         messages.success(request, "Profile data loaded successfully")
-        return render(request, 'your_info.html', context)
         
     except Exception as e:
         messages.error(request, f"Error loading profile: {str(e)}")
-        return redirect('dashboard')
     
+    return render(request, 'your_info.html', context)
+
 # Calculate sip
 def sip_calculator(request):
     if request.method != 'POST':

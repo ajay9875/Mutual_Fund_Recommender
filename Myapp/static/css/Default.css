@@ -135,7 +135,15 @@ p {
 .features_contact a{
     margin-left: 5px;
 }
-
+.disclaimer {
+  background-color: #fff3cd; /* Light yellow */
+  color: #856404;            /* Dark golden text */
+  padding: 1rem;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-top: 1rem;
+}
 /* --- Responsive Design --- */
 @media (max-width: 768px) {
     .step {
