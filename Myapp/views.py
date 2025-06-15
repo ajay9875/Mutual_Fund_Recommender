@@ -599,12 +599,254 @@ def get_funds_data_from_api(form_data):
         return None
 
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-
+# Newer Function
 def process_recommendations(form_data):
+    all_funds = get_funds_data_from_api(form_data)
+    if not all_funds:
+        print("Error: No fund data available.")
+        return []
+
+    # Safely extract form data
+    fund_type = form_data.get('fund_type', '').strip().lower()
+    fund_subtype = form_data.get('fund_subtype', '').strip().lower()
+    tenure = form_data.get('tenure', '1_year_return').strip()
+    return_type = form_data.get('return_type', '').strip().lower()
+    
+    # Validate tenure
+    if tenure not in all_funds[0]:
+        tenure = '1_year_return'
+
+    # Initialize fund buckets
+    exact_match_funds = []
+    type_only_match_funds = []
+    subtype_only_match_funds = []
+    other_funds = []
+
+    for fund in all_funds:
+        # Skip if no return data
+        fund_return = float_or_none(fund.get(tenure))
+        if fund_return is None:
+            continue
+
+        # Skip if doesn't match return type filter
+        classified_return = estimate_return_type_using_tenure(tenure, fund_return).lower()
+        if return_type and classified_return != return_type:
+            continue
+
+        fund_data = {
+            **fund,
+            'return_value': fund_return,
+            'return_class': classified_return
+        }
+
+        # Check matches
+        current_type = fund.get('category', '').lower()
+        current_subtype = fund.get('sub_category', '').lower()
+        
+        type_match = not fund_type or current_type == fund_type
+        subtype_match = not fund_subtype or current_subtype == fund_subtype
+
+        if type_match and subtype_match:
+            exact_match_funds.append(fund_data)
+        elif type_match and fund_type:  # Only type matches (when type is specified)
+            type_only_match_funds.append(fund_data)
+        elif subtype_match and fund_subtype:  # Only subtype matches (when subtype is specified)
+            subtype_only_match_funds.append(fund_data)
+        else:
+            other_funds.append(fund_data)
+
+    # Determine which funds to use based on user selection
+    if fund_type and fund_subtype:
+        # When both are selected, try exact matches first, then mix of partial matches
+        if exact_match_funds:
+            filtered_funds = exact_match_funds
+        else:
+            # Combine type matches and subtype matches when no exact matches exist
+            filtered_funds = type_only_match_funds + subtype_only_match_funds
+            if not filtered_funds:
+                filtered_funds = other_funds
+    elif fund_type:
+        # Only type selected - use only type matches
+        filtered_funds = exact_match_funds + type_only_match_funds
+    elif fund_subtype:
+        # Only subtype selected - use only subtype matches
+        filtered_funds = exact_match_funds + subtype_only_match_funds
+    else:
+        # Neither selected - use all funds
+        filtered_funds = exact_match_funds + type_only_match_funds + subtype_only_match_funds + other_funds
+
+    if not filtered_funds:
+        print("No funds matched filters.")
+        return []
+
+    # Feature engineering
+    texts = [
+        ' '.join([
+            fund.get('fund_name', '').lower(),
+            fund.get('category', '').lower(),
+            fund.get('sub_category', '').lower(),
+            fund.get('return_class', '').lower()
+        ])
+        for fund in filtered_funds
+    ]
+    return_values = [[fund['return_value']] for fund in filtered_funds]
+
+    # Vectorization
+    tfidf = TfidfVectorizer()
+    tfidf_matrix = tfidf.fit_transform(texts)
+
+    scaler = StandardScaler()
+    numeric_matrix = scaler.fit_transform(return_values)
+
+    combined_matrix = np.hstack([tfidf_matrix.toarray(), numeric_matrix])
+
+    # Build query from active filters
+    user_text = ' '.join(filter(None, [
+        fund_type,
+        fund_subtype,
+        return_type
+    ])) or 'mutual fund'
+
+    user_vector_text = tfidf.transform([user_text])
+    user_vector_numeric = scaler.transform([[np.median(return_values)]])
+    user_vector = np.hstack([user_vector_text.toarray(), user_vector_numeric])
+
+    # Ranking
+    similarities = cosine_similarity(user_vector, combined_matrix)[0]
+    matched_funds = [
+        {**filtered_funds[idx], 'similarity': round(score, 4)}
+        for idx, score in enumerate(similarities)
+        if score > 0
+    ]
+    #matched_funds.sort(key=lambda x: x['similarity'], reverse=True)
+
+    return matched_funds[:10]
+
+# New Function
+"""def process_recommendations(form_data):
+    all_funds = get_funds_data_from_api(form_data)
+    if not all_funds:
+        print("Error: No fund data available.")
+        return []
+
+    # Safely extract form data
+    fund_type = form_data.get('fund_type', '').strip().lower()
+    fund_subtype = form_data.get('fund_subtype', '').strip().lower()
+    tenure = form_data.get('tenure', '1_year_return').strip()
+    return_type = form_data.get('return_type', '').strip().lower()
+    
+    # Validate tenure
+    if tenure not in all_funds[0]:
+        tenure = '1_year_return'
+
+    # Initialize fund buckets
+    exact_match_funds = []
+    type_match_funds = []
+    subtype_match_funds = []
+    other_funds = []
+
+    for fund in all_funds:
+        # Skip if no return data
+        fund_return = float_or_none(fund.get(tenure))
+        if fund_return is None:
+            continue
+
+        # Skip if doesn't match return type filter
+        classified_return = estimate_return_type_using_tenure(tenure, fund_return).lower()
+        if return_type and classified_return != return_type:
+            continue
+
+        fund_data = {
+            **fund,
+            'return_value': fund_return,
+            'return_class': classified_return
+        }
+
+        # Check matches
+        type_match = not fund_type or fund.get('category', '').lower() == fund_type
+        subtype_match = not fund_subtype or fund.get('sub_category', '').lower() == fund_subtype
+
+        if type_match and subtype_match:
+            exact_match_funds.append(fund_data)
+        elif type_match:
+            type_match_funds.append(fund_data)
+        elif subtype_match:
+            subtype_match_funds.append(fund_data)
+        else:
+            other_funds.append(fund_data)
+
+    # Determine which funds to use based on user selection
+    if fund_type and fund_subtype:
+        # When both are selected, try exact matches first, then mix of partial matches
+        if exact_match_funds:
+            filtered_funds = exact_match_funds
+        else:
+            # Combine type matches and subtype matches when no exact matches exist
+            filtered_funds = type_match_funds + subtype_match_funds
+            if not filtered_funds:
+                filtered_funds = other_funds
+    elif fund_type:
+        # Only type selected - use type matches
+        filtered_funds = type_match_funds
+    elif fund_subtype:
+        # Only subtype selected - use subtype matches
+        filtered_funds = subtype_match_funds
+    else:
+        # Neither selected - use all funds
+        filtered_funds = exact_match_funds + type_match_funds + subtype_match_funds + other_funds
+
+    if not filtered_funds:
+        print("No funds matched filters.")
+        return []
+
+    # Feature engineering
+    texts = [
+        ' '.join([
+            fund.get('fund_name', '').lower(),
+            fund.get('category', '').lower(),
+            fund.get('sub_category', '').lower(),
+            fund.get('return_class', '').lower()
+        ])
+        for fund in filtered_funds
+    ]
+    return_values = [[fund['return_value']] for fund in filtered_funds]
+
+    # Vectorization
+    tfidf = TfidfVectorizer()
+    tfidf_matrix = tfidf.fit_transform(texts)
+
+    scaler = StandardScaler()
+    numeric_matrix = scaler.fit_transform(return_values)
+
+    combined_matrix = np.hstack([tfidf_matrix.toarray(), numeric_matrix])
+
+    # Build query from active filters
+    user_text = ' '.join(filter(None, [
+        fund_type,
+        fund_subtype,
+        return_type
+    ])) or 'mutual fund'
+
+    user_vector_text = tfidf.transform([user_text])
+    user_vector_numeric = scaler.transform([[np.median(return_values)]])
+    user_vector = np.hstack([user_vector_text.toarray(), user_vector_numeric])
+
+    # Ranking
+    similarities = cosine_similarity(user_vector, combined_matrix)[0]
+    matched_funds = [
+        {**filtered_funds[idx], 'similarity': round(score, 4)}
+        for idx, score in enumerate(similarities)
+        if score > 0
+    ]
+    matched_funds.sort(key=lambda x: x['similarity'], reverse=True)
+
+    return matched_funds[:10]"""
+
+#Old function
+"""def process_recommendations(form_data):
     all_funds = get_funds_data_from_api(form_data)
     if not all_funds:
         print("Error: No fund data available.")
@@ -683,7 +925,7 @@ def process_recommendations(form_data):
     ]
     matched_funds.sort(key=lambda x: x['similarity'], reverse=True)
 
-    return matched_funds[:10]
+    return matched_funds[:10]"""
 
 def estimate_return_type_using_tenure(tenure, return_rate):
     """Classifies returns into high/medium/low/negative based on tenure-specific thresholds."""
