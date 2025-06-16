@@ -27,7 +27,7 @@
         height: 60px;
       }
       
-      /* Mobile menu panel */
+      /* Mobile menu panel (left side) */
       .navbar-collapse-mobile {
         position: fixed !important;
         top: 0 !important;
@@ -46,6 +46,25 @@
         left: 0 !important;
       }
       
+      /* Profile menu panel (right side) */
+      .profile-collapse-mobile {
+        position: fixed !important;
+        top: 0 !important;
+        right: -50% !important;
+        width: 50% !important;
+        height: 100vh !important;
+        background-color: #343a40 !important;
+        padding-top: 60px !important;
+        transition: right 0.3s ease !important;
+        z-index: 1050 !important;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+        overflow-y: auto;
+      }
+      
+      .profile-collapse-mobile.show {
+        right: 0 !important;
+      }
+      
       /* Toggle button styling */
       .navbar-toggler-mobile {
         position: fixed;
@@ -57,33 +76,50 @@
         padding: 0.25rem 0.5rem;
       }
       
+      /* Profile button styling */
+      .profile-toggler-mobile {
+        position: fixed;
+        right: 15px;
+        top: 15px;
+        z-index: 1060;
+        background-color: #343a40;
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        border: none;
+      }
+      
+      .profile-toggler-mobile img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+      }
+      
       /* Mobile menu items */
       .nav-links-mobile {
         flex-direction: column !important;
         padding: 1rem;
       }
       
-      .nav-links-mobile li {
+      .nav-links-mobile li,
+      .profile-links-mobile li {
         width: 100%;
         padding: 0.75rem 0;
         border-bottom: 1px solid rgba(255,255,255,0.1);
       }
       
-      /* Profile button positioning */
-      .profile-btn-container {
-        position: fixed;
-        right: 15px;
-        top: 15px;
-        z-index: 1060;
+      /* Recommendation form */
+      .form-container {
+        display: none;
+        padding: 20px;
+        background: white;
+        margin: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       }
       
-      /* Profile dropdown adjustments */
-      .profile-dropdown {
-        position: fixed;
-        right: 15px;
-        top: 60px;
-        z-index: 1060;
-        width: 200px;
+      /* Ensure forms are visible when toggled */
+      .form-container.show {
+        display: block !important;
       }
     }
     
@@ -95,6 +131,9 @@
       .header {
         display: block !important;
       }
+      .profile-collapse-mobile {
+        display: none !important;
+      }
     }
   </style>
 </head>
@@ -103,6 +142,7 @@
   <!-- Mobile Navbar (Only shows on mobile) -->
   <nav class="navbar-mobile navbar-expand-lg navbar-dark bg-dark sticky-top d-lg-none">
     <div class="container-fluid">
+      <!-- Main menu toggle -->
       <button class="navbar-toggler-mobile navbar-toggler" type="button"
               data-bs-toggle="collapse" data-bs-target="#mobileMenu"
               aria-controls="mobileMenu" aria-expanded="false"
@@ -110,6 +150,19 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
+      <!-- Profile menu toggle -->
+      <button class="profile-toggler-mobile" type="button"
+              data-bs-toggle="collapse" data-bs-target="#profileMenu"
+              aria-controls="profileMenu" aria-expanded="false"
+              aria-label="Toggle profile">
+        {% if profilepic %}
+          <img src="{{ profilepic }}" class="profile-icon">
+        {% else %}
+          <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
+        {% endif %}
+      </button>
+
+      <!-- Main mobile menu (left side) -->
       <div class="collapse navbar-collapse-mobile navbar-collapse" id="mobileMenu">
         <ul class="nav-links-mobile navbar-nav">
           <li class="nav-item">
@@ -120,21 +173,21 @@
           </li>
           <li class="nav-item"><a href="{% url 'sip_calculator' %}" class="nav-link">SIP Calculator</a></li>
           <li class="nav-item"><a href="{% url 'fund_details' %}" class="nav-link">Fund Detail Search</a></li>
-          <li class="nav-item"><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;" class="nav-link">Get Recommendation</a></li>
+          <li class="nav-item"><a href="#" onclick="showRecommendationForm(); return false;" class="nav-link">Get Recommendation</a></li>
           <li class="nav-item"><a href="{% url 'fund_result' %}" class="nav-link">All Mutual Funds</a></li>
           <li class="nav-item"><a href="{% url 'your_funds' %}" class="nav-link">Your Mutual Funds</a></li>
           <li class="nav-item"><a href="\contact" class="nav-link">Contact</a></li>
         </ul>
       </div>
-      
-      <div class="profile-btn-container">
-        <a href="?menu=profile" onclick="toggleProfileMenu(); return false;" class="profile-btn">
-          {% if profilepic %}
-            <img src="{{ profilepic }}" class="profile-icon">
-          {% else %}
-            <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
-          {% endif %}
-        </a>
+
+      <!-- Profile menu (right side) -->
+      <div class="collapse profile-collapse-mobile navbar-collapse" id="profileMenu">
+        <ul class="nav-links-mobile navbar-nav">
+          <li class="nav-item"><a href="{% url 'your_info' %}" class="nav-link">Your Info</a></li>
+          <li class="nav-item"><a href="{% url 'your_funds' %}" class="nav-link">Your Funds</a></li>
+          <li class="nav-item"><a href="{% url 'account_settings' %}" class="nav-link">Settings</a></li>
+          <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
+        </ul>
       </div>
     </div>
   </nav>
@@ -153,26 +206,27 @@
         </div>
         <li><a href="{% url 'sip_calculator' %}">SIP Calculator</a></li>
         <li><a href="{% url 'fund_details' %}">Fund Detail Search</a></li>
-        <li><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;" id='rec'>Get Recommendation</a></li>
+        <li><a href="#" onclick="showRecommendationForm(); return false;" id='rec'>Get Recommendation</a></li>
         <li><a href="{% url 'fund_result' %}">All Mutual Funds</a></li>
         <li><a href="{% url 'your_funds' %}">Your Mutual Funds</a></li>
         <li><a href="\contact">Contact</a></li>
-        <a href="?menu=profile" onclick="toggleProfileMenu(); return false;" class="profile-btn">
-          {% if profilepic %}
-            <img src="{{ profilepic }}" class="profile-icon">
-          {% else %}
-            <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
-          {% endif %}
-        </a>
+        <div class="profile-container">
+          <a href="#" onclick="toggleProfileMenu(); return false;" class="profile-btn">
+            {% if profilepic %}
+              <img src="{{ profilepic }}" class="profile-icon">
+            {% else %}
+              <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
+            {% endif %}
+          </a>
+          <div class="profile-dropdown">
+            <a href="{% url 'your_info' %}">Your Info</a>
+            <a href="{% url 'your_funds' %}">Your Funds</a>
+            <a href="{% url 'account_settings' %}">Settings</a>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
       </ul>  
     </nav>
-
-    <div class="profile-dropdown">
-      <a href="{% url 'your_info' %}">Your Info</a>
-      <a href="{% url 'your_funds' %}">Your Funds</a>
-      <a href="{% url 'account_settings' %}">Settings</a>
-      <a href="/logout">Logout</a>
-    </div>
   </header>
 
   <!-- Session Timer -->
@@ -189,165 +243,217 @@
     {% endfor %}
   {% endif %}
 
-  <!-- Recommendation form-->
-  <div class="form-container">
-    <h2>Mutual Fund Recommendation Form</h2>
-
-    <form action="/dashboard/" method="POST">
-      {% csrf_token %}
-      <input type="hidden" name="recommendation" value="recommendation">
-      <!-- Company Type (Full Width) -->
-      <div class="form-group">
-        <label for="fund_type">Fund Type:</label>
-        <select id="fund_type" name="fund_type" onchange="handleCompanyTypeChange(this)">
-          <option value="" selected>Please select a mutual fund type</option>
-          <option value="Debt">Debt Funds</option>
-          <option value="Equity">Equity Funds</option>
-          <option value="Hybrid">Hybrid Funds</option>
-          <option value="Solutions Oriented">Solution Oriented Funds</option>
-          <option value="Global Fund of Funds">Fund of Funds(FoFs)</option>
-          <option value="Index Funds">Index Funds</option>
-          <option value="Other">Other Funds</option>
-        </select>
-
-        <input type="text" id="manual_company_type" name="manual_company_type" style="display:none;" placeholder="Enter company type" />
-      </div>          
-
-      <div class="form-group">
-          <label for="fund_subtype">Fund Subtype:</label>
-          <select id="fund_subtype" name="fund_subtype">
-              <option value="" selected>Please Select a mutual fund subtype</option>
-              <option value="Floating Rate">Floating Rate</option>
-              <option value="Fixed Maturity Intermediate-Term Bond">Fixed Maturity Intermediate-Term Bond</option>
-              <!-- All other subtype options remain unchanged -->
-          </select>
-          </div>
-    
-        <div class="form-row">
+  <!-- Recommendation form (shown/hidden by JavaScript) -->
+        <!-- Recommendation form-->
+        <div class="form-container" id="recommendationForm">
+          <h2>Mutual Fund Recommendation Form</h2>
+      
+          <form action="/dashboard/" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="recommendation" value="recommendation">
+            <!-- Company Type (Full Width) -->
             <div class="form-group">
-                <label for="tenure">Investment Tenure:</label>
-                <select id="tenure" name="tenure">
-                  <option value="" selected>Please select a investment tenure</option>
-                    <option value="1_month_return">1 Month</option>
-                    <option value="3_month_return">3 Months</option>
-                    <option value="6_month_return">6 Months</option>
-                    <option value="1_year_return">1 Year</option>
-                    <option value="3_year_return">3 Years</option>
-                    <option value="5_year_return">5+ Years</option>
-                </select>
-            </div>
-    
-        <!-- Profit Type -->
+              <label for="fund_type">Fund Type:</label>
+              <select id="fund_type" name="fund_type" onchange="handleCompanyTypeChange(this)">
+                <option value="" selected>Please select a mutual fund type</option>
+                <option value="Debt">Debt Funds</option>
+                <option value="Equity">Equity Funds</option>
+                <option value="Hybrid">Hybrid Funds</option>
+                <option value="Solutions Oriented">Solution Oriented Funds</option>
+                <option value="Global Fund of Funds">Fund of Funds(FoFs)</option>
+                <option value="Index Funds">Index Funds</option>
+                <option value="Other">Other Funds</option>
+                <!--<option value="manually">Enter Manually</option>-->
+              </select>
+
+              <input type="text" id="manual_company_type" name="manual_company_type" style="display:none;" placeholder="Enter company type" />
+            </div>          
+
             <div class="form-group">
-                <label for="return_type">Expected Return Type:</label>
-                <select id="return_type" name="return_type">
-                  <option value="" selected>Please select a return type</option>
-                    <option value="high">High</option>
-                    <option value="medium">Medium</option>
-                    <option value="low">Low</option>
+                <label for="fund_subtype">Fund Subtype:</label>
+                <select id="fund_subtype" name="fund_subtype">
+                    <option value="" selected>Please Select a mutual fund subtype</option>
+                    <option value="Floating Rate">Floating Rate</option>
+                    <option value="Fixed Maturity Intermediate-Term Bond">Fixed Maturity Intermediate-Term Bond</option>
+                    <option value="Dynamic Bond">Dynamic Bond</option>
+                    <option value="Ultra Short Duration">Ultra Short Duration</option>
+                    <option value="Corporate Bond">Corporate Bond</option>
+                    <option value="Short Duration">Short Duration</option>
+                    <option value="10 yr Government Bond">10 yr Government Bond</option>
+                    <option value="Government Bond">Government Bond</option>
+                    <option value="Money Market">Money Market</option>
+                    <option value="Long Duration">Long Duration</option>
+                    <option value="Other Bond">Other Bond</option>
+                    <option value="Low Duration">Low Duration</option>
+                    <option value="Credit Risk">Credit Risk</option>
+                    <option value="Banking & PSU">Banking & PSU</option>
+                    <option value="Medium to Long Duration">Medium to Long Duration</option>
+                    <option value="Fixed Maturity Short-Term Bond">Fixed Maturity Short-Term Bond</option>
+                    <option value="Medium Duration">Medium Duration</option>
+                    <option value="Fixed Maturity Ultrashort Bond">Fixed Maturity Ultrashort Bond</option>
+                    <option value="Children">Children</option>
+                    <option value="Retirement">Retirement</option>
+                    <option value="Focused Fund">Focused Fund</option>
+                    <option value="Equity - Other">Equity - Other</option>
+                    <option value="Contra">Contra</option>
+                    <option value="Flexi Cap">Flexi Cap</option>
+                    <option value="Equity - Consumption">Equity - Consumption</option>
+                    <option value="Sector - FMCG">Sector - FMCG</option>
+                    <option value="Sector - Financial Services">Sector - Financial Services</option>
+                    <option value="Mid-Cap">Mid-Cap</option>
+                    <option value="Equity - Infrastructure">Equity - Infrastructure</option>
+                    <option value="Multi-Cap">Multi-Cap</option>
+                    <option value="Large-Cap">Large-Cap</option>
+                    <option value="Small-Cap">Small-Cap</option>
+                    <option value="Dividend Yield">Dividend Yield</option>
+                    <option value="ELSS (Tax Savings)">ELSS (Tax Savings)</option>
+                    <option value="Large & Mid-Cap">Large & Mid-Cap</option>
+                    <option value="Sector - Healthcare">Sector - Healthcare</option>
+                    <option value="Value">Value</option>
+                    <option value="Equity - ESG">Equity - ESG</option>
+                    <option value="Sector - Technology">Sector - Technology</option>
+                    <option value="Fund of Funds">Fund of Funds</option>
+                    <option value="Multi Asset Allocation">Multi Asset Allocation</option>
+                    <option value="Equity Savings">Equity Savings</option>
+                    <option value="Balanced Allocation">Balanced Allocation</option>
+                    <option value="Dynamic Asset Allocation">Dynamic Asset Allocation</option>
+                    <option value="Aggressive Allocation">Aggressive Allocation</option>
+                    <option value="Conservative Allocation">Conservative Allocation</option>
+                    <option value="Global - Other">Global - Other</option>
+                    <option value="Index Funds">Index Funds</option>
+                    <option value="Index Funds - Fixed Income">Index Funds - Fixed Income</option>
+                    <option value="Liquid">Liquid</option>
+                    <option value="Overnight">Overnight</option>
+                    <option value="Arbitrage Fund">Arbitrage Fund</option>
                 </select>
-            </div>
-        </div>
-        <!-- Submit Button -->
-        <button class="get-recommendation-btn" type="submit">Get Recommendation</button>
-    </form>
-  </div>
+                </div>
+      
+              <div class="form-row">
+                  <div class="form-group">
+                      <label for="tenure">Investment Tenure:</label>
+                      <select id="tenure" name="tenure">
+                        <option value="" selected>Please select a investment tenure</option>
+                          <option value="1_month_return">1 Month</option>
+                          <option value="3_month_return">3 Months</option>
+                          <option value="6_month_return">6 Months</option>
+
+                          <option value="1_year_return">1 Year</option>
+                          <option value="3_year_return">3 Years</option>
+                          <option value="5_year_return">5+ Years</option>
+                      </select>
+                  </div>
+      
+              <!-- Profit Type -->
+                  <div class="form-group">
+                      <label for="return_type">Expected Return Type:</label>
+                      <select id="return_type" name="return_type">
+                        <option value="" selected>Please select a return type</option>
+                          <option value="high">High</option>
+                          <option value="medium">Medium</option>
+                          <option value="low">Low</option>
+                      </select>
+                  </div>
+              </div>
+              <!-- Submit Button -->
+              <button class="get-recommendation-btn" type="submit">Get Recommendation</button>
+          </form>
+    </div>
 
   <div class="greet"><h4>Welcome back, {{ full_name }}! 👋</h4></div>
   
-  <div class='recommendation'>
-    <h3>All Recommended Mutual Funds</h3>
-        {% if recommended_funds %}
-            <table class="fund-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Fund Name</th>
-                        <th>Plan Type</th>
-                        <th>Scheme Type</th>
-                        <th>NAV (₹)</th>
-                        <th>    
-                            {% if form_data.tenure == "5_year_return" %}
-                                5-Year Return (%)
-                            {% elif form_data.tenure == "3_year_return" %}
-                                3-Year Return (%)
-                            {% elif form_data.tenure == "1_month_return" %}
-                                1-Month Return (%)
-                            {% elif form_data.tenure == "3_month_return" %}
-                                3-Month Return (%)
-                            {% elif form_data.tenure == "6_month_return" %}
-                                6-Month Return (%)
-                            {% else %}
-                                1-Year Return (%)
-                            {% endif %}
-                        </th>
-                        <th>Risk</th>
-                        <th>Rating</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for fund in recommended_funds %}
+      <div class='recommendation'>
+        <h3>All Recommended Mutual Funds</h3>
+            {% if recommended_funds %}
+                <table class="fund-table">
+                    <thead>
                         <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ fund.fund_name }}</td>
-                            <td>{{ fund.category|default:"-" }}</td>
-                            <td>{{ fund.sub_category|default:"-" }}</td>
-                            <td>{{ fund.nav|default:"-" }}</td>
-                            <td>
+                            <th>#</th>
+                            <th>Fund Name</th>
+                            <th>Plan Type</th>
+                            <th>Scheme Type</th>
+                            <th>NAV (₹)</th>
+                            <th>    
                                 {% if form_data.tenure == "5_year_return" %}
-                                    {{ fund.5_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    5-Year Return (%)
                                 {% elif form_data.tenure == "3_year_return" %}
-                                    {{ fund.3_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    3-Year Return (%)
                                 {% elif form_data.tenure == "1_month_return" %}
-                                    {{ fund.1_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    1-Month Return (%)
                                 {% elif form_data.tenure == "3_month_return" %}
-                                    {{ fund.3_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    3-Month Return (%)
                                 {% elif form_data.tenure == "6_month_return" %}
-                                    {{ fund.6_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    6-Month Return (%)
                                 {% else %}
-                                    {{ fund.1_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    1-Year Return (%)
                                 {% endif %}
-                            </td>
-                            <td class="risk-{{ fund.risk|lower|slugify }}">
-                                {{ fund.risk|default:"NA" }}
-                            </td>
-                            <td>{% if fund.star_rating %}
-                                   {{ fund.star_rating }}/5 ⭐
-                                {% else %}
-                                    NA
-                                {% endif %}
-                            </td>
-                            <td class="action-buttons">
-                                <form action="{% url 'fund_result' %}" method="POST">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                    <input type="hidden" name="NAV" value="{{ fund.nav }}">
-                                    <input type="hidden" name="category" value="{{ fund.category }}">
-                                    <button type="submit" class="action-btn view-btn">View</button>
-                                </form>
-                                <form action="{% url 'your_funds' %}" method="POST">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="page_name" value="dashboard">
-                                    <input type="hidden" name="form_type" value="add-fund">
-                                    <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                    <input type="hidden" name="investment_type" value="{{ fund.category }}">
-                                    <input type="hidden" name="subcategory" value="{{ fund.sub_category }}">
-                                    <input type="hidden" name="nav" value="{{ fund.nav }}">
-                                    <input type="hidden" name="rating" value="{{ fund.star_rating }}">
-
-                                    <button type="submit" class="action-btn save-btn">Save</button>
-                                </form>
-                            </td>
+                            </th>
+                            <th>Risk</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for fund in recommended_funds %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ fund.fund_name }}</td>
+                                <td>{{ fund.category|default:"-" }}</td>
+                                <td>{{ fund.sub_category|default:"-" }}</td> {# not returned, but placeholder okay #}
+                                <td>{{ fund.nav|default:"-" }}</td>
+                                <td>
+                                    {% if form_data.tenure == "5_year_return" %}
+                                        {{ fund.5_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "3_year_return" %}
+                                        {{ fund.3_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "1_month_return" %}
+                                        {{ fund.1_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "3_month_return" %}
+                                        {{ fund.3_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "6_month_return" %}
+                                        {{ fund.6_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% else %}
+                                        {{ fund.1_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% endif %}
+                                </td>
+                                <td class="risk-{{ fund.risk|lower|slugify }}">
+                                    {{ fund.risk|default:"NA" }}
+                                </td>
+                                <td>{% if fund.star_rating %}
+                                       {{ fund.star_rating }}/5 ⭐
+                                    {% else %}
+                                        NA
+                                    {% endif %}
+                                </td>
+                                <td class="action-buttons">
+                                    <form action="{% url 'fund_result' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                        <input type="hidden" name="NAV" value="{{ fund.nav }}">
+                                        <input type="hidden" name="category" value="{{ fund.category }}">
+                                        <button type="submit" class="action-btn view-btn">View</button>
+                                    </form>
+                                    <form action="{% url 'your_funds' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="page_name" value="dashboard">
+                                        <input type="hidden" name="form_type" value="add-fund">
+                                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                        <input type="hidden" name="investment_type" value="{{ fund.category }}">
+                                        <input type="hidden" name="subcategory" value="{{ fund.sub_category }}">
+                                        <input type="hidden" name="nav" value="{{ fund.nav }}">
+                                        <input type="hidden" name="rating" value="{{ fund.star_rating }}">
 
-            {% else %}
-                <p>No results yet. To get a personalized recommendation, click the <strong>"Get Recommendation"</strong> button above.</p>
-            {% endif %}
-  </div>
+                                        <button type="submit" class="action-btn save-btn">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                    {% else %}
+                        <p>No results yet. To get a personalized recommendation, click the <strong>"Get Recommendation"</strong> button above.</p>
+                    {% endif %}
+              </div>
 
   <!-- Footer -->
   <footer class="footer">
@@ -358,71 +464,87 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="{% static 'javascript/allmessage.js' %}"></script>
   
+  <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'javascript/allmessage.js' %}"></script>
+  
   <script>
-    // Mobile Menu Functionality
     document.addEventListener('DOMContentLoaded', function() {
-      // Close mobile menu when clicking outside
-      document.addEventListener('click', function(e) {
-        const mobileMenu = document.getElementById('mobileMenu');
-        const toggler = document.querySelector('.navbar-toggler-mobile');
-        const profileBtn = document.querySelector('.profile-btn-container .profile-btn');
+      // Initialize Bootstrap collapse components
+      const mobileMenu = new bootstrap.Collapse(document.getElementById('mobileMenu'), {
+        toggle: false
+      });
+      const profileMenu = new bootstrap.Collapse(document.getElementById('profileMenu'), {
+        toggle: false
+      });
+      
+      // Close other menu when one opens
+      document.getElementById('mobileMenu').addEventListener('show.bs.collapse', function() {
+        profileMenu.hide();
+        hideRecommendationForm();
+      });
+      
+      document.getElementById('profileMenu').addEventListener('show.bs.collapse', function() {
+        mobileMenu.hide();
+        hideRecommendationForm();
+      });
+
+      // Show/hide recommendation form
+      window.showRecommendationForm = function() {
+        const recommendationForm = document.getElementById('recommendationForm');
+        // Close any open menus
+        mobileMenu.hide();
+        profileMenu.hide();
         
-        // Close menu if clicking outside
-        if (mobileMenu && !mobileMenu.contains(e.target) {
-          if (e.target !== toggler && e.target !== profileBtn) {
-            new bootstrap.Collapse(mobileMenu).hide();
-          }
-        }
-      });
-
-      // Close mobile menu when clicking links
-      const mobileLinks = document.querySelectorAll('#mobileMenu .nav-link');
-      mobileLinks.forEach(link => {
-        link.addEventListener('click', () => {
-          if (window.innerWidth < 992) {
-            new bootstrap.Collapse(document.getElementById('mobileMenu')).hide();
-          }
-        });
-      });
-
-      // Profile dropdown toggle (for mobile)
-      function toggleProfileMenu() {
-        const dropdown = document.querySelector('.profile-dropdown');
-        if (dropdown.style.display === 'block') {
-          dropdown.style.display = 'none';
-          history.pushState(null, "", window.location.pathname);
+        // Toggle form visibility
+        if (recommendationForm.style.display === "block") {
+          recommendationForm.style.display = "none";
         } else {
-          // Close mobile menu if open
-          const mobileMenu = bootstrap.Collapse.getInstance(document.getElementById('mobileMenu'));
-          if (mobileMenu) mobileMenu.hide();
-          
-          dropdown.style.display = 'block';
-          const newUrl = window.location.pathname + "?menu=profile";
-          history.pushState(null, "", newUrl);
+          recommendationForm.style.display = "block";
+          recommendationForm.scrollIntoView({ behavior: 'smooth' });
         }
+        return false;
       }
 
-      // Recommendation form toggle
-      function showRecommendationForm() {
-        let rec_form = document.querySelector('.form-container');
-        if (rec_form.style.display === "block") {
-          rec_form.style.display = "none";
-          history.pushState(null, "", window.location.pathname);
-        } else {
-          rec_form.style.display = "block";
-          const newUrl = window.location.pathname + "?menu=recommendation_form";
-          history.pushState(null, "", newUrl);
+      function hideRecommendationForm() {
+        document.getElementById('recommendationForm').style.display = "none";
+      }
+      
+      // Close menus when clicking outside
+      document.addEventListener('click', function(e) {
+        const isMobileMenuButton = e.target.classList.contains('navbar-toggler') || 
+                                 e.target.closest('.navbar-toggler');
+        const isProfileButton = e.target.classList.contains('profile-toggler-mobile') || 
+                              e.target.closest('.profile-toggler-mobile');
+        const isRecButton = e.target.id === 'rec' || 
+                          e.target.closest('#rec') ||
+                          e.target.closest('[onclick*="showRecommendationForm"]');
+        const isInForm = e.target.closest('#recommendationForm');
+        
+        if (!isMobileMenuButton && !document.getElementById('mobileMenu').contains(e.target)) {
+          mobileMenu.hide();
         }
+        
+        if (!isProfileButton && !document.getElementById('profileMenu').contains(e.target)) {
+          profileMenu.hide();
+        }
+        
+        if (!isRecButton && !isInForm) {
+          hideRecommendationForm();
+        }
+      });
+
+      // Desktop profile menu toggle
+      window.toggleProfileMenu = function() {
+        const dropdown = document.querySelector('.profile-dropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        return false;
       }
 
       // Handle company type change
-      function handleCompanyTypeChange(select) {
+      window.handleCompanyTypeChange = function(select) {
         var input = document.getElementById("manual_company_type");
-        if (select.value === "manually") {
-            input.style.display = "block";
-        } else {
-            input.style.display = "none";
-        }
+        input.style.display = select.value === "manually" ? "block" : "none";
       }
 
       // Session timer
@@ -443,7 +565,9 @@
           }, 2000);
         }
       }
-      window.onload = updateTimer;
+      if (remainingTime > 0) {
+        updateTimer();
+      }
     });
   </script>
 </body>

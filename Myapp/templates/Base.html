@@ -1,5 +1,4 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,81 +9,114 @@
     <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
     <!-- Bootstrap 5.1.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    <style>
+        /* Additional Mobile Styles */
+        @media (max-width: 991.98px) {
+            /* Ensure body content doesn't hide behind navbar */
+            body {
+                padding-top: 60px;
+            }
+            
+            /* Make sure main content is below the toggle button */
+            main {
+                position: relative;
+                z-index: 1;
+            }
+            
+            /* Dark overlay when menu is open */
+            .menu-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 1040;
+                display: none;
+            }
+            
+            .navbar-collapse.show + .menu-overlay {
+                display: block;
+            }
+        }
+    </style>
     {% block extra_css %}
     {# Extra CSS code goes here #}
     {% endblock extra_css %}
-  </head>
+</head>
 
 <body>
-          <!-- Reusable Header -->
-          <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-            <div class="container-fluid">
-              <!-- Mobile Toggle Button -->
-              <button class="navbar-toggler" type="button"
-                      data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                      aria-controls="navbarNav" aria-expanded="false"
-                      aria-label="Toggle navigation">
+    <!-- Reusable Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-              </button>
+            </button>
 
-              <!-- Nav Links -->
-              <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Nav Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav w-100 d-flex justify-content-evenly">
-                  <!-- Home Link -->
-                  <li class="nav-item px-2">
-                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" 
-                      href="/">Home</a>
-                  </li>
+                    <!-- Home Link -->
+                    <li class="nav-item px-2">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" 
+                        href="/">Home</a>
+                    </li>
 
-                  <!-- About Link (with dynamic active state) -->
-                  <li class="nav-item px-2">
-                    <a class="nav-link {% if request.path == about_url %}active{% endif %}" 
-                      href="{% url 'about' %}"
-                      {% if request.path == about_url %}aria-current="page"{% endif %}>
-                      About Us
-                    </a>
-                  </li>
+                    <!-- About Link -->
+                    <li class="nav-item px-2">
+                        <a class="nav-link {% if request.path == about_url %}active{% endif %}" 
+                        href="{% url 'about' %}"
+                        {% if request.path == about_url %}aria-current="page"{% endif %}>
+                        About Us
+                        </a>
+                    </li>
 
-                  <!-- SIP Calculator -->
-                  <li class="nav-item px-2">
-                    <a class="nav-link {% if request.path == sip_url %}active{% endif %}" 
-                      href="{% url 'sip_calculator' %}"
-                      {% if request.path == sip_url %}aria-current="page"{% endif %}>
-                      SIP Calculator
-                    </a>
-                  </li>
+                    <!-- SIP Calculator -->
+                    <li class="nav-item px-2">
+                        <a class="nav-link {% if request.path == sip_url %}active{% endif %}" 
+                        href="{% url 'sip_calculator' %}"
+                        {% if request.path == sip_url %}aria-current="page"{% endif %}>
+                        SIP Calculator
+                        </a>
+                    </li>
 
-                  <!-- Contact -->
-                  <li class="nav-item px-2">
-                    <a class="nav-link {% if request.path == contact_url %}active{% endif %}" 
-                      href="{% url 'contact' %}"
-                      {% if request.path == contact_url %}aria-current="page"{% endif %}>
-                      Contact Us
-                    </a>
-                  </li>
+                    <!-- Contact -->
+                    <li class="nav-item px-2">
+                        <a class="nav-link {% if request.path == contact_url %}active{% endif %}" 
+                        href="{% url 'contact' %}"
+                        {% if request.path == contact_url %}aria-current="page"{% endif %}>
+                        Contact Us
+                        </a>
+                    </li>
 
-                  <!-- User Login -->
-                  <li class="nav-item px-2">
-                    <a class="nav-link {% if request.path == login_url %}active{% endif %}" 
-                      href="{% url 'login' %}"
-                      {% if request.path == login_url %}aria-current="page"{% endif %}>
-                      User Login
-                    </a>
-                  </li>
+                    <!-- User Login -->
+                    <li class="nav-item px-2">
+                        <a class="nav-link {% if request.path == login_url %}active{% endif %}" 
+                        href="{% url 'login' %}"
+                        {% if request.path == login_url %}aria-current="page"{% endif %}>
+                        User Login
+                        </a>
+                    </li>
 
-                  <!-- Admin Login -->
-                  <li class="nav-item px-2">
-                    <a class="nav-link {% if request.path == '/admin/' %}active{% endif %}" 
-                      href="/admin"
-                      {% if request.path == '/admin/' %}aria-current="page"{% endif %}>
-                      Admin Login
-                    </a>
-                  </li>
+                    <!-- Admin Login -->
+                    <li class="nav-item px-2">
+                        <a class="nav-link {% if request.path == '/admin/' %}active{% endif %}" 
+                        href="/admin"
+                        {% if request.path == '/admin/' %}aria-current="page"{% endif %}>
+                        Admin Login
+                        </a>
+                    </li>
                 </ul>
-              </div>
             </div>
-          </nav>
+        </div>
+    </nav>
+    
+    <!-- Dark overlay for mobile (hidden by default) -->
+    <div class="menu-overlay"></div>
 
     <!-- Dynamic Content Goes Here -->
     <main>
@@ -93,36 +125,56 @@
         {% endblock content %}
     </main>
 
-    {% block js_code %}
-    {# JavaScript code goes here #}
+    <footer class="bg-dark text-white py-3 mt-auto">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center">
+                    <p class="mb-0">
+                        &copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <!-- Bootstrap 5.1.3 JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    // Auto-close menu when clicking links or outside
     document.addEventListener('DOMContentLoaded', function() {
-      const navbar = document.getElementById('navbarNav');
-      const toggler = document.querySelector('.navbar-toggler');
-      
-      // Close when clicking outside
-      document.addEventListener('click', function(e) {
-        if (!navbar.contains(e.target) && e.target !== toggler) {
-          new bootstrap.Collapse(navbar).hide();
+        const navbar = document.getElementById('navbarNav');
+        const toggler = document.querySelector('.navbar-toggler');
+        const overlay = document.querySelector('.menu-overlay');
+        
+        // Close menu when clicking outside or on overlay
+        document.addEventListener('click', function(e) {
+            if (!navbar.contains(e.target) && e.target !== toggler) {
+                const bsCollapse = new bootstrap.Collapse(navbar);
+                bsCollapse.hide();
+            }
+        });
+        
+        // Toggle overlay when menu opens/closes
+        navbar.addEventListener('show.bs.collapse', function() {
+            overlay.style.display = 'block';
+        });
+        
+        navbar.addEventListener('hide.bs.collapse', function() {
+            overlay.style.display = 'none';
+        });
+        
+        // Close menu when clicking links (mobile only)
+        if (window.innerWidth < 992) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    const bsCollapse = new bootstrap.Collapse(navbar);
+                    bsCollapse.hide();
+                });
+            });
         }
-      });
     });
     </script>
+    {% block js_code %}
+    {# Additional JavaScript code goes here #}
     {% endblock js_code %}
-
-    <footer class="bg-dark text-white py-3 mt-auto">  <!-- Same bg-dark as navbar -->
-      <div class="container-fluid">
-        <div class="row justify-content-center">  <!-- Centers content horizontally -->
-          <div class="col-12 text-center">  <!-- Full width column -->
-            <p class="mb-0">  <!-- mb-0 removes default margin -->
-              &copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved
-            </p>
-          </div>
-        </div>
-      </div>
-    </footer>
 </body>
 </html>
