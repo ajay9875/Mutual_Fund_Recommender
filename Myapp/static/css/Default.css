@@ -15,14 +15,23 @@ p {
     line-height: 1.6;
 }
 
+.logo img{
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+}
+.logo{
+    cursor: default;
+}
+
 /* --- Hero Section --- */
 .hero {
     background: linear-gradient(to right, #3498db, #2ecc71);
     color: white;
-    padding: 50px 20px;
+    padding: 20px 20px;
     text-align: center;
     border-radius: 10px;
-    margin: 0px 20px 30px 20px;
+    margin: 10px 20px 30px 20px;
 }
 .hero h1 {
     font-size: 36px;
