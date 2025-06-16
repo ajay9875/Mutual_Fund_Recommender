@@ -4,76 +4,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/Base.css' %}">
     <title>{% block title %}Default Title{% endblock title %}</title>
     <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
     <!-- Bootstrap 5.1.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Base Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
         /* Mobile Menu Styles */
         @media (max-width: 991.98px) {
-            /* Fixed header */
+            /* Show only toggle button */
             .navbar {
                 position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
-                z-index: 1030;
                 height: 60px;
-                background-color: #343a40 !important;
-                padding: 0.5rem 1rem !important;
+                background-color: transparent !important;
+                padding: 0 !important;
+                z-index: 1030;
             }
             
-            /* Body padding to account for fixed header */
             body {
                 padding-top: 60px;
             }
             
-            /* Mobile menu panel (50% width, slides from left) */
+            /* Toggle button styling */
+            .navbar-toggler {
+                position: fixed;
+                left: 15px;
+                top: 15px;
+                z-index: 1060;
+                background-color: #343a40;
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+            
+            /* Mobile menu panel - initially inactive */
             .navbar-collapse {
-                position: fixed !important;
-                top: 60px !important;
-                left: -50% !important;
-                width: 50% !important;
-                height: calc(100vh - 60px) !important;
-                background-color: #343a40 !important;
-                transition: left 0.3s ease !important;
-                z-index: 1050 !important;
-                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-                margin: 0 !important;
-                padding: 20px !important;
+                position: fixed;
+                top: 0;
+                left: -80%;
+                width: 80%;
+                height: 100vh;
+                background-color: #343a40;
+                transition: left 0.3s ease;
+                z-index: 1050;
+                padding-top: 60px;
                 overflow-y: auto;
             }
             
+            /* Active state when shown */
             .navbar-collapse.show {
-                left: 0 !important;
+                left: 0;
+                pointer-events: auto;
             }
             
             /* Nav links styling */
             .navbar-nav {
-                flex-direction: column !important;
+                flex-direction: column;
                 width: 100%;
             }
             
             .nav-item {
-                padding: 12px 0;
+                width: 100%;
+                padding: 12px 15px;
                 border-bottom: 1px solid rgba(255,255,255,0.1);
             }
             
-            /* Toggle button styling */
-            .navbar-toggler {
-                position: relative !important;
-                z-index: 1060 !important;
-                border: 1px solid rgba(255,255,255,0.1) !important;
+            .nav-link {
+                color: white !important;
+                display: block;
+                padding: 8px 0;
+                width: 100%;
             }
             
-            /* Dark overlay when menu is open */
+            /* Active link styling */
+            .nav-link.active {
+                font-weight: bold;
+                background-color: rgba(255,255,255,0.1);
+            }
+            
+            /* Overlay */
             .menu-overlay {
                 position: fixed;
-                top: 60px;
+                top: 0;
                 left: 0;
                 width: 100%;
-                height: calc(100vh - 60px);
+                height: 100%;
                 background-color: rgba(0,0,0,0.5);
                 z-index: 1040;
                 display: none;
@@ -82,63 +104,77 @@
             .navbar-collapse.show + .menu-overlay {
                 display: block;
             }
-            
-            /* Ensure content stays below header */
-            main {
-                position: relative;
-                z-index: 1;
+              /* Hide tooltips when either mobile menu is open */
+            .navbar-collapse-mobile.show ~ .tooltip-text,
+            .profile-collapse-mobile.show ~ .tooltip-text,
+            .navbar-collapse-mobile.show ~ * .tooltip-text,
+            .profile-collapse-mobile.show ~ * .tooltip-text,
+            .navbar-collapse-mobile.show .tooltip-text,
+            .profile-collapse-mobile.show .tooltip-text {
+              display: none !important;
+              visibility: hidden !important;
+              opacity: 0 !important;
+              pointer-events: none !important;
+            }
+
+            /* Optional: Hide ALL tooltips by default in mobile view */
+            .tooltip-text {
+              display: none !important;
             }
         }
         
         /* Desktop Styles */
         @media (min-width: 992px) {
-            .navbar-collapse {
-                position: static !important;
-                width: auto !important;
-                height: auto !important;
-                background-color: transparent !important;
-                padding-top: 0 !important;
+            .navbar {
+                background-color: #343a40 !important;
+                padding: 0.5rem 1rem !important;
+            }
+            
+            body {
+                padding-top: 0;
             }
             
             .menu-overlay {
                 display: none !important;
             }
             
-            body {
+            /* Reset mobile-specific styles */
+            .navbar-collapse {
+                position: relative;
+                left: auto;
+                width: auto;
+                height: auto;
+                background-color: transparent;
                 padding-top: 0;
             }
-        }
-        
-        /* Base styles */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        
-        /* Footer styles */
-        footer {
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            height: 60px;
+            
+            .navbar-nav {
+                flex-direction: row !important;
+            }
+            
+            .nav-item {
+                width: auto;
+                padding: 0;
+                border-bottom: none;
+            }
+            
+            .nav-link {
+                padding: 0.5rem 1rem !important;
+            }
+            
+            .nav-link.active {
+                font-weight: bold;
+                background-color: rgba(255,255,255,0.1);
+            }
         }
     </style>
-    {% block extra_css %}
-    {# Extra CSS code goes here #}
-    {% endblock extra_css %}
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-    <!-- Reusable Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <!-- Mobile Toggle Button -->
             <button class="navbar-toggler" type="button"
                     data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false"
@@ -146,72 +182,40 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Nav Links -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav w-100 d-flex justify-content-evenly">
-                    <!-- Home Link -->
                     <li class="nav-item px-2">
-                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" 
-                        href="/">Home</a>
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
                     </li>
-
-                    <!-- About Link -->
                     <li class="nav-item px-2">
                         <a class="nav-link {% if request.path == about_url %}active{% endif %}" 
-                        href="{% url 'about' %}"
-                        {% if request.path == about_url %}aria-current="page"{% endif %}>
-                        About Us
-                        </a>
+                           href="{% url 'about' %}">About Us</a>
                     </li>
-
-                    <!-- SIP Calculator -->
                     <li class="nav-item px-2">
                         <a class="nav-link {% if request.path == sip_url %}active{% endif %}" 
-                        href="{% url 'sip_calculator' %}"
-                        {% if request.path == sip_url %}aria-current="page"{% endif %}>
-                        SIP Calculator
-                        </a>
+                           href="{% url 'sip_calculator' %}">SIP Calculator</a>
                     </li>
-
-                    <!-- Contact -->
                     <li class="nav-item px-2">
                         <a class="nav-link {% if request.path == contact_url %}active{% endif %}" 
-                        href="{% url 'contact' %}"
-                        {% if request.path == contact_url %}aria-current="page"{% endif %}>
-                        Contact Us
-                        </a>
+                           href="{% url 'contact' %}">Contact Us</a>
                     </li>
-
-                    <!-- User Login -->
                     <li class="nav-item px-2">
                         <a class="nav-link {% if request.path == login_url %}active{% endif %}" 
-                        href="{% url 'login' %}"
-                        {% if request.path == login_url %}aria-current="page"{% endif %}>
-                        User Login
-                        </a>
+                           href="{% url 'login' %}">User Login</a>
                     </li>
-
-                    <!-- Admin Login -->
                     <li class="nav-item px-2">
                         <a class="nav-link {% if request.path == '/admin/' %}active{% endif %}" 
-                        href="/admin"
-                        {% if request.path == '/admin/' %}aria-current="page"{% endif %}>
-                        Admin Login
-                        </a>
+                           href="/admin">Admin Login</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Dark overlay for mobile (hidden by default) -->
     <div class="menu-overlay"></div>
 
-    <!-- Dynamic Content Goes Here -->
     <main>
-        {% block content %}
-        {# Content goes here #}
-        {% endblock content %}
+        {% block content %}{% endblock %}
     </main>
 
     <footer class="bg-dark text-white py-3 mt-auto">
@@ -226,55 +230,47 @@
         </div>
     </footer>
 
-    <!-- Bootstrap 5.1.3 JS Bundle with Popper -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const navbar = document.getElementById('navbarNav');
-        const toggler = document.querySelector('.navbar-toggler');
-        const overlay = document.querySelector('.menu-overlay');
-        
         // Initialize Bootstrap Collapse
+        const navbar = document.getElementById('navbarNav');
         const bsCollapse = new bootstrap.Collapse(navbar, {
             toggle: false
         });
         
-        // Close menu when clicking overlay
-        overlay.addEventListener('click', function() {
+        // Overlay click handler
+        document.querySelector('.menu-overlay').addEventListener('click', function() {
             bsCollapse.hide();
         });
         
-        // Toggle overlay when menu opens/closes
-        navbar.addEventListener('show.bs.collapse', function() {
-            overlay.style.display = 'block';
-        });
-        
-        navbar.addEventListener('hide.bs.collapse', function() {
-            overlay.style.display = 'none';
-        });
-        
-        // Close menu when clicking nav links (mobile only)
-        if (window.innerWidth < 992) {
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', function() {
-                    bsCollapse.hide();
-                });
-            });
-        }
-        
         // Handle window resize
-        window.addEventListener('resize', function() {
+        function handleResize() {
             if (window.innerWidth >= 992) {
+                // Always show navbar in desktop view
                 bsCollapse.show();
-                overlay.style.display = 'none';
+                document.querySelector('.menu-overlay').style.display = 'none';
             } else {
+                // Hide navbar in mobile view by default
                 bsCollapse.hide();
             }
+        }
+        
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initialize
+        
+        // Make all links always clickable in both views
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 992) {
+                    // Close menu after clicking a link in mobile view
+                    bsCollapse.hide();
+                }
+            });
         });
     });
     </script>
-    {% block js_code %}
-    {# Additional JavaScript code goes here #}
-    {% endblock js_code %}
+    {% block js_code %}{% endblock %}
 </body>
 </html>
