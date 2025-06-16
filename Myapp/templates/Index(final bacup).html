@@ -1,0 +1,392 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard: Mutual Fund Recommendations</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+  <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
+  <script src="{% static 'javascript/allmessage.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/Index.css' %}">
+</head>
+
+<body>
+  <header class="header">
+    <nav class="nav-links">
+     <ul>
+    <div class="home">
+        <a href="/" class="btn">
+            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
+          </a>
+          <div class="tooltip-text">
+                <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
+           </div>
+    </div>
+   
+        <li><a href="{% url 'sip_calculator' %}">SIP Calculator</a></li>
+        <li><a href="{% url 'fund_details' %}">Fund Detail Search</a></li>
+        <li><a href="?menu=recommendation_form" onclick="showRecommendationForm(); return false;" id='rec'>Get Recommendation</a></li>
+        <li><a href="{% url 'fund_result' %}">All Mutual Funds</a></li>
+        <li><a href="{% url 'your_funds' %}">Your Mutual Funds</a></li>
+        <li><a href="\contact">Contact</a></li>
+
+          <a href="?menu=profile" onclick="toggleProfileMenu(); return false;" class="profile-btn">
+            {% if profilepic %}
+              <img src="{{ profilepic }}" class="profile-icon">
+            {% else %}
+              <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
+            {% endif %}
+          </a>
+      </ul>  
+    </nav>
+
+    <div class="profile-dropdown">
+      <a href="{% url 'your_info' %}">Your Info</a>
+      <a href="{% url 'your_funds' %}">Your Funds</a>
+      <a href="{% url 'account_settings' %}">Settings</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </header>
+
+
+        <!-- Session Timer -->
+        {% if remaining_time %}
+          <div id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
+        {% endif %} 
+       
+        <!-- Flashed message will be appear here -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                   <div class='msg'> {{ message }} </div>
+                  </div> 
+                </div>
+            {% endfor %}
+        {% endif %}
+   
+        <!-- Recommendation form-->
+        <div class="form-container">
+          <h2>Mutual Fund Recommendation Form</h2>
+      
+          <form action="/dashboard/" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="recommendation" value="recommendation">
+            <!-- Company Type (Full Width) -->
+            <div class="form-group">
+              <label for="fund_type">Fund Type:</label>
+              <select id="fund_type" name="fund_type" onchange="handleCompanyTypeChange(this)">
+                <option value="" selected>Please select a mutual fund type</option>
+                <option value="Debt">Debt Funds</option>
+                <option value="Equity">Equity Funds</option>
+                <option value="Hybrid">Hybrid Funds</option>
+                <option value="Solutions Oriented">Solution Oriented Funds</option>
+                <option value="Global Fund of Funds">Fund of Funds(FoFs)</option>
+                <option value="Index Funds">Index Funds</option>
+                <option value="Other">Other Funds</option>
+                <!--<option value="manually">Enter Manually</option>-->
+              </select>
+
+              <input type="text" id="manual_company_type" name="manual_company_type" style="display:none;" placeholder="Enter company type" />
+            </div>          
+
+            <div class="form-group">
+                <label for="fund_subtype">Fund Subtype:</label>
+                <select id="fund_subtype" name="fund_subtype">
+                    <option value="" selected>Please Select a mutual fund subtype</option>
+                    <option value="Floating Rate">Floating Rate</option>
+                    <option value="Fixed Maturity Intermediate-Term Bond">Fixed Maturity Intermediate-Term Bond</option>
+                    <option value="Dynamic Bond">Dynamic Bond</option>
+                    <option value="Ultra Short Duration">Ultra Short Duration</option>
+                    <option value="Corporate Bond">Corporate Bond</option>
+                    <option value="Short Duration">Short Duration</option>
+                    <option value="10 yr Government Bond">10 yr Government Bond</option>
+                    <option value="Government Bond">Government Bond</option>
+                    <option value="Money Market">Money Market</option>
+                    <option value="Long Duration">Long Duration</option>
+                    <option value="Other Bond">Other Bond</option>
+                    <option value="Low Duration">Low Duration</option>
+                    <option value="Credit Risk">Credit Risk</option>
+                    <option value="Banking & PSU">Banking & PSU</option>
+                    <option value="Medium to Long Duration">Medium to Long Duration</option>
+                    <option value="Fixed Maturity Short-Term Bond">Fixed Maturity Short-Term Bond</option>
+                    <option value="Medium Duration">Medium Duration</option>
+                    <option value="Fixed Maturity Ultrashort Bond">Fixed Maturity Ultrashort Bond</option>
+                    <option value="Children">Children</option>
+                    <option value="Retirement">Retirement</option>
+                    <option value="Focused Fund">Focused Fund</option>
+                    <option value="Equity - Other">Equity - Other</option>
+                    <option value="Contra">Contra</option>
+                    <option value="Flexi Cap">Flexi Cap</option>
+                    <option value="Equity - Consumption">Equity - Consumption</option>
+                    <option value="Sector - FMCG">Sector - FMCG</option>
+                    <option value="Sector - Financial Services">Sector - Financial Services</option>
+                    <option value="Mid-Cap">Mid-Cap</option>
+                    <option value="Equity - Infrastructure">Equity - Infrastructure</option>
+                    <option value="Multi-Cap">Multi-Cap</option>
+                    <option value="Large-Cap">Large-Cap</option>
+                    <option value="Small-Cap">Small-Cap</option>
+                    <option value="Dividend Yield">Dividend Yield</option>
+                    <option value="ELSS (Tax Savings)">ELSS (Tax Savings)</option>
+                    <option value="Large & Mid-Cap">Large & Mid-Cap</option>
+                    <option value="Sector - Healthcare">Sector - Healthcare</option>
+                    <option value="Value">Value</option>
+                    <option value="Equity - ESG">Equity - ESG</option>
+                    <option value="Sector - Technology">Sector - Technology</option>
+                    <option value="Fund of Funds">Fund of Funds</option>
+                    <option value="Multi Asset Allocation">Multi Asset Allocation</option>
+                    <option value="Equity Savings">Equity Savings</option>
+                    <option value="Balanced Allocation">Balanced Allocation</option>
+                    <option value="Dynamic Asset Allocation">Dynamic Asset Allocation</option>
+                    <option value="Aggressive Allocation">Aggressive Allocation</option>
+                    <option value="Conservative Allocation">Conservative Allocation</option>
+                    <option value="Global - Other">Global - Other</option>
+                    <option value="Index Funds">Index Funds</option>
+                    <option value="Index Funds - Fixed Income">Index Funds - Fixed Income</option>
+                    <option value="Liquid">Liquid</option>
+                    <option value="Overnight">Overnight</option>
+                    <option value="Arbitrage Fund">Arbitrage Fund</option>
+                </select>
+                </div>
+      
+              <div class="form-row">
+                  <div class="form-group">
+                      <label for="tenure">Investment Tenure:</label>
+                      <select id="tenure" name="tenure">
+                        <option value="" selected>Please select a investment tenure</option>
+                          <option value="1_month_return">1 Month</option>
+                          <option value="3_month_return">3 Months</option>
+                          <option value="6_month_return">6 Months</option>
+
+                          <option value="1_year_return">1 Year</option>
+                          <option value="3_year_return">3 Years</option>
+                          <option value="5_year_return">5+ Years</option>
+                      </select>
+                  </div>
+      
+              <!-- Profit Type -->
+                  <div class="form-group">
+                      <label for="return_type">Expected Return Type:</label>
+                      <select id="return_type" name="return_type">
+                        <option value="" selected>Please select a return type</option>
+                          <option value="high">High</option>
+                          <option value="medium">Medium</option>
+                          <option value="low">Low</option>
+                      </select>
+                  </div>
+              </div>
+              <!-- Submit Button -->
+              <button class="get-recommendation-btn" type="submit">Get Recommendation</button>
+          </form>
+    </div>
+
+
+    
+      <div class="greet"><h4>Welcome back, {{ full_name }}! 👋</h4></div>
+      <div class='recommendation'>
+        <h3>All Recommended Mutual Funds</h3>
+            {% if recommended_funds %}
+                <table class="fund-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fund Name</th>
+                            <th>Plan Type</th>
+                            <th>Scheme Type</th>
+                            <th>NAV (₹)</th>
+                            <th>    
+                                {% if form_data.tenure == "5_year_return" %}
+                                    5-Year Return (%)
+                                {% elif form_data.tenure == "3_year_return" %}
+                                    3-Year Return (%)
+                                {% elif form_data.tenure == "1_month_return" %}
+                                    1-Month Return (%)
+                                {% elif form_data.tenure == "3_month_return" %}
+                                    3-Month Return (%)
+                                {% elif form_data.tenure == "6_month_return" %}
+                                    6-Month Return (%)
+                                {% else %}
+                                    1-Year Return (%)
+                                {% endif %}
+                            </th>
+                            <th>Risk</th>
+                            <th>Rating</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fund in recommended_funds %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ fund.fund_name }}</td>
+                                <td>{{ fund.category|default:"-" }}</td>
+                                <td>{{ fund.sub_category|default:"-" }}</td> {# not returned, but placeholder okay #}
+                                <td>{{ fund.nav|default:"-" }}</td>
+                                <td>
+                                    {% if form_data.tenure == "5_year_return" %}
+                                        {{ fund.5_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "3_year_return" %}
+                                        {{ fund.3_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "1_month_return" %}
+                                        {{ fund.1_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "3_month_return" %}
+                                        {{ fund.3_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% elif form_data.tenure == "6_month_return" %}
+                                        {{ fund.6_month_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% else %}
+                                        {{ fund.1_year_return|default:"NA" }} ({{ fund.return_type }})
+                                    {% endif %}
+                                </td>
+                                <td class="risk-{{ fund.risk|lower|slugify }}">
+                                    {{ fund.risk|default:"NA" }}
+                                </td>
+                                <td>{% if fund.star_rating %}
+                                       {{ fund.star_rating }}/5 ⭐
+                                    {% else %}
+                                        NA
+                                    {% endif %}
+                                </td>
+                                <td class="action-buttons">
+                                    <form action="{% url 'fund_result' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                        <input type="hidden" name="NAV" value="{{ fund.nav }}">
+                                        <input type="hidden" name="category" value="{{ fund.category }}">
+                                        <button type="submit" class="action-btn view-btn">View</button>
+                                    </form>
+                                    <form action="{% url 'your_funds' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="page_name" value="dashboard">
+                                        <input type="hidden" name="form_type" value="add-fund">
+                                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                                        <input type="hidden" name="investment_type" value="{{ fund.category }}">
+                                        <input type="hidden" name="subcategory" value="{{ fund.sub_category }}">
+                                        <input type="hidden" name="nav" value="{{ fund.nav }}">
+                                        <input type="hidden" name="rating" value="{{ fund.star_rating }}">
+
+                                        <button type="submit" class="action-btn save-btn">Save</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                    {% else %}
+                        <p>No results yet. To get a personalized recommendation, click the <strong>"Get Recommendation"</strong> button above.</p>
+                    {% endif %}
+
+              </div>
+        <!-- Footer -->
+            <footer class="footer">
+                <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+            </footer>
+                
+    <script>
+          // Show/Hide recommendation with mouseover/mouseout
+            document.getElementById('rec').addEventListener('mouseover', () => {
+            document.querySelector('.form-container').style.display = 'block';
+            });
+
+          //Show recommendation form only by clicking button
+          function showRecommendationForm() {
+              let rec_form = document.querySelector('.form-container');
+              
+              // Toggle display
+              if (rec_form.style.display === "block") {
+                  rec_form.style.display = "none";
+                  // Remove query param if needed
+                  history.pushState(null, "", window.location.pathname);
+              } else {
+                  rec_form.style.display = "block";
+                  // Change URL without reloading
+                  const newUrl = window.location.pathname + "?menu=recommendation_form";
+                  history.pushState(null, "", newUrl);
+              }
+          }
+
+          function handleCompanyTypeChange() {
+              var select = document.getElementById("company_type");
+              var input = document.getElementById("manual_company_type");
+              if (select.value === "manually") {
+                  input.style.display = "block"; // Show input field when 'Manully' is selected
+              } else {
+                  input.style.display = "none"; // Hide input field for Manully selections
+              }
+          }
+
+              // Toggle function for profile button
+              function toggleProfileMenu() {
+                const dropdown = document.querySelector('.profile-dropdown');
+                
+                if (dropdown.style.display === 'block') {
+                    dropdown.style.display = 'none';  // Hide if visible
+                    // Remove query param if needed
+                    history.pushState(null, "", window.location.pathname);
+                    
+                } else {
+                    dropdown.style.display = 'block'; // Show if hidden
+                    // Change URL without reloading
+                    const newUrl = window.location.pathname + "?menu=profile";
+                    history.pushState(null, "", newUrl);
+                }
+              }
+
+
+          // Show custom input if user want to give Manually
+          function toggleCustomProfit(selectElement) {
+              var customInput = document.getElementById("custom_profit");
+          
+              if (selectElement.value === "other") {
+                  customInput.style.display = "block"; // Show input field
+                  customInput.required = true; // Make it required
+              } else {
+                  customInput.style.display = "none"; // Hide input field
+                  customInput.required = false; // Remove required attribute
+              }
+          }          
+    
+          function toggleCustomProfit(select) {
+            const customProfitInput = document.getElementById('custom_profit');
+            if (select.value === 'other') {
+                customProfitInput.style.display = 'block';
+            } else {
+                customProfitInput.style.display = 'none';
+            }
+        }
+
+  let remainingTime = {{ remaining_time|default:0 }}; // Use Django variable in JS
+    
+  function updateTimer() {
+      let timerElement = document.getElementById("session-timer");
+
+      if (remainingTime > 0) {
+          let minutes = Math.floor(remainingTime / 60);
+          let seconds = Math.floor(remainingTime % 60);
+          timerElement.innerText = `Session expires in ${minutes}m ${seconds}s`;
+
+          // Change color dynamically when < 5 minutes
+          if (remainingTime < 300) { // 5 minutes = 300 seconds
+              timerElement.style.color = "red";
+          } else {
+              timerElement.style.color = "lightgrey";
+              ;
+          }
+
+          remainingTime--;
+          setTimeout(updateTimer, 1000);
+          
+      } else {
+          timerElement.innerText = "Logging out...";
+          setTimeout(() => {
+              window.location.href = "{% url 'logout' %}";  // Auto logout
+              window.location.reload();  // ✅ Corrected: Add parentheses to call the function
+            }, 2000);
+      }
+  }
+
+  window.onload = updateTimer;
+
+    </script> 
+</body>
+</html>

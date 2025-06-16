@@ -5,12 +5,55 @@ body {
     margin: 95px 0px 85px 0px;
     padding: 0;
 }
-/* Optional: Prevent mobile menu from being taller than viewport */
-  .navbar-collapse {
-    max-height: 70vh;
-    overflow-y: auto;
+/* Mobile Menu Styles */
+@media (max-width: 991.98px) {
+  .navbar {
+    background-color: transparent !important;
+    padding: 0 !important;
   }
+  
+  .navbar-collapse {
+    position: fixed !important;
+    top: 0 !important;
+    left: -50% !important;
+    width: 50% !important;
+    height: 100vh !important;
+    background-color: #343a40 !important;
+    padding-top: 56px !important;
+    transition: left 0.3s ease !important;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    z-index: 1050 !important;
+    margin: 0 !important;
+  }
+  
+  .navbar-collapse.show {
+    left: 0 !important;
+  }
+  
+  .navbar-nav {
+    flex-direction: column !important;
+  }
+  
+  .navbar-toggler {
+    position: fixed !important;
+    left: 15px !important;
+    top: 15px !important;
+    z-index: 1060 !important;
+    background-color: #343a40 !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+  }
+}
 
+/* Desktop Reset */
+@media (min-width: 992px) {
+  .navbar-collapse {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    background-color: transparent !important;
+    padding-top: 0 !important;
+  }
+}
 html {
     scroll-behavior: smooth;
 }

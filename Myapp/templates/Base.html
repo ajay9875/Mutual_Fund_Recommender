@@ -97,6 +97,20 @@
     {# JavaScript code goes here #}
     <!-- Bootstrap 5.1.3 JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    // Auto-close menu when clicking links or outside
+    document.addEventListener('DOMContentLoaded', function() {
+      const navbar = document.getElementById('navbarNav');
+      const toggler = document.querySelector('.navbar-toggler');
+      
+      // Close when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!navbar.contains(e.target) && e.target !== toggler) {
+          new bootstrap.Collapse(navbar).hide();
+        }
+      });
+    });
+    </script>
     {% endblock js_code %}
 
     <footer class="bg-dark text-white py-3 mt-auto">  <!-- Same bg-dark as navbar -->
