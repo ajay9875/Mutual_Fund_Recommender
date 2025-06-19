@@ -88,7 +88,7 @@ DATABASES = {
         'OPTIONS': {
             'timeout': 20,
         },
-        'ATOMIC_REQUESTS': True,
+        'ATOMIC_REQUESTS': False,
     }
 }
 
