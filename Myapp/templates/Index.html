@@ -572,10 +572,9 @@
           let seconds = Math.floor(remainingTime % 60);
           timerElement.innerText = `Session expires in ${minutes}m ${seconds}s`;
           if (remainingTime > 600){
-            timerElement.style.display = "none";
+            timerElement.style.color = "grey";
           }else{
             timerElement.style.color = "red";
-            timerElement.style.display = "block";
           }
           remainingTime--;
           setTimeout(updateTimer, 1000);
