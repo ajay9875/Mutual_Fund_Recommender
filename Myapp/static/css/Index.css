@@ -295,7 +295,9 @@ th {
     width: 25px;
     border-radius: 100%;
 }
-
+.timer{
+    justify-self: center;
+}
 /* --- Responsive Design --- */
 @media (max-width: 480px) {
     .form-container {

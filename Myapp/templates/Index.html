@@ -239,7 +239,7 @@
 
   <!-- Session Timer -->
   {% if remaining_time %}
-    <div id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
+    <div class="timer"  id="session-timer" style="font-weight: bolder"></div>
   {% endif %} 
   
   <!-- Flashed messages -->
@@ -571,13 +571,18 @@
           let minutes = Math.floor(remainingTime / 60);
           let seconds = Math.floor(remainingTime % 60);
           timerElement.innerText = `Session expires in ${minutes}m ${seconds}s`;
-          timerElement.style.color = remainingTime < 300 ? "red" : "lightgrey";
+          if (remainingTime > 600){
+            timerElement.style.display = "none";
+          }else{
+            timerElement.style.color = "red";
+            timerElement.style.display = "block";
+          }
           remainingTime--;
           setTimeout(updateTimer, 1000);
         } else {
           timerElement.innerText = "Logging out...";
           setTimeout(() => {
-            window.location.href = "{% url 'logout' %}";
+            window.location.href = "{% url 'login' %}";
           }, 2000);
         }
       }

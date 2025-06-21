@@ -170,7 +170,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Default email sender
 
 # Set session timeout to 60 minutes
-SESSION_COOKIE_AGE = 7200
+SESSION_COOKIE_AGE = 1800
 
 # Ensure sessions do not expire when the browser is closed
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
