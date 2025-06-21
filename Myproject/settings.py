@@ -130,23 +130,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-"""STATIC_URL = '/static/'  # URL for serving static files
-
-# Optional: Define Global Static Files Directory
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),  # For a project-wide static folder
-]
-
-# Static files (CSS, JavaScript, Images)
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-# Whitenoise compression
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Required in Production for `collectstatic`
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')"""
-
 # KEEP ONLY ONE COPY OF THESE (remove duplicates):
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # For collectstatic
@@ -169,14 +152,10 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Default email sender
 
-# Set session timeout to 60 minutes
-SESSION_COOKIE_AGE = 1800
-
-# Ensure sessions do not expire when the browser is closed
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-
-# Disable session extension on every request
-SESSION_SAVE_EVERY_REQUEST = False
+# Consistent 30-minute (1800s) timeout
+SESSION_COOKIE_AGE = 1800  # 30 minutes in seconds
+SESSION_SAVE_EVERY_REQUEST = True  # Renew timer on activity
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Use persistent sessions
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -188,11 +167,12 @@ if DEBUG:
 else:
     MEDIAFILES = []
 
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
 # Whitenoise compression and caching
 WHITENOISE_MANIFEST_STRICT = False
 WHITENOISE_MAX_AGE = 31536000  # 1 year cache
 
 # Optional: Set the error pages explicitly
 ERROR_404_TEMPLATE = '404.html'
-
-

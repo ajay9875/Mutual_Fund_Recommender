@@ -163,11 +163,15 @@
               data-bs-toggle="collapse" data-bs-target="#profileMenu"
               aria-controls="profileMenu" aria-expanded="false"
               aria-label="Toggle profile">
-        {% if profilepic %}
-          <img src="{{ profilepic }}" class="profile-icon">
-        {% else %}
-          <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
-        {% endif %}
+          {% if profilepic %}
+            <img src="{{ MEDIA_URL }}{{ profilepic|cut:MEDIA_URL }}" 
+                onerror="this.src='{% static 'icons/image.png' %}'; this.style.backgroundColor='gray'"
+                class="profile-icon">
+          {% else %}
+            <img src="{% static 'icons/image.png' %}" 
+                class="profile-icon" 
+                style="background-color: gray;">
+          {% endif %}
       </button>
 
       <!-- Main mobile menu (left side) -->
@@ -239,7 +243,7 @@
 
   <!-- Session Timer -->
   {% if remaining_time %}
-    <div class="timer"  id="session-timer" style="font-weight: bolder"></div>
+    <div class="timer" id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
   {% endif %} 
   
   <!-- Flashed messages -->
@@ -571,11 +575,7 @@
           let minutes = Math.floor(remainingTime / 60);
           let seconds = Math.floor(remainingTime % 60);
           timerElement.innerText = `Session expires in ${minutes}m ${seconds}s`;
-          if (remainingTime > 600){
-            timerElement.style.color = "grey";
-          }else{
-            timerElement.style.color = "red";
-          }
+          timerElement.style.color = remainingTime < 600 ? "red" : "lightgrey";
           remainingTime--;
           setTimeout(updateTimer, 1000);
         } else {

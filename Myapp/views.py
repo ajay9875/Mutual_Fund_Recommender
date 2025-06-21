@@ -397,7 +397,6 @@ import numpy as np
 from datetime import datetime
 import requests
 
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -406,12 +405,20 @@ def userdashboard(request):
         messages.info(request, "Session expired! Please login again.")
         return redirect('login')
 
-    if 'session_expiry' not in request.session:
-        request.session['session_expiry'] = request.session.get_expiry_date().timestamp()
+    """if 'session_expiry' not in request.session:
+        request.session['session_expiry'] = request.session.get_expiry_date().timestamp()"""
 
-    expiry_time = request.session['session_expiry']
+    # Calculate remaining time - IMPORTANT FIX:
+    session_start = request.session.get('session_start')
+    if not session_start:  # Handle missing session_start
+        request.session['session_start'] = int(time.time())
+        session_start = request.session['session_start']
+    
+    remaining_time = max(0, 1800 - (int(time.time()) - session_start))
+
+    """ expiry_time = request.session['session_expiry']
     current_time = datetime.now().timestamp()
-    remaining_time = max(0, int(expiry_time - current_time))
+    remaining_time = max(0, int(expiry_time - current_time))"""
 
     full_name = request.session.get('full_name', '').upper().strip()
     username = request.session.get('username', '').strip()
@@ -446,21 +453,6 @@ def userdashboard(request):
         investment_tenure = request.POST.get("tenure").strip()
         return_type = request.POST.get("return_type").strip()
 
-        #profit_percentage = request.POST.get("profit_percentage", "")
-        #if profit_percentage.lower() == "other":
-        #    profit_percentage = request.POST.get("custom_profit", "")
-        """
-        # Print all form values
-        print("\n=== FORM VALUES ===")
-        print(f"Fund Type (Original): {request.POST.get('company_type', 'Not provided')}")
-        print(f"Fund Type (Processed): {fund_type}")
-        #print(f"Risk Level: {risk}")
-        print(f"Investment Tenure: {tenure}")
-        print(f"Investment Type: {fund_subtype}")
-        print(f"Return Type: {return_type}")
-        #print(f"Expected Return (Original): {request.POST.get('profit_percentage', 'Not provided')}")
-        #print(f"Expected Return: {profit_percentage}")
-        """
         # Reassemble form data for rendering
         form_data = {
             "fund_type": fund_type,
@@ -960,6 +952,8 @@ def loginUser(request):
 
         if user is not None:
             login(request, user)
+            request.session.set_expiry(1800)  # Explicit 30-minute timeout
+            request.session['session_start'] = int(time.time())  # Critical anchor point
             
             # Store user details in session
             request.session['username'] = user.username  # Store username
