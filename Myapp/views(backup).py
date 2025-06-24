@@ -144,7 +144,7 @@ def fund_result(request):
     print(f"CACHE_DURATION: {CACHE_DURATION}")
     print(f"Time since last fetch: {current_time - last_fetched_time}")
 
-    if cached_data is not None and len(cached_data) > 1:
+    if cached_data is not None and (current_time - last_fetched_time) < CACHE_DURATION and len(cached_data) > 1:
         print("✅ Using cached fund data.")
         context.update({
             'categorized_funds': cached_data,
@@ -486,12 +486,6 @@ def userdashboard(request):
 
     return render(request, 'Index.html', context)
    
-import json
-import os
-
-# Constants
-JSON_DATA_PATH = os.path.join(settings.BASE_DIR, 'mutual_funds_data.json')
-
 def get_funds_data_from_api(form_data):
     #print(form_data)
     fund_type = form_data.get('fund_type', None)
@@ -504,103 +498,79 @@ def get_funds_data_from_api(form_data):
     if tenure not in valid_tenures:
         tenure = '1_year_return' # Force fallback to 1-year
 
-    # Try getting from Django cache first
-    cached_data = cache.get('all_funds_data_to_recommend')
+    current_time = time.time()
 
-    if cached_data is not None and len(cached_data) > 1:
+    # Try getting from Django cache
+    cached_data = cache.get('all_funds_data_to_recommend')
+    last_fetched_time = cache.get('last_fetched_time', 0)
+
+    print(f"LAST_FETCHED_TIME: {last_fetched_time}")
+    print(f"CACHE_DURATION: {CACHE_DURATION}")
+    print(f"Time since last fetch: {current_time - last_fetched_time}")
+
+    if cached_data is not None and (current_time - last_fetched_time) < CACHE_DURATION and len(cached_data) > 1:
         print("Fetching cached data from django...")
         api_response = cached_data
-        print("✅ Using cached fund data from django.")
+        print("✅ Using cached fund data.")
+
     else:
-        # If cache is empty, try loading from JSON file
-        try:
-            if os.path.exists(JSON_DATA_PATH):
-                with open(JSON_DATA_PATH, 'r') as f:
-                    json_data = json.load(f)
-                    if json_data and isinstance(json_data, dict) and len(json_data) > 0:
-                        print("✅ Using data from JSON file")
-                        # Update cache with JSON data (without timeout)
-                        cache.set('all_funds_data_to_recommend', json_data)
-                        api_response = json_data
-                    else:
-                        print("⚠️ JSON file exists but contains invalid data")
-                        raise ValueError("Empty or invalid JSON data")
-            else:
-                print("⚠️ JSON file does not exist at:", JSON_DATA_PATH)
-                raise FileNotFoundError("JSON file not found")
-        except Exception as json_error:
-            print(f"⚠️ JSON load error: {json_error}")
-            # If both cache and JSON fail, call the API
-            print("Fetching fresh data from API...")
-            try:
-                api_response = get_all_funds_data_by_indian_api()
-            except Exception as api_error:
-                print(f"‼️ API call failed: {api_error}")
-                return []
+        print("Fetching fresh data from API...")
+        api_response = get_all_funds_data_by_indian_api()
 
-            if api_response:
-                # Save to Django cache (without timeout)
-                cache.set('all_funds_data_to_recommend', api_response)
-                
-                # Save to JSON file with proper directory creation
-                try:
-                    # Ensure directory exists
-                    os.makedirs(os.path.dirname(JSON_DATA_PATH), exist_ok=True)
-                    
-                    # Write JSON file with pretty formatting for debugging
-                    with open(JSON_DATA_PATH, 'w') as f:
-                        json.dump(api_response, f, indent=4)
-                    print(f"✅ Saved fresh data to JSON file at: {JSON_DATA_PATH}")
-                    
-                    # Verify file was created
-                    if os.path.exists(JSON_DATA_PATH):
-                        print("✅ JSON file verification: File exists and is accessible")
-                    else:
-                        print("⚠️ JSON file verification: File was not created")
-                except Exception as save_error:
-                    print(f"‼️ Could not save to JSON file: {save_error}")
-                    print(f"Attempted path: {JSON_DATA_PATH}")
-                    print(f"Current working directory: {os.getcwd()}")
+        if api_response:
+            # Save to Django cache
+            cache.set('all_funds_data_to_recommend', api_response, timeout=CACHE_DURATION)
+            cache.set('last_fetched_time', current_time, timeout=CACHE_DURATION)
 
-            print(f"✅ Fetched and cached new data.")
+        print(f"✅ Fetched and cached new data.")
     
     try:  
         if not api_response or not isinstance(api_response, dict):
             print("API returned empty or invalid response")
             return []
 
+        #print(f"API contains categories: {list(api_response.keys())}")
         processed_data = []
 
         for category, funds_data in api_response.items():
+            
+            # Skip if funds_data is not a dict
             if not isinstance(funds_data, dict):
+                #print(f"  Invalid funds data structure in {category}")
                 continue
 
+            # Process each sub-category in this category
             for sub_category, fund_list in funds_data.items():
                 if not isinstance(fund_list, list):
+                    #print(f"Skipping invalid sub-category {sub_category}")
                     continue
                 
+                #print(f"Processing sub-category: {sub_category}")
                 for fund_item in fund_list:
                     try:
                         if not isinstance(fund_item, dict):
+                            #print(f"Skipping invalid fund data structure")
                             continue
-                            
+                                # Get return value (NEW FALLBACK LOGIC)
                         return_value = fund_item.get(tenure, fund_item.get('1_year_return'))
                         processed_data.append({
-                            'fund_name': fund_item.get('fund_name', '').strip(),
+                            'fund_name': fund_item.get('fund_name', '').strip(),  # Rename to expected key
                             'nav': round(float(fund_item.get('latest_nav')), 2),
                             'category': category,
                             'sub_category': sub_category,
                             '1_month_return': float_or_none(fund_item.get('1_month_return')),
                             '3_month_return': float_or_none(fund_item.get('3_month_return')),
                             '6_month_return': float_or_none(fund_item.get('6_month_return')),
+
                             '1_year_return': float_or_none(fund_item.get('1_year_return')),
                             '3_year_return': float_or_none(fund_item.get('3_year_return')),
                             '5_year_return': float_or_none(fund_item.get('5_year_return')),
                             'asset_size': float_or_none(fund_item.get('asset_size')),
                             'star_rating': float_or_none(fund_item.get('star_rating')),
                             'return_type': estimate_return_type_using_tenure(tenure, return_value),
-                            'risk': estimate_risk_from_return_profile(fund_item),
+                            'risk': estimate_risk_from_return_profile(fund_item),  # Optional: ensure risk is included
                         })
+    
                     except Exception as e:
                         print(f"Error processing fund: {str(e)}")
                         continue
