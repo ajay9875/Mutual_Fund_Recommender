@@ -31,7 +31,7 @@ def send_daily_notifications():
                 <li><strong>Latest market trends</strong> to keep you informed</li>
                 <li><strong>Investment tips</strong> to grow your portfolio</li>
             </ul>
-            <p><a href="https://mutual-fund-recommender.onrender.com/login">Log in</a> to view your personalized dashboard and recommendations.</p>
+            <p><a href="https://mutual-fund-recommender-amt2.onrender.com/login/">Log in</a> to view your personalized dashboard and recommendations.</p>
             <br>
             <p>Warm regards,</p>
             <p><strong>🔷 Mutual Fund Recommendation Team</strong></p>
