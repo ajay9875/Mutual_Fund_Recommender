@@ -4,6 +4,12 @@ from Myapp import views
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from django.contrib.sitemaps.views import sitemap
+from .sitemaps import FundSitemap
+
+sitemaps = {
+    'funds': FundSitemap,
+}
 
  # Ensure all views are imported for another routing
 
@@ -26,16 +32,23 @@ urlpatterns = [
     path("account_settings/", views.account_settings, name="account_settings"),
     path("delete_account/", views.delete_account, name="delete_account"),
 
-    path('fund-details/', views.fund_details, name='fund_details'),
+    #path('fund-details/', views.fund_details, name='fund_details'),
+    path('fund-details/<str:fund_name>/', views.fund_details, name='fund_details'), # New for SEO
     path('sip-calculator/', views.sip_calculator, name='sip_calculator'),
     path('fund-result/', views.fund_result, name='fund_result'),
     
     path('your-funds/', views.your_funds, name='your_funds'),  
-    path('your-info/', views.your_info, name='your_info'),  
+    path('your-info/', views.your_info, name='your_info'), 
+
+    # Add this line for robots.txt
+    path("robots.txt", views.robots_txt), 
 
     # Or, if you want to use `nav_data_view`
     # path('api/nav-data/', views.nav_data_view, name='nav-data'),
 
     # Other paths
     #path('nav-chart/', views.nav_chart_page, name='nav_chart'), # Ensure this is correctly mapped
+    #used for SEO optimization
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
 ]

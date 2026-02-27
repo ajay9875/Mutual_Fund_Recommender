@@ -99,41 +99,6 @@ def fund_result(request):
         return redirect('login')
     
     context = {}
-    if request.method == "POST":
-        fund_name = request.POST.get('fund_name')
-        if fund_name:
-            raw_fund_data = get_all_funds_data_by_indian_api()
-            found_fund = None
-            found_category = None
-            found_subtype = None
-
-            # Search through all categories
-            for main_category, subtypes in raw_fund_data.items():
-                for subtype, funds in subtypes.items():
-                    for fund in funds:
-                        if fund.get('fund_name') == fund_name:
-                            found_fund = fund
-                            found_category = main_category
-                            found_subtype = subtype
-                            break  # Found our fund, exit loops
-                    if found_fund:
-                        break
-                if found_fund:
-                    break
-
-            if found_fund:
-                context = {
-                    'plan_type': found_category,
-                    'scheme_type': found_subtype,
-                    'fund': found_fund,  # Wrap in a list to maintain template structure
-                }
-
-                messages.success(request, "Mutual Fund data fetched successfully.")
-            else:
-                messages.error(request, f"Fund '{fund_name}' not found.")
-                context = {'fund': None}
-
-            return render(request, 'Fund_result.html', context)
     
     current_time = time.time()
     # Try getting from Django cache
@@ -189,7 +154,18 @@ def fund_result(request):
     # Default return for GET requests or invalid POST
     return render(request, 'Fund_result.html', context)
 
-def fund_details(request):
+# For SEO optimization - To show specific fund details using fund name from URL
+from django.http import HttpResponse
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Sitemap: https://mutulfundrecommender.pythonanywhere.com/sitemap.xml",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+def fund_details(request, fund_name=None):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")
         return redirect('login')
@@ -201,6 +177,15 @@ def fund_details(request):
     print(f"Cached Data:{cached_data}")
     print(f"Last Fetched Data:{last_fetched_time}")
     """
+
+    # --- SEPARATE SEO LOGIC START ---
+    # 2. If Google/Sitemap provides a name via URL, we "inject" it into the request
+    if fund_name and request.method == "GET":
+        request.POST = request.POST.copy() # Make POST mutable
+        request.POST['fund_name'] = fund_name
+        request.method = "POST" # Force the view to treat this as a search
+    # --- SEPARATE SEO LOGIC END ---
+
     #context = {}
     all_funds = AllMutualFund.objects.all()
     context = {
@@ -491,6 +476,7 @@ import os
 
 # Constants
 JSON_DATA_PATH = os.path.join(settings.BASE_DIR, 'mutual_funds_data.json')
+ALL_JSON_DATA_PATH = os.path.join(settings.BASE_DIR, 'all_mutual_funds_data.json')
 
 def get_funds_data_from_api(form_data):
     #print(form_data)

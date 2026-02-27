@@ -7,7 +7,9 @@
     <title>{% block title %}Default Title{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/Header.css' %}">
     <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+    {% block extra_head %}{% endblock extra_head %}
     {% block extra_css %}{% endblock extra_css %}
+
 </head>
 
 <body> 
