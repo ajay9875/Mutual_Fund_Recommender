@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 # Ensure DEBUG is True for development not for deployment
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 CACHES = {
     'default': {
@@ -24,9 +24,11 @@ CACHES = {
 # SECURITY WARNING: don't run with debug turned on in production!
 #ALLOWED_HOSTS = []
 # Base allowed hosts (development defaults)
+
 BASE_ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    'mutulfundrecommender.pythonanywhere.com',  # Add this line
 ]
 
 # Environment variable hosts (production)
