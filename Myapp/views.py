@@ -154,17 +154,6 @@ def fund_result(request):
     # Default return for GET requests or invalid POST
     return render(request, 'Fund_result.html', context)
 
-# For SEO optimization - To show specific fund details using fund name from URL
-from django.http import HttpResponse
-
-def robots_txt(request):
-    lines = [
-        "User-agent: *",
-        "Allow: /",
-        "Sitemap: https://mutulfundrecommender.pythonanywhere.com/sitemap.xml",
-    ]
-    return HttpResponse("\n".join(lines), content_type="text/plain")
-
 def fund_details(request, fund_name=None):
     if request.user.is_anonymous:
         messages.info(request, "Session expired! Please login again.")
