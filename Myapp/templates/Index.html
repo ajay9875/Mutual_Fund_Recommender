@@ -1,959 +1,534 @@
+{% extends "BaseLoggedIn.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | Mutual Fund Recommender</title>
-  <meta name="description" content="AI-powered mutual fund recommendations. Track your funds, get personalised suggestions, and grow your wealth with confidence.">
 
-  <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
+{% block title %}Dashboard | MF Recommender{% endblock %}
 
-  <!-- Bootstrap 5 + Font Awesome -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% block extra_css %}
+<style>
+  /* ============================================================
+     DASHBOARD — TWO COLUMN LAYOUT
+     ============================================================ */
 
-  <style>
-    /* ============================================================
-       BASE
-       ============================================================ */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+  /* ---------- MAIN GRID ---------- */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;   /* ← RIGHT column bigger */
+    gap: 1.15rem;
+    align-items: start;
+  }
 
-    html, body {
-      background: #f5f7fa;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-      color: #0f172a;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  /* ---------- LEFT COLUMN ---------- */
+  .dash-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+  }
 
-    body {
-      padding-bottom: 80px;
-    }
+  /* ---------- RIGHT COLUMN ---------- */
+  .dash-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+    position: sticky;
+    top: 90px; /* below sticky header */
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    padding-right: 4px; /* room for scrollbar */
+  }
+  .dash-right::-webkit-scrollbar { width: 6px; }
+  .dash-right::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.15);
+    border-radius: 3px;
+  }
 
-    /* ============================================================
-       HEADER
-       ============================================================ */
-    .app-header {
-      background: #0f172a;
-      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.20);
-      position: sticky;
-      top: 0;
-      z-index: 1030;
-    }
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 18px;
+    padding: 2rem 1.75rem;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 36px rgba(15, 23, 42, 0.20);
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(79, 140, 255, 0.35), transparent 70%);
+    border-radius: 50%;
+  }
+  .hero-inner { position: relative; z-index: 1; }
 
-    .app-header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.65rem 1.75rem;
-      gap: 1rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+  .hero-text h1 {
+    font-size: 1.6rem; font-weight: 700;
+    margin: 0 0 0.5rem; letter-spacing: -0.5px; line-height: 1.25;
+  }
+  .hero-text p {
+    font-size: 0.95rem; color: #cbd5e1;
+    line-height: 1.65; margin: 0 0 1.25rem;
+  }
+  .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .hero-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 1.25rem; border-radius: 10px;
+    font-size: 0.92rem; font-weight: 600;
+    text-decoration: none; cursor: pointer; border: none;
+    transition: all 0.2s ease; font-family: inherit;
+  }
+  .hero-btn-primary {
+    background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(79, 140, 255, 0.4);
+  }
+  .hero-btn-primary:hover {
+    background: linear-gradient(135deg, #3b7bf0, #2563eb);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(79, 140, 255, 0.5);
+    color: #ffffff;
+  }
+  .hero-btn-outline {
+    background: transparent; color: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+  }
+  .hero-btn-outline:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #ffffff; color: #ffffff;
+  }
 
-    /* Brand */
-    .app-brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-    .app-brand img {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.18);
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .app-brand:hover img {
-      transform: scale(1.06);
-      border-color: #4f8cff;
-    }
-    .app-brand-text {
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-    }
-    .app-brand-text .name {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.2px;
-    }
-    .app-brand-text .tag {
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-top: 2px;
-    }
+  .session-pill {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.45rem 0.9rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 100px;
+    font-size: 0.8rem; color: #cbd5e1; font-weight: 500;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .session-pill.warning {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.3);
+    background: rgba(251, 191, 36, 0.10);
+  }
+  .session-pill.danger {
+    color: #fca5a5;
+    border-color: rgba(252, 165, 165, 0.35);
+    background: rgba(252, 165, 165, 0.10);
+  }
 
-    /* Nav */
-    .app-nav {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      margin-left: auto;
-    }
-    .app-nav a {
-      color: #cbd5e1;
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      padding: 0.55rem 1rem;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-    .app-nav a:hover {
-      color: #ffffff;
-      background: rgba(79, 140, 255, 0.12);
-    }
-    .app-nav a.active {
-      color: #ffffff;
-      background: #4f8cff;
-      box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
-    }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .stat-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0.85rem 0.75rem;
+    backdrop-filter: blur(6px);
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .stat-card .stat-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: rgba(79, 140, 255, 0.20);
+    color: #4f8cff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; margin-bottom: 0.5rem;
+  }
+  .stat-card .stat-value {
+    font-size: 1.2rem; font-weight: 700;
+    color: #ffffff; letter-spacing: -0.3px; line-height: 1;
+  }
+  .stat-card .stat-label {
+    font-size: 0.68rem; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    margin-top: 4px; font-weight: 600;
+  }
 
-    /* Profile */
-    .app-profile {
-      position: relative;
-      flex-shrink: 0;
-    }
-    .app-profile-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      padding: 0;
-      cursor: pointer;
-    }
-    .app-profile-btn img {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.18);
-      background: #64748b;
-      transition: transform 0.2s ease, border-color 0.2s ease;
-    }
-    .app-profile-btn:hover img {
-      transform: scale(1.06);
-      border-color: #4f8cff;
-    }
-    .app-profile-dropdown {
-      display: none;
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 10px 32px rgba(15, 23, 42, 0.15);
-      border: 1px solid #e2e8f0;
-      min-width: 200px;
-      padding: 0.4rem;
-      z-index: 1050;
-    }
-    .app-profile-dropdown.open { display: block; }
-    .app-profile-dropdown a {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 0.9rem;
-      color: #334155;
-      text-decoration: none;
-      padding: 0.6rem 0.85rem;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-    }
-    .app-profile-dropdown a:hover {
-      background: #eff6ff;
-      color: #1e40af;
-    }
-    .app-profile-dropdown a i {
-      width: 16px;
-      color: #94a3b8;
-    }
-    .app-profile-dropdown a:hover i {
-      color: #4f8cff;
-    }
+  /* ============================================================
+     SECTION TITLE (shared)
+     ============================================================ */
+  .section-title {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 0 0 0.85rem; gap: 1rem; flex-wrap: wrap;
+  }
+  .section-title h2 {
+    font-size: 1.05rem; font-weight: 700; color: #0f172a;
+    margin: 0; letter-spacing: -0.3px;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .section-title h2 i { color: #4f8cff; }
+  .section-title .muted { font-size: 0.8rem; color: #64748b; }
 
-    /* ============================================================
-       MOBILE HEADER
-       ============================================================ */
-    @media (max-width: 1024px) {
-      .app-header-inner {
-        padding: 0.55rem 1rem;
-      }
-    .app-profile {
-        display: none;
-    }
-      .app-nav { display: none; }
-      .mobile-toggle {
-        display: inline-flex !important;
-      }
-      .mobile-drawer {
-        position: fixed;
-        top: 0;
-        left: -85%;
-        width: 85%;
-        max-width: 300px;
-        height: 100vh;
-        background: #0f172a;
-        z-index: 1080;
-        transition: left 0.3s ease;
-        padding: 1.25rem 0;
-        overflow-y: auto;
-        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.45);
-      }
-      .mobile-drawer.open { left: 0; }
-      .mobile-drawer .drawer-header {
-        padding: 0 1.25rem 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .mobile-drawer .drawer-header span {
-        color: #94a3b8;
-        font-size: 0.75rem;
-        letter-spacing: 0.6px;
-        text-transform: uppercase;
-        font-weight: 600;
-      }
-      .mobile-drawer .drawer-close {
-        background: transparent;
-        border: none;
-        color: #cbd5e1;
-        font-size: 1.1rem;
-        cursor: pointer;
-        padding: 4px 8px;
-      }
-      .mobile-drawer a {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        color: #cbd5e1;
-        text-decoration: none;
-        padding: 0.85rem 1.25rem;
-        font-size: 0.95rem;
-        font-weight: 500;
-        border-left: 3px solid transparent;
-        transition: all 0.18s ease;
-      }
-      .mobile-drawer a:hover,
-      .mobile-drawer a.active {
-        color: #ffffff;
-        background: rgba(79, 140, 255, 0.10);
-        border-left-color: #4f8cff;
-      }
-      .mobile-drawer a i {
-        width: 18px;
-        color: #64748b;
-      }
-      .mobile-drawer a:hover i,
-      .mobile-drawer a.active i {
-        color: #4f8cff;
-      }
-    }
-    @media (min-width: 1024px) {
-      .mobile-toggle { display: none !important; }
-      .mobile-drawer { display: none !important; }
-    }
-    .mobile-toggle {
-      display: none;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #ffffff;
-      border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .mobile-toggle:hover {
-      background: rgba(79, 140, 255, 0.15);
-      border-color: rgba(79, 140, 255, 0.4);
-    }
+  /* ============================================================
+     HOW IT WORKS — 2x2 grid (compact for left column)
+     ============================================================ */
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .step-card {
+    background: #ffffff; border: 1px solid #e2e8f0;
+    border-radius: 12px; padding: 1rem 0.9rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+  }
+  .step-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(79, 140, 255, 0.12);
+    border-color: rgba(79, 140, 255, 0.35);
+  }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+    color: #ffffff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+    margin-bottom: 0.6rem;
+    box-shadow: 0 4px 12px rgba(79, 140, 255, 0.35);
+  }
+  .step-card h4 {
+    font-size: 0.88rem; font-weight: 700;
+    color: #0f172a; margin: 0 0 0.3rem; letter-spacing: -0.2px;
+  }
+  .step-card p { font-size: 0.8rem; color: #64748b; line-height: 1.5; margin: 0; }
 
-    .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.6);
-      z-index: 1075;
-      display: none;
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-    .drawer-overlay.open {
-      display: block;
-      opacity: 1;
-    }
+  /* ============================================================
+     FEATURES (below steps in left column)
+     ============================================================ */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .feature-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.3rem 0.95rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .feature-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(79, 140, 255, 0.10);
+    border-color: rgba(79, 140, 255, 0.3);
+  }
+  .feature-icon {
+    flex-shrink: 0;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: rgba(79, 140, 255, 0.10);
+    color: #4f8cff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.95rem;
+  }
+  .feature-body h5 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.2rem;
+    letter-spacing: -0.2px;
+  }
+  .feature-body p {
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin: 0;
+  }
 
-    /* ============================================================
-       PAGE CONTENT
-       ============================================================ */
-    .page-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 1.75rem 1.75rem 2rem;
-      flex: 1;
-      width: 100%;
-    }
+  /* ============================================================
+     FUNDS PANEL (right column)
+     ============================================================ */
+  .funds-panel {
+    background: #ffffff; border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+  }
+  .funds-panel-head {
+    padding: 1.15rem 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+  }
+  .funds-panel-head h3 {
+    font-size: 1rem; font-weight: 700;
+    margin: 0; color: #0f172a;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .funds-panel-head h3 i { color: #4f8cff; }
+  .funds-panel-head .head-sub {
+    font-size: 0.8rem; color: #64748b; margin: 0.25rem 0 0;
+  }
 
-    /* ---------- HERO ---------- */
-    .hero {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      border-radius: 18px;
-      padding: 2.25rem 2rem;
-      color: #ffffff;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 36px rgba(15, 23, 42, 0.20);
-      margin-bottom: 1.75rem;
-    }
-    .hero::before {
-      content: "";
-      position: absolute;
-      top: -80px;
-      right: -80px;
-      width: 260px;
-      height: 260px;
-      background: radial-gradient(circle, rgba(79, 140, 255, 0.35), transparent 70%);
-      border-radius: 50%;
-    }
-    .hero-inner {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 2rem;
-      align-items: center;
-    }
-    .hero-text h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin: 0 0 0.5rem;
-      letter-spacing: -0.5px;
-      line-height: 1.25;
-    }
-    .hero-text p {
-      font-size: 0.98rem;
-      color: #cbd5e1;
-      line-height: 1.65;
-      margin: 0 0 1.25rem;
-      max-width: 580px;
-    }
-    .hero-actions {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-    .hero-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.7rem 1.25rem;
-      border-radius: 10px;
-      font-size: 0.92rem;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
-    .hero-btn-primary {
-      background: linear-gradient(135deg, #4f8cff, #3b7bf0);
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(79, 140, 255, 0.4);
-    }
-    .hero-btn-primary:hover {
-      background: linear-gradient(135deg, #3b7bf0, #2563eb);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(79, 140, 255, 0.5);
-      color: #ffffff;
-    }
-    .hero-btn-outline {
-      background: transparent;
-      color: #ffffff;
-      border: 1.5px solid rgba(255, 255, 255, 0.35);
-    }
-    .hero-btn-outline:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: #ffffff;
-      color: #ffffff;
-    }
+  .funds-empty { padding: 4.12rem 1.25rem; text-align: center; color: #64748b; }
+  .funds-empty .empty-icon {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(79, 140, 255, 0.10); color: #4f8cff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 0.85rem;
+  }
+  .funds-empty h4 {
+    font-size: 1rem; font-weight: 700;
+    color: #0f172a; margin: 0 0 0.4rem;
+  }
+  .funds-empty p {
+    font-size: 0.86rem; margin: 0 auto 1.15rem;
+    max-width: 340px; line-height: 1.55;
+  }
+  .funds-empty .cta-btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.7rem 1.3rem;
+    background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+    color: #ffffff; border: none; border-radius: 10px;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    text-decoration: none; transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+    font-family: inherit;
+  }
+  .funds-empty .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+    color: #ffffff;
+  }
 
-    .session-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.45rem 0.9rem;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 100px;
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      font-weight: 500;
-      margin-bottom: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .session-pill.warning {
-      color: #fbbf24;
-      border-color: rgba(251, 191, 36, 0.3);
-      background: rgba(251, 191, 36, 0.10);
-    }
-    .session-pill.danger {
-      color: #fca5a5;
-      border-color: rgba(252, 165, 165, 0.35);
-      background: rgba(252, 165, 165, 0.10);
-    }
+  .fund-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .fund-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.82rem; min-width: 640px;
+  }
+  .fund-table thead th {
+    background: #f8fafc; color: #475569;
+    text-align: left; padding: 0.7rem 0.75rem;
+    font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+  .fund-table tbody td {
+    padding: 0.75rem 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155; vertical-align: middle;
+  }
+  .fund-table tbody tr:hover { background: #f8fafc; }
+  .fund-table tbody tr:last-child td { border-bottom: none; }
+  .fund-table .fund-name { font-weight: 600; color: #0f172a; max-width: 240px; }
+  .fund-table .nav-value { font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+  .fund-table .risk-low      { color: #16a34a; font-weight: 600; }
+  .fund-table .risk-moderate { color: #f59e0b; font-weight: 600; }
+  .fund-table .risk-high     { color: #dc2626; font-weight: 600; }
 
-    .hero-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.85rem;
-    }
-    .stat-card {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 1rem 0.9rem;
-      backdrop-filter: blur(6px);
-    }
-    .stat-card .stat-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 9px;
-      background: rgba(79, 140, 255, 0.20);
-      color: #4f8cff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      margin-bottom: 0.6rem;
-    }
-    .stat-card .stat-value {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.3px;
-      line-height: 1;
-    }
-    .stat-card .stat-label {
-      font-size: 0.72rem;
-      color: #94a3b8;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-top: 4px;
-      font-weight: 600;
-    }
+  .fund-table .action-buttons { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+  .action-btn {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    padding: 0.35rem 0.65rem; border-radius: 7px;
+    font-size: 0.74rem; font-weight: 600;
+    border: 1px solid transparent; cursor: pointer;
+    transition: all 0.18s ease; text-decoration: none;
+    font-family: inherit;
+  }
+  .action-btn.view-btn {
+    background: rgba(79, 140, 255, 0.10);
+    color: #2563eb;
+    border-color: rgba(79, 140, 255, 0.25);
+  }
+  .action-btn.view-btn:hover {
+    background: #4f8cff; color: #ffffff; border-color: #4f8cff;
+  }
+  .action-btn.save-btn {
+    background: rgba(34, 197, 94, 0.10);
+    color: #16a34a;
+    border-color: rgba(34, 197, 94, 0.25);
+  }
+  .action-btn.save-btn:hover {
+    background: #22c55e; color: #ffffff; border-color: #22c55e;
+  }
 
-    /* ---------- HOW IT WORKS ---------- */
-    .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 0 0 1rem;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .section-title h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 0;
-      letter-spacing: -0.3px;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .section-title h2 i { color: #4f8cff; }
-    .section-title .muted {
-      font-size: 0.85rem;
-      color: #64748b;
-    }
+  .badge-rating {
+    display: inline-flex; align-items: center; gap: 0.2rem;
+    padding: 0.2rem 0.5rem;
+    background: #fef3c7; color: #92400e;
+    border-radius: 6px;
+    font-size: 0.72rem; font-weight: 700;
+  }
 
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .step-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 1.35rem 1.1rem;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      position: relative;
-    }
-    .step-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 28px rgba(79, 140, 255, 0.12);
-      border-color: rgba(79, 140, 255, 0.35);
-    }
-    .step-num {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #4f8cff, #3b7bf0);
-      color: #ffffff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      font-weight: 700;
-      margin-bottom: 0.85rem;
-      box-shadow: 0 4px 12px rgba(79, 140, 255, 0.35);
-    }
-    .step-card h4 {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 0 0 0.35rem;
-      letter-spacing: -0.2px;
-    }
-    .step-card p {
-      font-size: 0.84rem;
-      color: #64748b;
-      line-height: 1.55;
-      margin: 0;
-    }
+  /* ============================================================
+     MODAL — RECOMMENDATION FORM (centered overlay)
+     ============================================================ */
+  .rec-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(3px);
+    z-index: 1090;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .rec-modal-backdrop.open {
+    display: block;
+    opacity: 1;
+  }
 
-    /* ---------- RECOMMENDATION FORM ---------- */
-    .form-container {
-      display: none;
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
-      border: 1px solid #e2e8f0;
-      margin-bottom: 2rem;
-    }
-    .form-container.show { display: block; }
-    .form-container h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 0 0 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .form-container h2 i { color: #4f8cff; }
+  .rec-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: min(92vw, 640px);
+    max-height: 88vh;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+    z-index: 1095;
+    overflow: hidden;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .rec-modal.open {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #334155;
-      margin-bottom: 0.4rem;
-    }
-    .form-group select,
-    .form-group input {
-      width: 100%;
-      padding: 0.75rem 0.9rem;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 0.92rem;
-      color: #0f172a;
-      background: #f8fafc;
-      transition: all 0.2s ease;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-    .form-group select:focus,
-    .form-group input:focus {
-      outline: none;
-      border-color: #4f8cff;
-      background: #ffffff;
-      box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
-    }
-    .btn-recommend {
-      width: 100%;
-      padding: 0.9rem 1.5rem;
-      background: linear-gradient(135deg, #4f8cff, #3b7bf0);
-      color: #ffffff;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 0.5rem;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      font-family: inherit;
-    }
-    .btn-recommend:hover {
-      background: linear-gradient(135deg, #3b7bf0, #2563eb);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
-    }
+  .rec-modal-head {
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .rec-modal-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .rec-modal-head h2 i { color: #4f8cff; }
+  .rec-modal-close {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    border-radius: 8px;
+    width: 32px; height: 32px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-size: 0.9rem;
+  }
+  .rec-modal-close:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
 
-    /* ---------- FUNDS PANEL ---------- */
-    .funds-panel {
-      background: #ffffff;
-      border-radius: 16px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
-      overflow: hidden;
-    }
-    .funds-panel-head {
-      padding: 1.25rem 1.5rem;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .funds-panel-head h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin: 0;
-      color: #0f172a;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .funds-panel-head h3 i { color: #4f8cff; }
-    .funds-panel-head .head-sub {
-      font-size: 0.83rem;
-      color: #64748b;
-      margin: 0.25rem 0 0;
-    }
+  .rec-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1 1 auto;
+  }
 
-    .funds-empty {
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      color: #64748b;
-    }
-    .funds-empty .empty-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background: rgba(79, 140, 255, 0.10);
-      color: #4f8cff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    .funds-empty h4 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #0f172a;
-      margin: 0 0 0.4rem;
-    }
-    .funds-empty p {
-      font-size: 0.9rem;
-      margin: 0 auto 1.25rem;
-      max-width: 420px;
-      line-height: 1.55;
-    }
-    .funds-empty .cta-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.4rem;
-      background: linear-gradient(135deg, #4f8cff, #3b7bf0);
-      color: #ffffff;
-      border: none;
-      border-radius: 10px;
-      font-size: 0.92rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
-      font-family: inherit;
-    }
-    .funds-empty .cta-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
-      color: #ffffff;
-    }
+  .rec-modal-body .form-group { margin-bottom: 0.85rem; }
+  .rec-modal-body .form-group label {
+    display: block; font-size: 0.83rem; font-weight: 600;
+    color: #334155; margin-bottom: 0.35rem;
+  }
+  .rec-modal-body .form-group select,
+  .rec-modal-body .form-group input {
+    width: 100%; padding: 0.7rem 0.85rem;
+    border: 1.5px solid #e2e8f0; border-radius: 10px;
+    font-size: 0.9rem; color: #0f172a;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+    box-sizing: border-box; font-family: inherit;
+  }
+  .rec-modal-body .form-group select:focus,
+  .rec-modal-body .form-group input:focus {
+    outline: none; border-color: #4f8cff;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+  }
+  .rec-modal-body .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
 
-    .fund-table-wrap {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .fund-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.87rem;
-      min-width: 820px;
-    }
-    .fund-table thead th {
-      background: #f8fafc;
-      color: #475569;
-      text-align: left;
-      padding: 0.85rem 0.9rem;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid #e2e8f0;
-      white-space: nowrap;
-    }
-    .fund-table tbody td {
-      padding: 0.9rem 0.9rem;
-      border-bottom: 1px solid #f1f5f9;
-      color: #334155;
-      vertical-align: middle;
-    }
-    .fund-table tbody tr:hover { background: #f8fafc; }
-    .fund-table tbody tr:last-child td { border-bottom: none; }
-    .fund-table .fund-name {
-      font-weight: 600;
-      color: #0f172a;
-      max-width: 320px;
-    }
-    .fund-table .nav-value {
-      font-weight: 600;
-      color: #0f172a;
-      font-variant-numeric: tabular-nums;
-    }
-    .fund-table .risk-low      { color: #16a34a; font-weight: 600; }
-    .fund-table .risk-moderate { color: #f59e0b; font-weight: 600; }
-    .fund-table .risk-high     { color: #dc2626; font-weight: 600; }
+  .rec-modal-body .btn-recommend {
+    width: 100%; padding: 0.85rem 1.5rem;
+    background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+    color: #ffffff; border: none; border-radius: 10px;
+    font-size: 0.94rem; font-weight: 600; cursor: pointer;
+    margin-top: 0.5rem; transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.5rem; font-family: inherit;
+  }
+  .rec-modal-body .btn-recommend:hover {
+    background: linear-gradient(135deg, #3b7bf0, #2563eb);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+  }
 
-    .fund-table .action-buttons {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 1024px) {
+    .dash-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+    .dash-right {
+      position: static;
+      max-height: none;
+      overflow: visible;
+      padding-right: 0;
     }
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.4rem 0.75rem;
-      border-radius: 8px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition: all 0.18s ease;
-      text-decoration: none;
-      font-family: inherit;
-    }
-    .action-btn.view-btn {
-      background: rgba(79, 140, 255, 0.10);
-      color: #2563eb;
-      border-color: rgba(79, 140, 255, 0.25);
-    }
-    .action-btn.view-btn:hover {
-      background: #4f8cff;
-      color: #ffffff;
-      border-color: #4f8cff;
-    }
-    .action-btn.save-btn {
-      background: rgba(34, 197, 94, 0.10);
-      color: #16a34a;
-      border-color: rgba(34, 197, 94, 0.25);
-    }
-    .action-btn.save-btn:hover {
-      background: #22c55e;
-      color: #ffffff;
-      border-color: #22c55e;
-    }
+    .hero-stats { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .hero { padding: 1.5rem 1.25rem; border-radius: 14px; }
+    .hero-text h1 { font-size: 1.35rem; }
+    .hero-text p { font-size: 0.9rem; }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .stat-card { padding: 0.7rem 0.65rem; }
+    .stat-card .stat-value { font-size: 1.05rem; }
+    .steps-grid { grid-template-columns: 1fr; gap: 0.65rem; }
+    .features-grid { grid-template-columns: 1fr; gap: 0.65rem; }
+    .step-card { padding: 0.9rem 0.85rem; }
+    .rec-modal-body .form-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 420px) {
+    .hero { padding: 1.25rem 1rem; }
+    .hero-stats { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction: column; }
+    .hero-btn { width: 100%; justify-content: center; }
+  }
+</style>
+{% endblock extra_css %}
 
-    .badge-rating {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      padding: 0.25rem 0.6rem;
-      background: #fef3c7;
-      color: #92400e;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 700;
-    }
+{% block content %}
 
-    /* ============================================================
-       FLASH MESSAGES
-       ============================================================ */
-    .msg-wrap {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 1rem 1.75rem 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .msg-box {
-      padding: 0.85rem 1.1rem;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 0.75rem;
-      border-left: 4px solid;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    .msg-box.error   { background: #fef2f2; color: #991b1b; border-left-color: #dc2626; }
-    .msg-box.success { background: #f0fdf4; color: #166534; border-left-color: #16a34a; }
-    .msg-box.warning { background: #fffbeb; color: #92400e; border-left-color: #f59e0b; }
-    .msg-box.info    { background: #eff6ff; color: #1e40af; border-left-color: #3b82f6; }
+<div class="dash-grid">
 
-    /* ============================================================
-       FOOTER
-       ============================================================ */
-    .app-footer {
-      background: #0b1120;
-      color: #94a3b8;
-      padding: 1rem 0;
-      font-size: 0.85rem;
-      text-align: center;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 1020;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .app-footer p { margin: 0; }
-
-    /* ============================================================
-       RESPONSIVE
-       ============================================================ */
-    @media (max-width: 1024px) {
-      .hero-inner { grid-template-columns: 1fr; }
-      .hero-stats { grid-template-columns: repeat(2, 1fr); }
-      .steps-grid { grid-template-columns: repeat(2, 1fr); }
-      .page-content { padding: 1.25rem 1rem 2rem; }
-      .msg-wrap { padding: 1rem 1rem 0; }
-    }
-    @media (max-width: 768px) {
-      .hero { padding: 1.5rem 1.25rem; border-radius: 14px; }
-      .hero-text h1 { font-size: 1.35rem; }
-      .hero-text p { font-size: 0.9rem; }
-      .hero-stats { gap: 0.6rem; }
-      .stat-card { padding: 0.85rem 0.75rem; }
-      .stat-card .stat-value { font-size: 1.15rem; }
-      .steps-grid { grid-template-columns: 1fr; gap: 0.75rem; }
-      .step-card { padding: 1.1rem 1rem; }
-      .form-row { grid-template-columns: 1fr; }
-      .form-container { padding: 1.5rem 1.25rem; }
-      .funds-panel-head { padding: 1rem 1.15rem; }
-      .funds-panel-head h3 { font-size: 0.98rem; }
-    }
-    @media (max-width: 420px) {
-      .hero { padding: 1.25rem 1rem; }
-      .hero-stats { grid-template-columns: 1fr; }
-      .hero-actions { flex-direction: column; }
-      .hero-btn { width: 100%; justify-content: center; }
-    }
-  </style>
-</head>
-
-<body>
-
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="app-header-inner">
-
-      <a href="/" class="app-brand" aria-label="Go to Home">
-        <img src="{% static 'favicon/favicon.webp' %}" alt="Brand">
-        <div class="app-brand-text">
-          <span class="name">MF Recommender</span>
-          <span class="tag">AI Powered</span>
-        </div>
-      </a>
-
-      <button class="mobile-toggle" type="button" aria-label="Open menu" onclick="openDrawer()">
-        <i class="fas fa-bars"></i>
-      </button>
-
-      <nav class="app-nav">
-        <a href="{% url 'sip_calculator' %}">SIP Calculator</a>
-        <a href="{% url 'fund_details' %}">Fund Details</a>
-        <a href="#" onclick="toggleRecommendationForm(event)">Get Recommendation</a>
-        <a href="{% url 'fund_result' %}">All Funds</a>
-        <a href="{% url 'your_funds' %}">Your Funds</a>
-        <a href="/contact">Contact</a>
-      </nav>
-
-      <div class="app-profile">
-        <button class="app-profile-btn" type="button" onclick="toggleProfileDropdown(event)" aria-label="Profile menu">
-          {% if profilepic %}
-            <img src="{{ profilepic }}" alt="Profile" onerror="this.src='{% static 'icons/image.png' %}'">
-          {% else %}
-            <img src="{% static 'icons/image.png' %}" alt="Profile">
-          {% endif %}
-        </button>
-        <div class="app-profile-dropdown" id="profileDropdown">
-          <a href="{% url 'your_info' %}"><i class="fas fa-user"></i> Your Info</a>
-          <a href="{% url 'your_funds' %}"><i class="fas fa-layer-group"></i> Your Funds</a>
-          <a href="{% url 'account_settings' %}"><i class="fas fa-cog"></i> Settings</a>
-          <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </div>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- MOBILE DRAWER -->
-  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-  <aside class="mobile-drawer" id="mobileDrawer">
-    <div class="drawer-header">
-      <span>Menu</span>
-      <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <a href="/"><i class="fas fa-home"></i> Home</a>
-    <a href="{% url 'sip_calculator' %}"><i class="fas fa-calculator"></i> SIP Calculator</a>
-    <a href="{% url 'fund_details' %}"><i class="fas fa-search"></i> Fund Details</a>
-    <a href="#" onclick="toggleRecommendationForm(event)"><i class="fas fa-magic"></i> Get Recommendation</a>
-    <a href="{% url 'fund_result' %}"><i class="fas fa-chart-line"></i> All Funds</a>
-    <a href="{% url 'your_funds' %}"><i class="fas fa-layer-group"></i> Your Funds</a>
-    <a href="/contact"><i class="fas fa-envelope"></i> Contact</a>
-    <div class="drawer-header" style="margin-top: 1.5rem;"><span>Account</span></div>
-    <a href="{% url 'your_info' %}"><i class="fas fa-user"></i> Your Info</a>
-    <a href="{% url 'your_funds' %}"><i class="fas fa-layer-group"></i> Your Funds</a>
-    <a href="{% url 'account_settings' %}"><i class="fas fa-cog"></i> Settings</a>
-    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
-  </aside>
-
-  <!-- FLASH MESSAGES -->
-  {% if messages %}
-  <div class="msg-wrap">
-    {% for message in messages %}
-      <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
-        {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>
-        {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle"></i>
-        {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
-        {% else %}<i class="fas fa-info-circle"></i>{% endif %}
-        <span>{{ message }}</span>
-      </div>
-    {% endfor %}
-  </div>
-  {% endif %}
-
-  <!-- PAGE CONTENT -->
-  <main class="page-content">
+  <!-- ============================================================
+       LEFT COLUMN — HERO + STEPS + FEATURES
+       ============================================================ -->
+  <div class="dash-left">
 
     <!-- HERO -->
     <section class="hero">
@@ -975,7 +550,7 @@
           </p>
 
           <div class="hero-actions">
-            <button class="hero-btn hero-btn-primary" onclick="toggleRecommendationForm(event)">
+            <button class="hero-btn hero-btn-primary" onclick="openRecModal(event)">
               <i class="fas fa-magic"></i> Get Recommendation
             </button>
             <a href="{% url 'fund_result' %}" class="hero-btn hero-btn-outline">
@@ -988,7 +563,7 @@
           <div class="stat-card">
             <div class="stat-icon"><i class="fas fa-brain"></i></div>
             <div class="stat-value">AI</div>
-            <div class="stat-label">Smart Engine</div>
+            <div class="stat-label">Powered Engine</div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
@@ -998,7 +573,7 @@
           <div class="stat-card">
             <div class="stat-icon"><i class="fas fa-bolt"></i></div>
             <div class="stat-value">Instant</div>
-            <div class="stat-label">Recommendations</div>
+            <div class="stat-label">Results</div>
           </div>
           <div class="stat-card">
             <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
@@ -1010,170 +585,68 @@
       </div>
     </section>
 
-    <!-- HOW IT WORKS -->
-    <div class="section-title">
-      <h2><i class="fas fa-route"></i> How It Works</h2>
-      <span class="muted">4 simple steps to your personalised recommendation</span>
-    </div>
-
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <h4>Choose Fund Type</h4>
-        <p>Select from Equity, Debt, Hybrid, Index funds and more.</p>
+    <!-- FEATURES -->
+    <div>
+      <div class="section-title">
+        <h2><i class="fas fa-star"></i> Why Choose Us</h2>
+        <span class="muted">Trusted by investors</span>
       </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <h4>Pick a Subtype</h4>
-        <p>Narrow down by Large Cap, Mid Cap, Sector funds, etc.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <h4>Set Tenure & Return</h4>
-        <p>Tell us your investment horizon and expected returns.</p>
-      </div>
-      <div class="step-card">
-        <div class="step-num">4</div>
-        <h4>Get Recommendations</h4>
-        <p>Instantly receive AI-matched funds ranked by performance.</p>
-      </div>
-    </div>
 
-    <!-- RECOMMENDATION FORM -->
-    <div class="form-container" id="recommendationForm">
-      <h2><i class="fas fa-magic"></i> Mutual Fund Recommendation Form</h2>
-
-      <form action="/dashboard/" method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="recommendation" value="recommendation">
-
-        <!-- Fund Type -->
-        <div class="form-group">
-          <label for="fund_type">Fund Type:</label>
-          <select id="fund_type" name="fund_type" onchange="handleCompanyTypeChange(this)">
-            <option value="" selected>Please select a mutual fund type</option>
-            <option value="Debt">Debt Funds</option>
-            <option value="Equity">Equity Funds</option>
-            <option value="Hybrid">Hybrid Funds</option>
-            <option value="Solutions Oriented">Solution Oriented Funds</option>
-            <option value="Global Fund of Funds">Fund of Funds(FoFs)</option>
-            <option value="Index Funds">Index Funds</option>
-            <option value="Other">Other Funds</option>
-          </select>
-
-          <input type="text" id="manual_company_type" name="manual_company_type"
-                style="display:none; margin-top: 0.5rem;"
-                placeholder="Enter company type">
-        </div>
-
-        <!-- Fund Subtype -->
-        <div class="form-group">
-          <label for="fund_subtype">Fund Subtype:</label>
-          <select id="fund_subtype" name="fund_subtype">
-            <option value="" selected>Please Select a mutual fund subtype</option>
-            <option value="Floating Rate">Floating Rate</option>
-            <option value="Fixed Maturity Intermediate-Term Bond">Fixed Maturity Intermediate-Term Bond</option>
-            <option value="Dynamic Bond">Dynamic Bond</option>
-            <option value="Ultra Short Duration">Ultra Short Duration</option>
-            <option value="Corporate Bond">Corporate Bond</option>
-            <option value="Short Duration">Short Duration</option>
-            <option value="10 yr Government Bond">10 yr Government Bond</option>
-            <option value="Government Bond">Government Bond</option>
-            <option value="Money Market">Money Market</option>
-            <option value="Long Duration">Long Duration</option>
-            <option value="Other Bond">Other Bond</option>
-            <option value="Low Duration">Low Duration</option>
-            <option value="Credit Risk">Credit Risk</option>
-            <option value="Banking & PSU">Banking & PSU</option>
-            <option value="Medium to Long Duration">Medium to Long Duration</option>
-            <option value="Fixed Maturity Short-Term Bond">Fixed Maturity Short-Term Bond</option>
-            <option value="Medium Duration">Medium Duration</option>
-            <option value="Fixed Maturity Ultrashort Bond">Fixed Maturity Ultrashort Bond</option>
-            <option value="Children">Children</option>
-            <option value="Retirement">Retirement</option>
-            <option value="Focused Fund">Focused Fund</option>
-            <option value="Equity - Other">Equity - Other</option>
-            <option value="Contra">Contra</option>
-            <option value="Flexi Cap">Flexi Cap</option>
-            <option value="Equity - Consumption">Equity - Consumption</option>
-            <option value="Sector - FMCG">Sector - FMCG</option>
-            <option value="Sector - Financial Services">Sector - Financial Services</option>
-            <option value="Mid-Cap">Mid-Cap</option>
-            <option value="Equity - Infrastructure">Equity - Infrastructure</option>
-            <option value="Multi-Cap">Multi-Cap</option>
-            <option value="Large-Cap">Large-Cap</option>
-            <option value="Small-Cap">Small-Cap</option>
-            <option value="Dividend Yield">Dividend Yield</option>
-            <option value="ELSS (Tax Savings)">ELSS (Tax Savings)</option>
-            <option value="Large & Mid-Cap">Large & Mid-Cap</option>
-            <option value="Sector - Healthcare">Sector - Healthcare</option>
-            <option value="Value">Value</option>
-            <option value="Equity - ESG">Equity - ESG</option>
-            <option value="Sector - Technology">Sector - Technology</option>
-            <option value="Fund of Funds">Fund of Funds</option>
-            <option value="Multi Asset Allocation">Multi Asset Allocation</option>
-            <option value="Equity Savings">Equity Savings</option>
-            <option value="Balanced Allocation">Balanced Allocation</option>
-            <option value="Dynamic Asset Allocation">Dynamic Asset Allocation</option>
-            <option value="Aggressive Allocation">Aggressive Allocation</option>
-            <option value="Conservative Allocation">Conservative Allocation</option>
-            <option value="Global - Other">Global - Other</option>
-            <option value="Index Funds">Index Funds</option>
-            <option value="Index Funds - Fixed Income">Index Funds - Fixed Income</option>
-            <option value="Liquid">Liquid</option>
-            <option value="Overnight">Overnight</option>
-            <option value="Arbitrage Fund">Arbitrage Fund</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="tenure">Investment Tenure:</label>
-            <select id="tenure" name="tenure">
-              <option value="" selected>Please select a investment tenure</option>
-              <option value="1_month_return">1 Month</option>
-              <option value="3_month_return">3 Months</option>
-              <option value="6_month_return">6 Months</option>
-              <option value="1_year_return">1 Year</option>
-              <option value="3_year_return">3 Years</option>
-              <option value="5_year_return">5+ Years</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="return_type">Expected Return Type:</label>
-            <select id="return_type" name="return_type">
-              <option value="" selected>Please select a return type</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-brain"></i></div>
+          <div class="feature-body">
+            <h5>AI-Powered Insights</h5>
+            <p>Advanced algorithms analyse thousands of funds in real time.</p>
           </div>
         </div>
-
-        <button class="btn-recommend" type="submit">
-          <i class="fas fa-bolt"></i> Get Recommendation
-        </button>
-      </form>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-user-check"></i></div>
+          <div class="feature-body">
+            <h5>Personalised Picks</h5>
+            <p>Recommendations tailored to your risk and goals.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+          <div class="feature-body">
+            <h5>Real-Time Trends</h5>
+            <p>Live NAV movements and market shifts refreshed continuously.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+          <div class="feature-body">
+            <h5>Safe & Secure</h5>
+            <p>256-bit encryption with zero data sharing — ever.</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- FUNDS PANEL -->
+  </div>
+
+  <!-- ============================================================
+       RIGHT COLUMN — RESULTS
+       ============================================================ -->
+  <div class="dash-right">
+
     <div class="funds-panel">
 
       <div class="funds-panel-head">
         <div>
           <h3>
             {% if recommended_funds %}
-              <i class="fas fa-star"></i> All Recommended Mutual Funds
+              <i class="fas fa-star"></i> Recommended Funds
             {% else %}
               <i class="fas fa-fire"></i> Trending Mutual Funds
             {% endif %}
           </h3>
           <p class="head-sub">
             {% if recommended_funds %}
-              AI-matched funds based on your preferences
+              AI-matched based on your preferences
             {% else %}
-              Popular funds to help you get started — fill the form above for personalised picks
+              Fill the form for personalised picks
             {% endif %}
           </p>
         </div>
@@ -1186,23 +659,15 @@
               <tr>
                 <th>#</th>
                 <th>Fund Name</th>
-                <th>Plan Type</th>
-                <th>Scheme Type</th>
+                <th>Plan</th>
                 <th>NAV (₹)</th>
                 <th>
-                  {% if form_data.tenure == "5_year_return" %}
-                    5-Year Return (%)
-                  {% elif form_data.tenure == "3_year_return" %}
-                    3-Year Return (%)
-                  {% elif form_data.tenure == "1_month_return" %}
-                    1-Month Return (%)
-                  {% elif form_data.tenure == "3_month_return" %}
-                    3-Month Return (%)
-                  {% elif form_data.tenure == "6_month_return" %}
-                    6-Month Return (%)
-                  {% else %}
-                    1-Year Return (%)
-                  {% endif %}
+                  {% if form_data.tenure == "5_year_return" %}5Y Return
+                  {% elif form_data.tenure == "3_year_return" %}3Y Return
+                  {% elif form_data.tenure == "1_month_return" %}1M Return
+                  {% elif form_data.tenure == "3_month_return" %}3M Return
+                  {% elif form_data.tenure == "6_month_return" %}6M Return
+                  {% else %}1Y Return{% endif %}
                 </th>
                 <th>Risk</th>
                 <th>Rating</th>
@@ -1215,21 +680,20 @@
                   <td>{{ forloop.counter }}</td>
                   <td class="fund-name">{{ fund.fund_name }}</td>
                   <td>{{ fund.category|default:"-" }}</td>
-                  <td>{{ fund.sub_category|default:"-" }}</td>
                   <td class="nav-value">{{ fund.nav|default:"-" }}</td>
                   <td>
                     {% if form_data.tenure == "5_year_return" %}
-                      {{ fund.5_year_return|default:"NA" }} ({{ fund.return_type }})
+                      {{ fund.5_year_return|default:"NA" }}
                     {% elif form_data.tenure == "3_year_return" %}
-                      {{ fund.3_year_return|default:"NA" }} ({{ fund.return_type }})
+                      {{ fund.3_year_return|default:"NA" }}
                     {% elif form_data.tenure == "1_month_return" %}
-                      {{ fund.1_month_return|default:"NA" }} ({{ fund.return_type }})
+                      {{ fund.1_month_return|default:"NA" }}
                     {% elif form_data.tenure == "3_month_return" %}
-                      {{ fund.3_month_return|default:"NA" }} ({{ fund.return_type }})
+                      {{ fund.3_month_return|default:"NA" }}
                     {% elif form_data.tenure == "6_month_return" %}
-                      {{ fund.6_month_return|default:"NA" }} ({{ fund.return_type }})
+                      {{ fund.6_month_return|default:"NA" }}
                     {% else %}
-                      {{ fund.1_year_return|default:"NA" }} ({{ fund.return_type }})
+                      {{ fund.1_year_return|default:"NA" }}
                     {% endif %}
                   </td>
                   <td class="risk-{{ fund.risk|lower|slugify }}">
@@ -1238,22 +702,18 @@
                   <td>
                     {% if fund.star_rating %}
                       <span class="badge-rating"><i class="fas fa-star"></i> {{ fund.star_rating }}/5</span>
-                    {% else %}
-                      NA
-                    {% endif %}
+                    {% else %}NA{% endif %}
                   </td>
                   <td>
                     <div class="action-buttons">
-                      <form action="{% url 'fund_result' %}" method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                        <input type="hidden" name="NAV" value="{{ fund.nav }}">
-                        <input type="hidden" name="category" value="{{ fund.category }}">
-                        <button type="submit" class="action-btn view-btn">
-                          <i class="fas fa-eye"></i> View
-                        </button>
+                      <form action="{% url 'fund_result' %}" method="POST">
+                          {% csrf_token %}
+                          <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                          <input type="hidden" name="NAV" value="{{ fund.nav }}">
+                          <input type="hidden" name="category" value="{{ fund.category }}">
+                          <button type="submit" class="action-btn view-btn">View</button>
                       </form>
-                      <form action="{% url 'your_funds' %}" method="POST" style="display:inline;">
+                      <form action="{% url 'your_funds' %}" method="POST">
                         {% csrf_token %}
                         <input type="hidden" name="page_name" value="dashboard">
                         <input type="hidden" name="form_type" value="add-fund">
@@ -1275,127 +735,283 @@
         </div>
 
       {% else %}
+        
         <div class="funds-empty">
           <div class="empty-icon"><i class="fas fa-chart-line"></i></div>
           <h4>No results yet</h4>
           <p>
-            To get a personalized recommendation, click the
-            <strong>"Get Recommendation"</strong> button above.
+            Click <strong>Get Recommendation</strong> and fill in a few simple details —
+            our AI will match you with the best funds for your goals.
           </p>
-          <button class="cta-btn" onclick="toggleRecommendationForm(event)">
+          <button class="cta-btn" onclick="openRecModal(event)">
             <i class="fas fa-magic"></i> Get My Recommendation
           </button>
         </div>
+
       {% endif %}
 
     </div>
+      <!-- HOW IT WORKS -->
+      <div>
+        <div class="section-title">
+          <h2><i class="fas fa-route"></i> How It Works</h2>
+          <span class="muted">4 simple steps</span>
+        </div>
 
-  </main>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-num">1</div>
+            <h4>Choose Fund Type</h4>
+            <p>Select from Equity, Debt, Hybrid, Index funds and more.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">2</div>
+            <h4>Pick a Subtype</h4>
+            <p>Narrow down by Large Cap, Mid Cap, Sector funds, etc.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">3</div>
+            <h4>Set Tenure & Return</h4>
+            <p>Tell us your investment horizon and expected returns.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-num">4</div>
+            <h4>Get Recommendations</h4>
+            <p>Instantly receive AI-matched funds ranked by performance.</p>
+          </div>
+        </div>
+      </div>
 
-  <!-- FOOTER -->
-  <footer class="app-footer">
-    <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
-  </footer>
+  </div>
 
-  <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  {% if messages %}<script src="{% static 'javascript/allmessage.js' %}"></script>{% endif %}
+</div>
 
-  <script>
-  (function() {
+<!-- ============================================================
+     MODAL — RECOMMENDATION FORM (centered overlay)
+     ============================================================ -->
+<div class="rec-modal-backdrop" id="recModalBackdrop" onclick="closeRecModal()"></div>
 
-    /* ============================================================
-       PROFILE DROPDOWN
-       ============================================================ */
-    window.toggleProfileDropdown = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      const dd = document.getElementById('profileDropdown');
-      dd.classList.toggle('open');
-    };
-    document.addEventListener('click', function(e) {
-      const dd = document.getElementById('profileDropdown');
-      if (!dd) return;
-      if (!e.target.closest('.app-profile')) dd.classList.remove('open');
-    });
+<div class="rec-modal" id="recModal" role="dialog" aria-modal="true" aria-labelledby="recModalTitle">
+  <div class="rec-modal-head">
+    <h2 id="recModalTitle"><i class="fas fa-magic"></i> Mutual Fund Recommendation</h2>
+    <button class="rec-modal-close" type="button" onclick="closeRecModal()" aria-label="Close">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
 
-    /* ============================================================
-       MOBILE DRAWER
-       ============================================================ */
-    window.openDrawer = function() {
-      document.getElementById('mobileDrawer').classList.add('open');
-      document.getElementById('drawerOverlay').classList.add('open');
-    };
-    window.closeDrawer = function() {
-      document.getElementById('mobileDrawer').classList.remove('open');
-      document.getElementById('drawerOverlay').classList.remove('open');
-    };
+  <div class="rec-modal-body">
+    <form action="/dashboard/" method="POST">
+      {% csrf_token %}
+      <input type="hidden" name="recommendation" value="recommendation">
 
-    /* ============================================================
-       RECOMMENDATION FORM TOGGLE
-       ============================================================ */
-    window.toggleRecommendationForm = function(e) {
-      if (e) e.preventDefault();
-      const form = document.getElementById('recommendationForm');
-      if (!form) return;
+      <!-- Fund Type -->
+      <div class="form-group">
+        <label for="fund_type">Fund Type</label>
+        <select id="fund_type" name="fund_type" onchange="handleCompanyTypeChange(this)">
+          <option value="" selected>Please select a mutual fund type</option>
+          <option value="Debt">Debt Funds</option>
+          <option value="Equity">Equity Funds</option>
+          <option value="Hybrid">Hybrid Funds</option>
+          <option value="Solutions Oriented">Solution Oriented Funds</option>
+          <option value="Global Fund of Funds">Fund of Funds(FoFs)</option>
+          <option value="Index Funds">Index Funds</option>
+          <option value="Other">Other Funds</option>
+        </select>
 
-      window.closeDrawer();
-      const dd = document.getElementById('profileDropdown');
-      if (dd) dd.classList.remove('open');
+        <input type="text" id="manual_company_type" name="manual_company_type"
+              style="display:none; margin-top: 0.5rem;"
+              placeholder="Enter company type">
+      </div>
 
-      if (form.classList.contains('show')) {
-        form.classList.remove('show');
-      } else {
-        form.classList.add('show');
-        setTimeout(function() {
-          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 50);
+      <!-- Fund Subtype -->
+      <div class="form-group">
+        <label for="fund_subtype">Fund Subtype</label>
+        <select id="fund_subtype" name="fund_subtype">
+          <option value="" selected>Please select a mutual fund subtype</option>
+          <option value="Floating Rate">Floating Rate</option>
+          <option value="Fixed Maturity Intermediate-Term Bond">Fixed Maturity Intermediate-Term Bond</option>
+          <option value="Dynamic Bond">Dynamic Bond</option>
+          <option value="Ultra Short Duration">Ultra Short Duration</option>
+          <option value="Corporate Bond">Corporate Bond</option>
+          <option value="Short Duration">Short Duration</option>
+          <option value="10 yr Government Bond">10 yr Government Bond</option>
+          <option value="Government Bond">Government Bond</option>
+          <option value="Money Market">Money Market</option>
+          <option value="Long Duration">Long Duration</option>
+          <option value="Other Bond">Other Bond</option>
+          <option value="Low Duration">Low Duration</option>
+          <option value="Credit Risk">Credit Risk</option>
+          <option value="Banking & PSU">Banking & PSU</option>
+          <option value="Medium to Long Duration">Medium to Long Duration</option>
+          <option value="Fixed Maturity Short-Term Bond">Fixed Maturity Short-Term Bond</option>
+          <option value="Medium Duration">Medium Duration</option>
+          <option value="Fixed Maturity Ultrashort Bond">Fixed Maturity Ultrashort Bond</option>
+          <option value="Children">Children</option>
+          <option value="Retirement">Retirement</option>
+          <option value="Focused Fund">Focused Fund</option>
+          <option value="Equity - Other">Equity - Other</option>
+          <option value="Contra">Contra</option>
+          <option value="Flexi Cap">Flexi Cap</option>
+          <option value="Equity - Consumption">Equity - Consumption</option>
+          <option value="Sector - FMCG">Sector - FMCG</option>
+          <option value="Sector - Financial Services">Sector - Financial Services</option>
+          <option value="Mid-Cap">Mid-Cap</option>
+          <option value="Equity - Infrastructure">Equity - Infrastructure</option>
+          <option value="Multi-Cap">Multi-Cap</option>
+          <option value="Large-Cap">Large-Cap</option>
+          <option value="Small-Cap">Small-Cap</option>
+          <option value="Dividend Yield">Dividend Yield</option>
+          <option value="ELSS (Tax Savings)">ELSS (Tax Savings)</option>
+          <option value="Large & Mid-Cap">Large & Mid-Cap</option>
+          <option value="Sector - Healthcare">Sector - Healthcare</option>
+          <option value="Value">Value</option>
+          <option value="Equity - ESG">Equity - ESG</option>
+          <option value="Sector - Technology">Sector - Technology</option>
+          <option value="Fund of Funds">Fund of Funds</option>
+          <option value="Multi Asset Allocation">Multi Asset Allocation</option>
+          <option value="Equity Savings">Equity Savings</option>
+          <option value="Balanced Allocation">Balanced Allocation</option>
+          <option value="Dynamic Asset Allocation">Dynamic Asset Allocation</option>
+          <option value="Aggressive Allocation">Aggressive Allocation</option>
+          <option value="Conservative Allocation">Conservative Allocation</option>
+          <option value="Global - Other">Global - Other</option>
+          <option value="Index Funds">Index Funds</option>
+          <option value="Index Funds - Fixed Income">Index Funds - Fixed Income</option>
+          <option value="Liquid">Liquid</option>
+          <option value="Overnight">Overnight</option>
+          <option value="Arbitrage Fund">Arbitrage Fund</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tenure">Investment Tenure</label>
+          <select id="tenure" name="tenure">
+            <option value="" selected>Please select a investment tenure</option>
+            <option value="1_month_return">1 Month</option>
+            <option value="3_month_return">3 Months</option>
+            <option value="6_month_return">6 Months</option>
+            <option value="1_year_return">1 Year</option>
+            <option value="3_year_return">3 Years</option>
+            <option value="5_year_return">5+ Years</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="return_type">Expected Return Type</label>
+          <select id="return_type" name="return_type">
+            <option value="" selected>Please select a return type</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-recommend" type="submit">
+        <i class="fas fa-bolt"></i> Get Recommendation
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block js_code %}
+<script>
+(function() {
+
+  /* ============================================================
+     MODAL — open / close
+     ============================================================ */
+  const recModal         = document.getElementById('recModal');
+  const recModalBackdrop = document.getElementById('recModalBackdrop');
+
+  window.openRecModal = function(e) {
+    if (e) e.preventDefault();
+    if (!recModal) return;
+    recModal.classList.add('open');
+    recModalBackdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // focus the first select for keyboard users
+    setTimeout(function() {
+      const firstSelect = recModal.querySelector('select');
+      if (firstSelect) firstSelect.focus();
+    }, 100);
+  };
+
+  window.closeRecModal = function() {
+    if (!recModal) return;
+    recModal.classList.remove('open');
+    recModalBackdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  // ESC closes the modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeRecModal();
+  });
+
+  /* ============================================================
+     ALIAS — keep the old name working so header still triggers it
+     (`triggerGetRecommendation` in BaseLoggedIn.html calls
+      `window.toggleRecommendationForm` when it exists)
+     ============================================================ */
+  window.toggleRecommendationForm = window.openRecModal;
+
+  /* ============================================================
+     MANUAL COMPANY TYPE TOGGLE
+     ============================================================ */
+  window.handleCompanyTypeChange = function(select) {
+    const input = document.getElementById('manual_company_type');
+    if (!input) return;
+    input.style.display = (select.value === 'manually') ? 'block' : 'none';
+  };
+
+  /* ============================================================
+     OPEN MODAL IF URL HASH PRESENT
+     (used when arriving from other pages via header)
+     ============================================================ */
+  if (window.location.hash === '#recommendationForm') {
+    setTimeout(function() { window.openRecModal(); }, 250);
+  }
+
+  /* ============================================================
+     SESSION TIMER + AUTO LOGOUT
+     ============================================================ */
+  const remainingTime = parseInt("{{ remaining_time|default:0 }}", 10) || 0;
+  const timerText     = document.getElementById('session-timer-text');
+  const sessionPill   = document.getElementById('session-pill');
+
+  let timeLeft      = remainingTime;
+  let hasRedirected = false;
+
+  function updateTimer() {
+    if (!timerText) return;
+    if (hasRedirected) return;
+
+    if (timeLeft > 0) {
+      const m = Math.floor(timeLeft / 60);
+      const s = timeLeft % 60;
+      timerText.textContent = 'Session expires in ' + m + 'm ' + s + 's';
+
+      if (sessionPill) {
+        sessionPill.classList.toggle('warning', timeLeft < 300 && timeLeft >= 120);
+        sessionPill.classList.toggle('danger',  timeLeft < 120);
       }
-    };
 
-    /* ============================================================
-       MANUAL COMPANY TYPE TOGGLE
-       ============================================================ */
-    window.handleCompanyTypeChange = function(select) {
-      const input = document.getElementById('manual_company_type');
-      if (!input) return;
-      input.style.display = (select.value === 'manually') ? 'block' : 'none';
-    };
-
-    /* ============================================================
-       SESSION TIMER + AUTO LOGOUT
-       ============================================================ */
-    let remainingTime = parseInt("{{ remaining_time|default:0 }}", 10) || 0;
-    const timerText = document.getElementById('session-timer-text');
-    const sessionPill = document.getElementById('session-pill');
-    const loginUrl = "{% url 'login' %}";
-
-    function updateTimer() {
-      if (!timerText) return;
-
-      if (remainingTime > 0) {
-        const minutes = Math.floor(remainingTime / 60);
-        const seconds = remainingTime % 60;
-        timerText.textContent = 'Session expires in ' + minutes + 'm ' + seconds + 's';
-
-        if (sessionPill) {
-          sessionPill.classList.toggle('warning', remainingTime < 600 && remainingTime >= 120);
-          sessionPill.classList.toggle('danger',  remainingTime < 120);
-        }
-        remainingTime--;
-        setTimeout(updateTimer, 1000);
-      } else {
-        timerText.textContent = 'Session expired — logging out…';
-        if (sessionPill) sessionPill.classList.add('danger');
-        setTimeout(function() {
-          window.location.href = loginUrl;
-        }, 1500);
-      }
+      timeLeft--;
+      setTimeout(updateTimer, 1000);
+    } else {
+      hasRedirected = true;
+      timerText.textContent = 'Session expired — logging out…';
+      if (sessionPill) sessionPill.classList.add('danger');
+      setTimeout(function() { window.location.reload(); }, 1500);
     }
+  }
+  updateTimer();
 
-    if (remainingTime > 0) updateTimer();
-
-  })();
-  </script>
-</body>
-</html>
+})();
+</script>
+{% endblock js_code %}

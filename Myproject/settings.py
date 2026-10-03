@@ -159,7 +159,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Default email sender
 
 # Consistent 30-minute (1800s) timeout
 SESSION_COOKIE_AGE = 1800  # 30 minutes in seconds
-SESSION_SAVE_EVERY_REQUEST = True  # Renew timer on activity
+SESSION_SAVE_EVERY_REQUEST = False  # Renew timer on activity
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Use persistent sessions
 
 MEDIA_URL = "/media/"

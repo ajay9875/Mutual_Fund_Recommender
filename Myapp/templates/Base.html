@@ -304,7 +304,7 @@
         .navbar > .container-fluid {
             display: flex !important;
             align-items: center !important;
-            justify-content: space-between !important;
+            justify-content: space-around !important;
             gap: 2rem;
             padding: 0 !important;
         }
@@ -412,10 +412,6 @@
                     <li class="nav-item px-2">
                         <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" 
                         href="{% url 'about' %}">About Us</a>
-                    </li>
-                    <li class="nav-item px-2">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'sip_calculator' %}active{% endif %}" 
-                        href="{% url 'sip_calculator' %}">SIP Calculator</a>
                     </li>
                     <li class="nav-item px-2">
                         <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 

@@ -382,17 +382,22 @@ def userdashboard(request):
     """if 'session_expiry' not in request.session:
         request.session['session_expiry'] = request.session.get_expiry_date().timestamp()"""
 
-    # Calculate remaining time - IMPORTANT FIX:
-    session_start = request.session.get('session_start')
-    if not session_start:  # Handle missing session_start
-        request.session['session_start'] = int(time.time())
-        session_start = request.session['session_start']
-    
-    remaining_time = max(0, 1800 - (int(time.time()) - session_start))
+    # -------- Compute real remaining time --------
 
-    """ expiry_time = request.session['session_expiry']
-    current_time = datetime.now().timestamp()
-    remaining_time = max(0, int(expiry_time - current_time))"""
+    session_start = request.session.get('session_start')
+    if not session_start:
+        # Fallback: if missing, treat "now" as the start
+        session_start = int(time.time())
+        request.session['session_start'] = session_start
+
+    total_duration = getattr(settings, 'SESSION_COOKIE_AGE', 300)   # ← 300
+    elapsed        = int(time.time()) - session_start
+    remaining_time = max(0, total_duration - elapsed)
+
+    # If it already hit 0, log the user out immediately
+    if remaining_time <= 0:
+        messages.info(request, "Session expired! Please login again.")
+        return redirect('login')
 
     full_name = request.session.get('full_name', '').upper().strip()
     username = request.session.get('username', '').strip()
@@ -957,7 +962,7 @@ def loginUser(request):
 
         if user is not None:
             login(request, user)
-            request.session.set_expiry(1800)  # Explicit 30-minute timeout
+            #request.session.set_expiry(60)  # Explicit 30-minute timeout
             request.session['session_start'] = int(time.time())  # Critical anchor point
             
             # Store user details in session
