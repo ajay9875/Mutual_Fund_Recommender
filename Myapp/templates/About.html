@@ -1,62 +1,218 @@
-{% extends 'Header.html' %}
+{% extends "Base.html" %}
 {% load static %}
-       
-{% block title %} {{ title }} {% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/About.css' %}">
+<style>
+    /* Same CSS as you already have — unchanged */
+    .about-page { background-color: #f5f7fa; min-height: calc(100vh - 120px); padding: 2.5rem 1rem 4rem; }
+    .container-narrow { max-width: 1100px; margin: 0 auto; }
+
+    .home-btn-wrap { margin-bottom: 1.75rem; display: flex; justify-content: flex-start; }
+    .btn-home { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: #ffffff; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; text-decoration: none; border: 1px solid rgba(0,0,0,0.05); }
+    .btn-home:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(79,140,255,0.25); }
+    .btn-home img { width: 22px; height: 22px; object-fit: contain; }
+
+    .hero-about { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 18px; padding: 3rem 2.5rem; color: #ffffff; margin-bottom: 2.5rem; box-shadow: 0 10px 40px rgba(15,23,42,0.18); position: relative; overflow: hidden; }
+    .hero-about::before { content: ""; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(79,140,255,0.25), transparent 70%); border-radius: 50%; }
+    .hero-about h1 { font-size: 2.1rem; font-weight: 700; margin: 0 0 1rem; letter-spacing: -0.5px; line-height: 1.25; position: relative; z-index: 1; }
+    .hero-about p { font-size: 1.05rem; line-height: 1.7; color: #cbd5e1; margin: 0; max-width: 780px; position: relative; z-index: 1; }
+
+    .section-title { font-size: 1.55rem; font-weight: 700; color: #0f172a; margin: 0 0 2rem; text-align: center; letter-spacing: -0.3px; position: relative; display: inline-block; padding-bottom: 0.6rem; width: 100%; }
+    .section-title::after { content: ""; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 60px; height: 3px; background: #4f8cff; border-radius: 2px; }
+
+    .features-section { margin-bottom: 3rem; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+    .feature-card { background: #ffffff; border-radius: 14px; padding: 1.75rem 1.5rem; box-shadow: 0 4px 18px rgba(15,23,42,0.06); border: 1px solid rgba(15,23,42,0.04); transition: transform 0.25s ease, box-shadow 0.25s ease; text-align: left; }
+    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(79,140,255,0.15); }
+    .feature-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(79,140,255,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 1.4rem; color: #4f8cff; }
+    .feature-card h4 { font-size: 1.05rem; font-weight: 600; color: #0f172a; margin: 0 0 0.5rem; letter-spacing: -0.2px; }
+    .feature-card p { font-size: 0.92rem; color: #64748b; line-height: 1.65; margin: 0; }
+
+    .stats-strip { background: #ffffff; border-radius: 16px; padding: 2rem 1.5rem; margin-bottom: 3rem; box-shadow: 0 6px 24px rgba(15,23,42,0.07); border: 1px solid rgba(15,23,42,0.04); display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; text-align: center; }
+    .stat-item h3 { font-size: 1.9rem; font-weight: 700; color: #4f8cff; margin: 0 0 0.35rem; letter-spacing: -0.5px; }
+    .stat-item p { font-size: 0.88rem; color: #64748b; margin: 0; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .mission-section { background: #ffffff; border-radius: 16px; padding: 2.5rem 2.25rem; margin-bottom: 3rem; box-shadow: 0 6px 24px rgba(15,23,42,0.06); border: 1px solid rgba(15,23,42,0.04); }
+    .mission-section h2 { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin: 0 0 1rem; letter-spacing: -0.3px; }
+    .mission-section p { font-size: 1rem; line-height: 1.75; color: #334155; margin: 0 0 1rem; text-align: justify; }
+    .mission-section p:last-of-type { margin-bottom: 0; }
+
+    .disclaimer { background-color: #fff8e1; color: #7a5c00; padding: 1rem 1.25rem; border-left: 4px solid #f0b400; border-radius: 8px; font-size: 0.95rem; line-height: 1.6; text-align: left; margin-top: 1.5rem; }
+    .disclaimer strong { color: #5c4500; }
+
+    .team-section { margin-bottom: 3rem; }
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; justify-items: center; }
+    .team { background: #ffffff; border-radius: 14px; padding: 1.75rem 1rem 1.5rem; width: 100%; max-width: 240px; box-shadow: 0 4px 18px rgba(15,23,42,0.07); border: 1px solid rgba(15,23,42,0.04); transition: transform 0.25s ease, box-shadow 0.25s ease; text-align: center; }
+    .team:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(79,140,255,0.15); }
+    .team .profile-icon { width: 82px; height: 82px; border-radius: 50%; object-fit: cover; background-color: #e2e8f0; border: 3px solid #f1f5f9; display: block; margin: 0 auto 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .team h5 { font-size: 1rem; font-weight: 600; color: #0f172a; margin: 0 0 0.3rem; letter-spacing: -0.2px; }
+    .team p { font-size: 0.85rem; color: #64748b; margin: 0; font-weight: 500; letter-spacing: 0.2px; }
+
+    .cta-section { background: linear-gradient(135deg, #4f8cff 0%, #3b7bf0 100%); border-radius: 16px; padding: 2.5rem 2rem; text-align: center; color: #ffffff; box-shadow: 0 10px 32px rgba(79,140,255,0.3); }
+    .cta-section h2 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.75rem; letter-spacing: -0.3px; }
+    .cta-section p { font-size: 1rem; color: rgba(255,255,255,0.92); margin: 0 0 1.5rem; max-width: 620px; margin-left: auto; margin-right: auto; }
+    .cta-buttons { display: flex; gap: 0.85rem; justify-content: center; flex-wrap: wrap; }
+    .cta-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-weight: 600; font-size: 0.95rem; text-decoration: none; transition: all 0.2s ease; letter-spacing: 0.2px; }
+    .cta-btn-primary { background: #ffffff; color: #3b7bf0; box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+    .cta-btn-primary:hover { background: #f8fafc; color: #2563eb; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
+    .cta-btn-outline { background: transparent; color: #ffffff; border: 2px solid rgba(255,255,255,0.6); }
+    .cta-btn-outline:hover { background: rgba(255,255,255,0.12); border-color: #ffffff; color: #ffffff; transform: translateY(-2px); }
+
+    @media (max-width: 991.98px) {
+        .about-page { padding: 1.75rem 1rem 3rem; }
+        .hero-about { padding: 2.25rem 1.75rem; border-radius: 14px; }
+        .hero-about h1 { font-size: 1.75rem; }
+        .hero-about p { font-size: 1rem; }
+        .mission-section { padding: 2rem 1.75rem; }
+        .section-title { font-size: 1.4rem; }
+    }
+
+    @media (max-width: 767.98px) {
+        .about-page { padding: 1.25rem 0.75rem 2.5rem; }
+        .home-btn-wrap { margin-bottom: 1rem; }
+        .btn-home { width: 40px; height: 40px; }
+        .btn-home img { width: 20px; height: 20px; }
+        .hero-about { padding: 1.75rem 1.25rem; border-radius: 12px; margin-bottom: 2rem; }
+        .hero-about h1 { font-size: 1.4rem; }
+        .hero-about p { font-size: 0.94rem; }
+        .section-title { font-size: 1.2rem; margin-bottom: 1.5rem; }
+        .feature-card { padding: 1.35rem 1.15rem; }
+        .feature-icon { width: 42px; height: 42px; font-size: 1.2rem; }
+        .feature-card h4 { font-size: 0.98rem; }
+        .feature-card p { font-size: 0.87rem; }
+        .stats-strip { padding: 1.5rem 1rem; gap: 1.25rem; }
+        .stat-item h3 { font-size: 1.5rem; }
+        .stat-item p { font-size: 0.78rem; }
+        .mission-section { padding: 1.5rem 1.25rem; border-radius: 12px; }
+        .mission-section h2 { font-size: 1.2rem; }
+        .mission-section p { font-size: 0.94rem; text-align: left; }
+        .disclaimer { font-size: 0.88rem; padding: 0.85rem 1rem; }
+        .team-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .team { padding: 1.35rem 0.75rem 1.15rem; max-width: none; }
+        .team .profile-icon { width: 68px; height: 68px; }
+        .team h5 { font-size: 0.92rem; }
+        .team p { font-size: 0.78rem; }
+        .cta-section { padding: 2rem 1.25rem; border-radius: 12px; }
+        .cta-section h2 { font-size: 1.2rem; }
+        .cta-section p { font-size: 0.92rem; }
+        .cta-btn { padding: 0.65rem 1.2rem; font-size: 0.88rem; }
+    }
+
+    @media (max-width: 420px) {
+        .team-grid { grid-template-columns: 1fr; }
+        .team { max-width: 260px; }
+        .cta-buttons { flex-direction: column; }
+        .cta-btn { width: 100%; justify-content: center; }
+    }
+</style>
 {% endblock extra_css %}
 
-{% block header %} {{ header }} {% endblock %}
-
 {% block content %}
+<div class="about-page">
+    <div class="container-narrow">
+        <section class="hero-about">
+            <h1>Welcome to Mutual Fund Recommendation</h1>
+            <p>
+                Whether you're a seasoned investor or just starting your financial journey,
+                our platform provides data-backed insights and real-time analysis to guide
+                you towards profitable and secure investments. With a seamless, user-friendly
+                experience, we make choosing the right mutual funds simpler, smarter,
+                and more efficient.
+            </p>
+        </section>
 
-   <div class="main-content-class">
-    <div class="home">
-        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
-      </div>
+        <section class="features-section">
+            <h2 class="section-title">What We Offer</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>Real-Time Analysis</h4>
+                    <p>Live market data and up-to-the-minute performance insights to keep you informed.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                    <h4>AI-Powered Insights</h4>
+                    <p>Smart algorithms analyse thousands of funds to surface the best matches for you.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h4>Secure & Reliable</h4>
+                    <p>Your data is protected with industry-standard security and privacy practices.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-user-graduate"></i></div>
+                    <h4>Beginner Friendly</h4>
+                    <p>Simple explanations and a clean interface make investing approachable for everyone.</p>
+                </div>
+            </div>
+        </section>
 
-    <div class="about-content">
-        <h3>Welcome to Mutual Fund Recommendation</h3>
-        <p>
-            Whether you're a seasoned investor or just starting your financial journey,
-            our platform provides data-backed insights and real-time analysis to guide
-            you towards profitable and secure investments. With a seamless, user-friendly
-            experience, we make choosing the right mutual funds simpler, smarter,
-            and more efficient.
-            Invest with confidence. Grow with precision. Your financial future starts here!<br>
-          <div class="disclaimer">
-            Disclaimer: We’re here to help you make smarter investment choices with data and insights.
-            However, mutual fund investments are subject to market risks, and returns are not guaranteed.
-           </div>
-        </p>
+        <section class="stats-strip">
+            <div class="stat-item"><h3>1000+</h3><p>Mutual Funds</p></div>
+            <div class="stat-item"><h3>24/7</h3><p>Live Analysis</p></div>
+            <div class="stat-item"><h3>AI</h3><p>Smart Recommendations</p></div>
+            <div class="stat-item"><h3>100%</h3><p>Data-Driven</p></div>
+        </section>
+
+        <section class="mission-section">
+            <h2>Our Mission</h2>
+            <p>
+                We believe that investing should be transparent, data-driven, and accessible to everyone —
+                not just experts. Our mission is to empower retail investors with institutional-grade
+                analytics so they can make confident decisions about their financial future.
+            </p>
+            <p>
+                From first-time investors exploring SIPs to experienced users comparing fund performance,
+                our platform delivers clear, unbiased, and actionable insights — all in one place.
+                Invest with confidence. Grow with precision. Your financial future starts here!
+            </p>
+            <div class="disclaimer">
+                <strong>Disclaimer:</strong> We're here to help you make smarter investment choices with data and insights.
+                However, mutual fund investments are subject to market risks, and returns are not guaranteed.
+            </div>
+        </section>
+
+        <section class="team-section">
+            <h2 class="section-title">Meet Our Team</h2>
+            <div class="team-grid">
+                <div class="team">
+                    <img src="{% static 'icons/image.png' %}" class="profile-icon" alt="Ajay Kumar Sah">
+                    <h5>Ajay Kumar Sah</h5>
+                    <p>Team Lead</p>
+                </div>
+                <div class="team">
+                    <img src="{% static 'icons/image.png' %}" class="profile-icon" alt="Aditya Kumar Choudhary">
+                    <h5>Aditya Kumar Choudhary</h5>
+                    <p>Team Member</p>
+                </div>
+                <div class="team">
+                    <img src="{% static 'icons/image.png' %}" class="profile-icon" alt="Gufran Ansari">
+                    <h5>Gufran Ansari</h5>
+                    <p>Team Member</p>
+                </div>
+                <div class="team">
+                    <img src="{% static 'icons/image.png' %}" class="profile-icon" alt="Shameer Raza">
+                    <h5>Shameer Raza</h5>
+                    <p>Team Member</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Ready to Start Investing Smarter?</h2>
+            <p>Explore our SIP Calculator or get personalised fund recommendations in seconds.</p>
+            <div class="cta-buttons">
+                <a href="{% url 'sip_calculator' %}" class="cta-btn cta-btn-primary">
+                    <i class="fas fa-calculator"></i> Try SIP Calculator
+                </a>
+                <a href="{% url 'contact' %}" class="cta-btn cta-btn-outline">
+                    <i class="fas fa-envelope"></i> Contact Us
+                </a>
+            </div>
+        </section>
+
     </div>
-  </div>
-
-
-    <div class="team-section">
-        <h2>Meet Our Team</h2>
-          <div class="team-member">
-            <div class="team">
-              <span style="font-size: 3rem;"> <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;"></span>
-                <h5>Ajay Kumar Sah</h5>
-                <p>Team Lead</p>
-            </div>
-            <div class="team">
-              <span style="font-size: 3rem;"> <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;"></span>
-                <h5>Aditya Kumar Choudhary</h5>
-                <p>Team Member</p>
-            </div>
-            <div class="team">
-              <span style="font-size: 3rem;"> <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;"></span>
-                <h5>Gufran Ansari</h5>
-                <p>Team Member</p>
-            </div>
-            <div class="team">
-              <span style="font-size: 3rem;"> <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;"></span>
-                <h5>Shameer Raza</h5>
-                <p>Team Member</p>
-           </div>
-        </div>
-    </div>
+</div>
 {% endblock %}

@@ -1111,7 +1111,7 @@ def forgetpassword(request):
             otp = random.randint(100000, 999999)
 
             # Store OTP and expiry in session
-            expiry_time = datetime.now() + timedelta(minutes=5)
+            expiry_time = datetime.now() + timedelta(minutes=10)
             request.session['reset_email'] = email
             request.session['otp_sent'] = otp
             request.session['otp_expiry'] = expiry_time.strftime("%Y-%m-%d %H:%M:%S")
@@ -1287,7 +1287,7 @@ def forgetusername(request):
             otp = random.randint(100000, 999999)
 
             # Store OTP and expiry in session
-            expiry_time = datetime.now() + timedelta(minutes=2)
+            expiry_time = datetime.now() + timedelta(minutes=10)
             request.session['reset_email'] = email
             request.session['otp_sent'] = otp
             request.session['otp_expiry'] = expiry_time.strftime("%Y-%m-%d %H:%M:%S")

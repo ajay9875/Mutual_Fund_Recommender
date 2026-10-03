@@ -1,41 +1,650 @@
-{% extends 'Header.html' %}
+{% extends "Base.html" %}
 {% load static %}
 
-{% block title %} {{ title }} {% endblock %}
+{% block title %}{{ title }}{% endblock title %}
+
+{% block extra_head %}
+    <meta name="robots" content="noindex, nofollow">
+{% endblock extra_head %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/VirifyOtp.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
-{% endblock extra_css %}
+<style>
+    /* ============================================================
+       VERIFY OTP PAGE – PROFESSIONAL & RESPONSIVE
+       ============================================================ */
 
-{% block header %} {{ header }} {% endblock header %}
+    /* ---------- FLASH MESSAGES (outside flex container) ---------- */
+    .msg-wrap {
+        max-width: 1000px;
+        margin: 2rem auto 0;
+        padding: 0 1rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .msg-box {
+        padding: 0.85rem 1.1rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+        border-left: 4px solid;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .msg-box i { font-size: 1rem; }
+    .msg-box.error   { background: #fef2f2; color: #991b1b; border-left-color: #dc2626; }
+    .msg-box.success { background: #f0fdf4; color: #166534; border-left-color: #16a34a; }
+    .msg-box.warning { background: #fffbeb; color: #92400e; border-left-color: #f59e0b; }
+    .msg-box.info    { background: #eff6ff; color: #1e40af; border-left-color: #3b82f6; }
+
+    /* ---------- PAGE WRAPPER ---------- */
+    .otp-page {
+        background-color: #f5f7fa;
+        min-height: calc(100vh - 120px);
+        padding: 1.5rem 1rem 4rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .otp-layout {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 2rem;
+        align-items: stretch;
+    }
+
+    /* ============================================================
+       LEFT PANEL – INFO / SECURITY
+       ============================================================ */
+    .info-panel {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 18px;
+        padding: 2.75rem 2.25rem;
+        color: #ffffff;
+        box-shadow: 0 10px 40px rgba(15, 23, 42, 0.20);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-panel::before {
+        content: "";
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(79, 140, 255, 0.30), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .info-panel::after {
+        content: "";
+        position: absolute;
+        bottom: -100px;
+        left: -60px;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle, rgba(75, 192, 192, 0.20), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .info-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-brand .brand-mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.45);
+    }
+
+    .info-brand .brand-text {
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+    }
+    .info-brand .brand-text span {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: #94a3b8;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    .info-panel h2 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin: 0 0 0.75rem;
+        letter-spacing: -0.5px;
+        line-height: 1.25;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-panel p.lead {
+        font-size: 1rem;
+        color: #cbd5e1;
+        margin: 0 0 2rem;
+        line-height: 1.65;
+        position: relative;
+        z-index: 1;
+    }
+
+    .steps-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .steps-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.9rem;
+        font-size: 0.94rem;
+        color: #e2e8f0;
+        line-height: 1.55;
+    }
+
+    .steps-list .step-num {
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(79, 140, 255, 0.18);
+        color: #4f8cff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-top: 1px;
+    }
+
+    .steps-list strong {
+        color: #ffffff;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .info-note {
+        margin-top: 1.75rem;
+        padding: 0.9rem 1.1rem;
+        background: rgba(79, 140, 255, 0.10);
+        border-left: 3px solid #4f8cff;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        color: #cbd5e1;
+        line-height: 1.55;
+        display: flex;
+        gap: 0.65rem;
+        align-items: flex-start;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-note i {
+        color: #4f8cff;
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+
+    .info-footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.85rem;
+        color: #94a3b8;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-footer a {
+        color: #4f8cff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .info-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* ============================================================
+       RIGHT PANEL – OTP FORM CARD
+       ============================================================ */
+    .form-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-head {
+        text-align: center;
+        margin-bottom: 1.75rem;
+    }
+
+    .form-head .form-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 6px 18px rgba(79, 140, 255, 0.40);
+    }
+
+    .form-head h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.4px;
+    }
+
+    .form-head p {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.55;
+    }
+
+    /* ---------- OTP INPUT ---------- */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.55rem;
+        letter-spacing: 0.2px;
+        text-align: center;
+    }
+
+    .otp-input-wrap {
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+
+    .otp-input-wrap input {
+        width: 100%;
+        max-width: 280px;
+        padding: 1rem 1rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: 0.8rem;
+        text-align: center;
+        color: #0f172a;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .otp-input-wrap input:focus {
+        outline: none;
+        border-color: #4f8cff;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+    }
+
+    .otp-input-wrap input::placeholder {
+        color: #cbd5e1;
+        font-size: 1.2rem;
+        letter-spacing: 0.3rem;
+        font-weight: 500;
+    }
+
+    /* ---------- SUBMIT BUTTON ---------- */
+    .btn-submit {
+        width: 100%;
+        padding: 0.95rem 1.5rem;
+        background: linear-gradient(135deg, #4f8cff 0%, #3b7bf0 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-family: inherit;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #3b7bf0 0%, #2563eb 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* ---------- BACK LINK ---------- */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+        font-size: 0.87rem;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: #4f8cff;
+    }
+
+    /* ---------- RESEND NOTE ---------- */
+    .resend-note {
+        margin-top: 1.5rem;
+        padding: 0.85rem 1rem;
+        background: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        border-radius: 8px;
+        font-size: 0.84rem;
+        color: #1e40af;
+        line-height: 1.55;
+        display: flex;
+        gap: 0.6rem;
+        align-items: flex-start;
+    }
+
+    .resend-note i {
+        color: #3b82f6;
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+
+    /* ============================================================
+       RESPONSIVE – TABLET
+       ============================================================ */
+    @media (max-width: 991.98px) {
+        .otp-page {
+            padding: 1.5rem 1rem 3rem;
+        }
+        .otp-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 520px;
+        }
+        .info-panel {
+            padding: 2rem 1.75rem;
+        }
+        .info-panel h2 { font-size: 1.45rem; }
+        .form-card {
+            padding: 2rem 1.75rem;
+        }
+    }
+
+    /* ============================================================
+       RESPONSIVE – MOBILE
+       ============================================================ */
+    @media (max-width: 767.98px) {
+        .otp-page { padding: 1rem 0.75rem 2.5rem; }
+        .msg-wrap { margin-top: 1.25rem; }
+
+        .info-panel {
+            padding: 1.75rem 1.35rem;
+            border-radius: 14px;
+        }
+        .info-brand .brand-mark {
+            width: 40px; height: 40px; font-size: 1.15rem;
+        }
+        .info-brand .brand-text { font-size: 0.95rem; }
+        .info-brand .brand-text span { font-size: 0.65rem; }
+
+        .info-panel h2 { font-size: 1.25rem; }
+        .info-panel p.lead { font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .steps-list li { font-size: 0.88rem; }
+        .steps-list .step-num {
+            width: 26px; height: 26px; font-size: 0.78rem;
+        }
+        .info-note { font-size: 0.8rem; padding: 0.75rem 0.9rem; }
+
+        .form-card {
+            padding: 1.75rem 1.35rem;
+            border-radius: 14px;
+        }
+        .form-head .form-icon {
+            width: 48px; height: 48px; font-size: 1.25rem;
+        }
+        .form-head h3 { font-size: 1.3rem; }
+        .form-head p { font-size: 0.85rem; }
+
+        .otp-input-wrap input {
+            padding: 0.85rem 0.75rem;
+            font-size: 1.35rem;
+            letter-spacing: 0.6rem;
+        }
+        .otp-input-wrap input::placeholder {
+            font-size: 1rem;
+            letter-spacing: 0.2rem;
+        }
+
+        .btn-submit { padding: 0.85rem 1.25rem; font-size: 0.94rem; }
+        .back-link { font-size: 0.82rem; }
+        .resend-note { font-size: 0.8rem; }
+    }
+
+    /* ============================================================
+       VERY SMALL (≤ 420px)
+       ============================================================ */
+    @media (max-width: 420px) {
+        .info-panel { padding: 1.5rem 1.15rem; }
+        .form-card { padding: 1.5rem 1.15rem; }
+        .steps-list li { font-size: 0.84rem; }
+        .otp-input-wrap input {
+            font-size: 1.2rem;
+            letter-spacing: 0.4rem;
+        }
+    }
+</style>
+{% endblock extra_css %}
 
 {% block content %}
 
-        <!-- Flashed message will be appear here -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                   <div class='msg'> {{ message }} </div>
-                  </div> 
+<!-- FLASH MESSAGES — outside the flex container so they center at top -->
+{% if messages %}
+<div class="msg-wrap">
+    {% for message in messages %}
+        <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
+            {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle"></i>
+            {% elif message.tags == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+            {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle"></i>
+            {% else %}
+                <i class="fas fa-info-circle"></i>
+            {% endif %}
+            <span>{{ message }}</span>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="otp-page">
+
+    <div class="otp-layout">
+
+        <!-- ============ LEFT: INFO PANEL ============ -->
+        <aside class="info-panel">
+
+            <div class="info-brand">
+                <div class="brand-mark">
+                    <i class="fas fa-shield-halved"></i>
                 </div>
-            {% endfor %}
-        {% endif %}
+                <div class="brand-text">
+                    Two-Factor Verification
+                    <span>Secure Access</span>
+                </div>
+            </div>
 
-    <!-- Verify OTP Form  -->
-    <div class="verifyotp">
-        <form method="POST" action="/verifyotp/">
-            {% csrf_token %}
-            <h2>Verify OTP</h2>
+            <h2>One last step to secure your account.</h2>
+            <p class="lead">
+                We've sent a 6-digit one-time password to your registered email.
+                Enter it below to complete your verification and access your dashboard.
+            </p>
 
-            <label for="otp">Enter OTP</label>
-            <input type="text" class="form-control" name="otp" autocomplete="off" required>
+            <ul class="steps-list">
+                <li>
+                    <span class="step-num">1</span>
+                    <div>
+                        <strong>Check your inbox</strong>
+                        Look for the OTP we just sent to your registered email.
+                    </div>
+                </li>
+                <li>
+                    <span class="step-num">2</span>
+                    <div>
+                        <strong>Enter the 6-digit code</strong>
+                        Type the code exactly as shown — it's valid for 10 minutes.
+                    </div>
+                </li>
+                <li>
+                    <span class="step-num">3</span>
+                    <div>
+                        <strong>You're verified</strong>
+                        You'll be redirected to your dashboard automatically.
+                    </div>
+                </li>
+            </ul>
 
-            <button id="verifyotp-btn" type="submit">Verify OTP</button>
+            <div class="info-note">
+                <i class="fas fa-shield-halved"></i>
+                <span>Never share your OTP with anyone. Our team will never ask for it.</span>
+            </div>
 
-            <p style="text-align: center; text-decoration: none;"><a href="/" style="text-decoration: none;">← Back to Home</a></p>
-        </form>
+            <div class="info-footer">
+                Wrong email? <a href="{% url 'forgetusername' %}">Recover your account</a>
+            </div>
+
+        </aside>
+
+        <!-- ============ RIGHT: OTP FORM CARD ============ -->
+        <div class="form-card">
+
+            <div class="form-head">
+                <div class="form-icon">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h3>Verify OTP</h3>
+                <p>Enter the 6-digit code sent to your email</p>
+            </div>
+
+            <form method="POST" action="/verifyotp/" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="otp">Enter OTP</label>
+                    <div class="otp-input-wrap">
+                        <input type="text" id="otp" name="otp"
+                               placeholder="• • • • • •"
+                               inputmode="numeric"
+                               pattern="[0-9]{4,8}"
+                               maxlength="8"
+                               autocomplete="one-time-code"
+                               required>
+                    </div>
+                </div>
+
+                <button id="verifyotp-btn" type="submit" class="btn-submit">
+                    <i class="fas fa-check-circle"></i> Verify OTP
+                </button>
+
+            </form>
+
+            <div class="resend-note">
+                <i class="fas fa-clock"></i>
+                <span>
+                    Your OTP expires in <strong>10 minutes</strong>. Didn't get it?
+                    Check your spam folder, or request a new code after <strong>60 seconds</strong>.
+                </span>
+            </div>
+        </div>
+
     </div>
 
+</div>
+
 {% endblock content %}
+
+{% block js_code %}
+<script src="{% static 'javascript/allmessage.js' %}"></script>
+<script>
+    /* ==========================================================
+       Auto-format OTP input:
+       - Keep only digits
+       - Limit to 8 chars
+       - Auto-focus is implicit since it's the only field
+       ========================================================== */
+    (function () {
+        const otpInput = document.getElementById('otp');
+        if (!otpInput) return;
+
+        otpInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\D/g, '').slice(0, 8);
+        });
+
+        otpInput.addEventListener('paste', function (e) {
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            if (!text) return;
+            e.preventDefault();
+            this.value = text.replace(/\D/g, '').slice(0, 8);
+        });
+
+        // Auto-focus on page load
+        otpInput.focus();
+    })();
+</script>
+{% endblock js_code %}

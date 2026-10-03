@@ -1,78 +1,640 @@
+{% extends "Base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signup Page</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">  
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Newuser.css' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
-</head>
-<body>
 
-    <!-- Flash Messages -->
-  {% if messages %}
-    <div class="messages">
-      {% for message in messages %}
-        <div class="message {{ message.tags }}">
-          <div class="msg">{{ message }}</div>
-        </div>
-      {% endfor %}
+{% block title %}{{ title }}{% endblock title %}
+
+{% block extra_head %}
+    <meta name="robots" content="noindex, nofollow">
+{% endblock extra_head %}
+
+{% block extra_css %}
+<style>
+    /* ============================================================
+       SIGNUP PAGE – PROFESSIONAL & RESPONSIVE
+       ============================================================ */
+
+    .signup-page-wrap {
+        background-color: #f5f7fa;
+        min-height: calc(100vh - 120px);
+        padding: 2.5rem 1rem 4rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .signup-layout {
+        width: 100%;
+        max-width: 1080px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1.25fr;
+        gap: 2rem;
+        align-items: stretch;
+    }
+
+    /* ============================================================
+       LEFT PANEL – WELCOME / FEATURES
+       ============================================================ */
+    .welcome-panel {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 18px;
+        padding: 2.75rem 2.25rem;
+        color: #ffffff;
+        box-shadow: 0 10px 40px rgba(15, 23, 42, 0.20);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .welcome-panel::before {
+        content: "";
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(79, 140, 255, 0.30), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .welcome-panel::after {
+        content: "";
+        position: absolute;
+        bottom: -100px;
+        left: -60px;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle, rgba(75, 192, 192, 0.20), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .welcome-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-brand .brand-mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.45);
+    }
+
+    .welcome-brand .brand-text {
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+    }
+    .welcome-brand .brand-text span {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: #94a3b8;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    .welcome-panel h2 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin: 0 0 0.75rem;
+        letter-spacing: -0.5px;
+        line-height: 1.25;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-panel p.lead {
+        font-size: 1rem;
+        color: #cbd5e1;
+        margin: 0 0 2rem;
+        line-height: 1.65;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.9rem;
+        font-size: 0.94rem;
+        color: #e2e8f0;
+        line-height: 1.55;
+    }
+
+    .feature-list li i {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: rgba(79, 140, 255, 0.18);
+        color: #4f8cff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        margin-top: 2px;
+    }
+
+    .welcome-footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.85rem;
+        color: #94a3b8;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-footer a {
+        color: #4f8cff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .welcome-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* ============================================================
+       RIGHT PANEL – FORM CARD
+       ============================================================ */
+    .form-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-head {
+        text-align: center;
+        margin-bottom: 1.75rem;
+    }
+
+    .form-head .form-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 6px 18px rgba(79, 140, 255, 0.40);
+    }
+
+    .form-head h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.4px;
+    }
+
+    .form-head p {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.55;
+    }
+
+    /* ---------- FORM ROW (for first/last name side by side) ---------- */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.85rem;
+    }
+
+    /* ---------- FORM FIELDS ---------- */
+    .form-group {
+        margin-bottom: 1.05rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.45rem;
+        letter-spacing: 0.2px;
+    }
+
+    .form-group label .req {
+        color: #dc2626;
+        margin-left: 2px;
+    }
+
+    .input-wrap {
+        position: relative;
+        display: block;
+    }
+
+    .input-wrap input {
+        width: 100%;
+        padding: 0.8rem 1rem 0.8rem 2.75rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: #0f172a;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .input-wrap input:focus {
+        outline: none;
+        border-color: #4f8cff;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+    }
+
+    .input-wrap input::placeholder {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* Left icon inside input */
+    .input-wrap .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 1rem;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+
+    .input-wrap input:focus + .input-icon {
+        color: #4f8cff;
+    }
+
+    /* Password toggle eye */
+    .input-wrap .toggle-icon {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #94a3b8;
+        font-size: 0.95rem;
+        padding: 4px;
+        transition: color 0.2s ease;
+    }
+
+    .input-wrap .toggle-icon:hover {
+        color: #4f8cff;
+    }
+
+    /* ---------- SUBMIT BUTTON ---------- */
+    .btn-submit {
+        width: 100%;
+        padding: 0.95rem 1.5rem;
+        background: linear-gradient(135deg, #4f8cff 0%, #3b7bf0 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        margin-top: 0.6rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-family: inherit;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #3b7bf0 0%, #2563eb 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* ---------- BACK LINK ---------- */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+        font-size: 0.87rem;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: #4f8cff;
+    }
+
+    /* ============================================================
+       RESPONSIVE – TABLET
+       ============================================================ */
+    @media (max-width: 991.98px) {
+        .signup-page-wrap {
+            padding: 1.75rem 1rem 3rem;
+        }
+        .signup-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 560px;
+        }
+        .welcome-panel {
+            padding: 2rem 1.75rem;
+        }
+        .welcome-panel h2 { font-size: 1.45rem; }
+        .form-card {
+            padding: 2rem 1.75rem;
+        }
+    }
+
+    /* ============================================================
+       RESPONSIVE – MOBILE
+       ============================================================ */
+    @media (max-width: 767.98px) {
+        .signup-page-wrap { padding: 1.25rem 0.75rem 2.5rem; }
+
+        .welcome-panel {
+            padding: 1.75rem 1.35rem;
+            border-radius: 14px;
+        }
+        .welcome-brand .brand-mark {
+            width: 40px; height: 40px; font-size: 1.15rem;
+        }
+        .welcome-brand .brand-text { font-size: 0.95rem; }
+        .welcome-brand .brand-text span { font-size: 0.65rem; }
+
+        .welcome-panel h2 { font-size: 1.25rem; }
+        .welcome-panel p.lead { font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .feature-list li { font-size: 0.88rem; }
+        .feature-list li i {
+            width: 28px; height: 28px; font-size: 0.85rem;
+        }
+
+        .form-card {
+            padding: 1.75rem 1.35rem;
+            border-radius: 14px;
+        }
+        .form-head .form-icon {
+            width: 48px; height: 48px; font-size: 1.25rem;
+        }
+        .form-head h3 { font-size: 1.3rem; }
+        .form-head p { font-size: 0.85rem; }
+
+        /* Stack first name / last name on mobile */
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .input-wrap input {
+            padding: 0.75rem 0.9rem 0.75rem 2.5rem;
+            font-size: 0.92rem;
+        }
+        .input-wrap .input-icon { left: 0.85rem; font-size: 0.88rem; }
+        .input-wrap .toggle-icon { right: 0.85rem; font-size: 0.88rem; }
+
+        .btn-submit { padding: 0.85rem 1.25rem; font-size: 0.94rem; }
+        .back-link { font-size: 0.82rem; }
+    }
+
+    /* ============================================================
+       VERY SMALL (≤ 420px)
+       ============================================================ */
+    @media (max-width: 420px) {
+        .welcome-panel { padding: 1.5rem 1.15rem; }
+        .form-card { padding: 1.5rem 1.15rem; }
+        .feature-list li { font-size: 0.84rem; }
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+
+    <!-- FLASH MESSAGES -->
+    {% if messages %}
+    <div class="msg-wrap">
+        {% for message in messages %}
+            <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
+                {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
     </div>
-  {% endif %}
+    {% endif %}
 
-  <!-- Signup Form -->
-  <div class="signup-page">
-        <form action="{% url 'newuser' %}" method="POST">
-          {% csrf_token %}
-         <div class="signup-icon">
-            <h3>SignUp Now</h3>
-            <!-- Login icon -->
-           <img src="{% static 'icons/signupicon.png' %}">
-         </div> 
-      
-      <div class="username-input">
-          <label for="username"  class="form-label">Create Username</label>
-          <input type="text" class="form-control" id="username" onclick="hideError_message()" name="username" required>
-      </div>
-      
-      <div class="first_name">
-          <label for="first_name" class="form-label">First Name</label>
-          <input type="text" class="form-control" id="first_name" name="first_name" required>
-      </div>
+<div class="signup-page-wrap">
 
-      <div class="last_name">
-          <label for="last_name" class="form-label">Last Name</label>
-          <input type="text" class="form-control" id="last_name" name="last_name" required>
-      </div>
-      
-      <div class="email-input">
-          <label for="email" class="form-label">Email Address</label>
-          <input type="email" class="form-control" id="email" name="email" required>
-      </div>
-      
-      <div class="newpass">
-          <label for="password" class="form-label">Create Password</label>
-          <input type="password" class="form-control" id="newpassword" name="newpassword" required>
-      </div>
-      
-      <div class="cpass">
-          <label for="confirmpassword" class="form-label">Re-enter Password</label>
-          <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" required>
-      </div>
-      
-      <div class="btn">
-          <button class="button submit-button">SUBMIT</button>
-      </div>  
-      
-    </form>
-        <p style="text-align: center; text-decoration: none;"><a href="/" style="text-decoration: none;">← Back to Home</a></p>
-  </div>
-  
-</body>
-</html>
+    <div class="signup-layout">
 
+        <!-- ============ LEFT: WELCOME PANEL ============ -->
+        <aside class="welcome-panel">
 
+            <div class="welcome-brand">
+                <div class="brand-mark">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="brand-text">
+                    MF Recommend
+                    <span>AI Powered</span>
+                </div>
+            </div>
 
+            <h2>Join thousands of smart investors.</h2>
+            <p class="lead">
+                Create your free account in seconds and unlock AI-powered mutual fund
+                recommendations, real-time SIP projections, and personalised portfolio insights.
+            </p>
+
+            <ul class="feature-list">
+                <li>
+                    <i class="fas fa-brain"></i>
+                    <span>Personalised AI fund recommendations tailored to your goals</span>
+                </li>
+                <li>
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Real-time SIP and lump-sum investment calculators</span>
+                </li>
+                <li>
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Bank-grade security and encrypted data protection</span>
+                </li>
+                <li>
+                    <i class="fas fa-infinity"></i>
+                    <span>Lifetime free access — no hidden charges, no spam</span>
+                </li>
+            </ul>
+
+            <div class="welcome-footer">
+                Already have an account? <a href="{% url 'login' %}">Sign in here</a>
+            </div>
+
+        </aside>
+
+        <!-- ============ RIGHT: SIGNUP FORM ============ -->
+        <div class="form-card">
+
+            <div class="form-head">
+                <div class="form-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3>Create Your Account</h3>
+                <p>Fill in the details below to get started. It only takes a minute.</p>
+            </div>
+
+            <form action="{% url 'newuser' %}" method="POST" novalidate>
+                {% csrf_token %}
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username">Create Username <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <input type="text" id="username" name="username"
+                               placeholder="Choose a unique username"
+                               autocomplete="username" required maxlength="50">
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <!-- First + Last name -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <input type="text" id="first_name" name="first_name"
+                                   placeholder="First name"
+                                   autocomplete="given-name" required maxlength="50">
+                            <i class="fas fa-id-badge input-icon"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <input type="text" id="last_name" name="last_name"
+                                   placeholder="Last name"
+                                   autocomplete="family-name" required maxlength="50">
+                            <i class="fas fa-id-badge input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email Address <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <input type="email" id="email" name="email"
+                               placeholder="your.email@example.com"
+                               autocomplete="email" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="newpassword">Create Password <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <input type="password" id="newpassword" name="newpassword"
+                               placeholder="Enter a strong password"
+                               autocomplete="new-password" required minlength="8">
+                        <i class="fas fa-lock input-icon"></i>
+                        <i class="fa-solid fa-eye toggle-icon"
+                           data-target="newpassword"
+                           onclick="togglePassword('newpassword', this)"></i>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirmpassword">Re-enter Password <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <input type="password" id="confirmpassword" name="confirmpassword"
+                               placeholder="Re-enter your password"
+                               autocomplete="new-password" required minlength="8">
+                        <i class="fas fa-lock input-icon"></i>
+                        <i class="fa-solid fa-eye toggle-icon"
+                           data-target="confirmpassword"
+                           onclick="togglePassword('confirmpassword', this)"></i>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock content %}
+
+{% block js_code %}
+<script src="{% static 'javascript/allmessage.js' %}"></script>
+<script>
+    /* ==========================================================
+       Password toggle — works for any input by target id
+       ========================================================== */
+    function togglePassword(targetId, iconEl) {
+        const pw = document.getElementById(targetId);
+        if (!pw || !iconEl) return;
+        if (pw.type === 'password') {
+            pw.type = 'text';
+            iconEl.classList.remove('fa-eye');
+            iconEl.classList.add('fa-eye-slash');
+        } else {
+            pw.type = 'password';
+            iconEl.classList.remove('fa-eye-slash');
+            iconEl.classList.add('fa-eye');
+        }
+    }
+</script>
+{% endblock js_code %}

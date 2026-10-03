@@ -1,67 +1,649 @@
-{% extends "Header.html" %}
+{% extends "Base.html" %}
 {% load static %}
 
-{% block title %} {{ title }} {% endblock title %}
+{% block title %}{{ title }}{% endblock title %}
+
 {% block extra_head %}
     <meta name="robots" content="noindex, nofollow">
 {% endblock extra_head %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/Login.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-{% endblock extra_css %}
+<style>
+    /* ============================================================
+       LOGIN PAGE – PROFESSIONAL & RESPONSIVE
+       ============================================================ */
 
-<!-- Header details -->
-{% block header %} <meta name="robots" content="noindex, nofollow"> {{ header }} {% endblock %}
+    .login-page {
+        background-color: #f5f7fa;
+        min-height: calc(100vh - 120px);
+        padding: 2.5rem 1rem 4rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .login-layout {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 2rem;
+        align-items: stretch;
+    }
+
+    /* ============================================================
+       LEFT PANEL – WELCOME / FEATURES
+       ============================================================ */
+    .welcome-panel {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 18px;
+        padding: 2.75rem 2.25rem;
+        color: #ffffff;
+        box-shadow: 0 10px 40px rgba(15, 23, 42, 0.20);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .welcome-panel::before {
+        content: "";
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(79, 140, 255, 0.30), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .welcome-panel::after {
+        content: "";
+        position: absolute;
+        bottom: -100px;
+        left: -60px;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle, rgba(75, 192, 192, 0.20), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .welcome-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-brand .brand-mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.45);
+    }
+
+    .welcome-brand .brand-text {
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+    }
+    .welcome-brand .brand-text span {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: #94a3b8;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    .welcome-panel h2 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin: 0 0 0.75rem;
+        letter-spacing: -0.5px;
+        line-height: 1.25;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-panel p.lead {
+        font-size: 1rem;
+        color: #cbd5e1;
+        margin: 0 0 2rem;
+        line-height: 1.65;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        font-size: 0.94rem;
+        color: #e2e8f0;
+        line-height: 1.55;
+    }
+
+    .feature-list li i {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: rgba(79, 140, 255, 0.18);
+        color: #4f8cff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        margin-top: 2px;
+    }
+
+    .welcome-footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.82rem;
+        color: #94a3b8;
+        position: relative;
+        z-index: 1;
+    }
+
+    .welcome-footer a {
+        color: #4f8cff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .welcome-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* ============================================================
+       RIGHT PANEL – LOGIN CARD
+       ============================================================ */
+    .login-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .login-head {
+        text-align: center;
+        margin-bottom: 1.75rem;
+    }
+
+    .login-head .login-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 6px 18px rgba(79, 140, 255, 0.40);
+    }
+
+    .login-head h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.4px;
+    }
+
+    .login-head p {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* ---------- FORM FIELDS ---------- */
+    .form-group {
+        margin-bottom: 1.15rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.45rem;
+        letter-spacing: 0.2px;
+    }
+
+    .input-wrap {
+        position: relative;
+        display: block;
+    }
+
+    .input-wrap input {
+        width: 100%;
+        padding: 0.85rem 1rem 0.85rem 2.75rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: #0f172a;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .input-wrap input:focus {
+        outline: none;
+        border-color: #4f8cff;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+    }
+
+    .input-wrap input::placeholder {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* Left icon inside input */
+    .input-wrap .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 1rem;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+
+    .input-wrap input:focus + .input-icon {
+        color: #4f8cff;
+    }
+
+    /* Password toggle eye */
+    .input-wrap .toggle-icon {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #94a3b8;
+        font-size: 0.95rem;
+        transition: color 0.2s ease;
+        padding: 4px;
+    }
+
+    .input-wrap .toggle-icon:hover {
+        color: #4f8cff;
+    }
+
+    /* ---------- SUBMIT BUTTON ---------- */
+    .btn-login {
+        width: 100%;
+        padding: 0.95rem 1.5rem;
+        background: linear-gradient(135deg, #4f8cff 0%, #3b7bf0 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        margin-top: 0.75rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-family: inherit;
+    }
+
+    .btn-login:hover {
+        background: linear-gradient(135deg, #3b7bf0 0%, #2563eb 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+    }
+
+    .btn-login:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+    }
+
+    /* ---------- DIVIDER ---------- */
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 1.5rem 0 1.1rem;
+        color: #94a3b8;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+    }
+    .divider::before,
+    .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e2e8f0;
+    }
+
+    /* ---------- LINKS ---------- */
+    .login-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .login-links a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.87rem;
+        color: #475569;
+        text-decoration: none;
+        padding: 0.55rem 0.85rem;
+        border-radius: 8px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .login-links a:hover {
+        background: #eff6ff;
+        border-color: rgba(79, 140, 255, 0.35);
+        color: #1e40af;
+    }
+
+    .login-links a i.link-arrow {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .login-links a:hover i.link-arrow {
+        color: #4f8cff;
+        transform: translateX(3px);
+    }
+
+    .login-links a.primary-link {
+        color: #4f8cff;
+        background: rgba(79, 140, 255, 0.08);
+        border-color: rgba(79, 140, 255, 0.25);
+        font-weight: 600;
+    }
+    .login-links a.primary-link:hover {
+        background: rgba(79, 140, 255, 0.14);
+        color: #2563eb;
+    }
+
+    /* ============================================================
+       RESPONSIVE – TABLET
+       ============================================================ */
+    @media (max-width: 991.98px) {
+        .login-page {
+            padding: 1.75rem 1rem 3rem;
+        }
+        .login-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 520px;
+        }
+        .welcome-panel {
+            padding: 2rem 1.75rem;
+        }
+        .welcome-panel h2 { font-size: 1.45rem; }
+        .login-card {
+            padding: 2rem 1.75rem;
+        }
+    }
+
+    /* ============================================================
+       RESPONSIVE – MOBILE
+       ============================================================ */
+    @media (max-width: 767.98px) {
+        .login-page { padding: 1.25rem 0.75rem 2.5rem; }
+        .welcome-panel {
+            padding: 1.75rem 1.35rem;
+            border-radius: 14px;
+        }
+        .welcome-brand .brand-mark {
+            width: 40px; height: 40px; font-size: 1.15rem;
+        }
+        .welcome-brand .brand-text { font-size: 0.95rem; }
+        .welcome-brand .brand-text span { font-size: 0.65rem; }
+
+        .welcome-panel h2 { font-size: 1.25rem; }
+        .welcome-panel p.lead { font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .feature-list li { font-size: 0.88rem; }
+        .feature-list li i {
+            width: 28px; height: 28px; font-size: 0.85rem;
+        }
+
+        .login-card {
+            padding: 1.75rem 1.35rem;
+            border-radius: 14px;
+        }
+        .login-head .login-icon {
+            width: 48px; height: 48px; font-size: 1.25rem;
+        }
+        .login-head h3 { font-size: 1.3rem; }
+        .login-head p { font-size: 0.85rem; }
+
+        .input-wrap input {
+            padding: 0.75rem 0.9rem 0.75rem 2.5rem;
+            font-size: 0.92rem;
+        }
+        .input-wrap .input-icon { left: 0.85rem; font-size: 0.88rem; }
+        .input-wrap .toggle-icon { right: 0.85rem; font-size: 0.88rem; }
+
+        .btn-login { padding: 0.85rem 1.25rem; font-size: 0.94rem; }
+
+        .login-links a { font-size: 0.82rem; padding: 0.5rem 0.75rem; }
+    }
+
+    /* ============================================================
+       VERY SMALL (≤ 420px)
+       ============================================================ */
+    @media (max-width: 420px) {
+        .welcome-panel { padding: 1.5rem 1.15rem; }
+        .login-card { padding: 1.5rem 1.15rem; }
+        .feature-list li { font-size: 0.84rem; }
+    }
+</style>
+{% endblock extra_css %}
 
 {% block content %}
 
-        <!-- Flashed Messages -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                   <div class='msg'> {{ message }} </div>
-                  </div> 
-            {% endfor %}
-        {% endif %}
-
-        <!-- Right Side - Login Form -->
-        <div class="Loginpage">
-            <div class="log-icon">
-                <h3>User Login</h3>
-                <img src="{% static 'icons/loginicon.png' %}" alt="Login Icon">
+    <!-- FLASH MESSAGES -->
+    {% if messages %}
+    <div class="msg-wrap">
+        {% for message in messages %}
+            <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
+                {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <span>{{ message }}</span>
             </div>
-            
-            <form method="POST" action="{% url 'login' %}">
+        {% endfor %}
+    </div>
+    {% endif %}
+
+<div class="login-page">
+
+    <div class="login-layout">
+
+        <!-- ============ LEFT: WELCOME / FEATURES ============ -->
+        <aside class="welcome-panel">
+
+            <div class="welcome-brand">
+                <div class="brand-mark">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="brand-text">
+                    MF Recommend
+                    <span>AI Powered</span>
+                </div>
+            </div>
+
+            <h2>Welcome back to smarter investing.</h2>
+            <p class="lead">
+                Sign in to access personalised fund recommendations, live SIP projections,
+                and portfolio insights — all powered by AI.
+            </p>
+
+            <ul class="feature-list">
+                <li>
+                    <i class="fas fa-brain"></i>
+                    <span>AI-driven mutual fund recommendations tailored to your goals</span>
+                </li>
+                <li>
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Real-time SIP and lump-sum investment projections</span>
+                </li>
+                <li>
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure, encrypted access to your personalised dashboard</span>
+                </li>
+                <li>
+                    <i class="fas fa-clock"></i>
+                    <span>Track your investments anytime, from any device</span>
+                </li>
+            </ul>
+
+            <div class="welcome-footer">
+                New to the platform? <a href="{% url 'newuser' %}">Create an account</a>
+            </div>
+
+        </aside>
+
+        <!-- ============ RIGHT: LOGIN FORM ============ -->
+        <div class="login-card">
+
+            <div class="login-head">
+                <div class="login-icon">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <h3>User Login</h3>
+                <p>Enter your credentials to continue</p>
+            </div>
+
+            <form method="POST" action="{% url 'login' %}" novalidate>
                 {% csrf_token %}
+
+                <!-- Username -->
                 <div class="form-group">
-                    <div class="password-container">
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username" autocomplete="off" required>
+                    <label for="username">Username</label>
+                    <div class="input-wrap">
+                        <input type="text" id="username" name="username"
+                               placeholder="Enter your username"
+                               autocomplete="username" required>
+                        <i class="fas fa-user input-icon"></i>
                     </div>
                 </div>
+
+                <!-- Password -->
                 <div class="form-group">
-                    <div class="password-container">
-                        <input type="password" id="password" name="password" placeholder="Enter Password" autocomplete="off" required>
-                        <i class="fa-solid fa-eye toggle-icon" id="togglePassword" onclick="togglePassword()"></i>
-                    </div>                   
+                    <label for="password">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="password" name="password"
+                               placeholder="Enter your password"
+                               autocomplete="current-password" required>
+                        <i class="fas fa-lock input-icon"></i>
+                        <i class="fa-solid fa-eye toggle-icon" id="togglePassword"
+                           onclick="togglePassword()" aria-label="Show password"></i>
+                    </div>
                 </div>
-                <button type="submit">SUBMIT</button>
-                <div class="link">
-                    <a href="/forgetpass">Forgot password?</a>
-                    <a href="/forgetusername">Forgot username?</a>
-                    <a href="{% url 'newuser' %}">New user?</a>
-                    <a href="/">← Back to Home</a>
-                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
             </form>
+
+            <!-- Divider -->
+            <div class="divider">Need help?</div>
+
+            <!-- Links -->
+            <div class="login-links">
+                <a href="/forgetpass">
+                    <span><i class="fas fa-key me-2"></i> Forgot password?</span>
+                    <i class="fas fa-chevron-right link-arrow"></i>
+                </a>
+                <a href="/forgetusername">
+                    <span><i class="fas fa-user-question me-2"></i> Forgot username?</span>
+                    <i class="fas fa-chevron-right link-arrow"></i>
+                </a>
+                <a href="{% url 'newuser' %}" class="primary-link">
+                    <span><i class="fas fa-user-plus me-2"></i> Create a new account</span>
+                    <i class="fas fa-chevron-right link-arrow"></i>
+                </a>
+            </div>
+
         </div>
+
     </div>
- </div>
+
+</div>
 
 {% endblock content %}
 
-<!-- java script code -->
-{% block js_code %} 
-  <script src="{% static 'javascript/allmessage.js' %}"></script>
-  <script src="{% static 'javascript/login.js' %}"></script>
+{% block js_code %}
+<script src="{% static 'javascript/allmessage.js' %}"></script>
+<script src="{% static 'javascript/login.js' %}"></script>
+<script>
+    /* ==========================================================
+       Password toggle (inline fallback if login.js is missing)
+       ========================================================== */
+    function togglePassword() {
+        const pw = document.getElementById('password');
+        const icon = document.getElementById('togglePassword');
+        if (!pw || !icon) return;
+        if (pw.type === 'password') {
+            pw.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            icon.setAttribute('aria-label', 'Hide password');
+        } else {
+            pw.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            icon.setAttribute('aria-label', 'Show password');
+        }
+    }
+</script>
 {% endblock js_code %}

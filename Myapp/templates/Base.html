@@ -8,166 +8,376 @@
     <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
     <!-- Bootstrap 5.1.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        /* Base Styles */
+
+    <!-- Font Awesome 6.5.1 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<style>
+    /* ============================================================
+       GLOBAL / BASE
+       ============================================================ */
+    body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f7fa;
+    }
+
+    /* ============================================================
+       BRAND IMAGE
+       ============================================================ */
+    .navbar-brand-img {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        flex-shrink: 0;
+        gap: 0.5rem;
+    }
+
+    .navbar-brand-img img {
+        height: 42px;
+        width: 42px;
+        object-fit: cover;
+        border-radius: 100%;
+        border: 2px solid rgba(255, 255, 255, 0.18);
+        transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        display: block;
+    }
+
+    .navbar-brand-img:hover img,
+    .navbar-brand-img:focus img {
+        transform: scale(1.06);
+        border-color: #4f8cff;
+        box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.15);
+    }
+
+    .app-brand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+    }
+    .app-brand-text .name {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: -0.2px;
+    }
+    .app-brand-text .tag {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 2px;
+    }
+
+    /* ============================================================
+       NAVBAR – base
+       ============================================================ */
+    .navbar {
+        background-color: #0f172a !important;
+        padding: 0 !important;
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+    }
+
+    /* ---------- FLASH MESSAGES ---------- */
+    .msg-wrap {
+        max-width: 1080px;
+        margin: 20px auto;
+    }
+    .msg-box {
+        padding: 0.85rem 1.1rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+        border-left: 4px solid;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .msg-box i { font-size: 1rem; }
+    .msg-box.error   { background: #fef2f2; color: #991b1b; border-left-color: #dc2626; }
+    .msg-box.success { background: #f0fdf4; color: #166534; border-left-color: #16a34a; }
+    .msg-box.warning { background: #fffbeb; color: #92400e; border-left-color: #f59e0b; }
+    .msg-box.info    { background: #eff6ff; color: #1e40af; border-left-color: #3b82f6; }
+
+    /* ============================================================
+       TABLET / MOBILE MENU  (max-width: 1023.98px)
+       ============================================================ */
+    @media (max-width: 1023.98px) {
+
+        /* Navbar fixed at top — very high z-index so panel escapes overlay */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            z-index: 1070;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
+            padding-top: 60px;
+        }
+
+        /* Container: brand LEFT, hamburger RIGHT */
+        .navbar > .container-fluid {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            height: 60px;
+            padding: 0 15px !important;
+            background-color: #0f172a;
+            position: relative;
+            z-index: 1085;
+        }
+
+        .navbar-brand-img img {
+            height: 40px;
+            width: 40px;
+        }
+
+        /* Hamburger toggle */
+        .navbar-toggler {
+            position: static !important;
+            display: block !important;
+            order: 2;
+            margin-left: auto;
+            z-index: 1085;
+            background-color: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 8px 10px;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-toggler:hover {
+            background-color: rgba(79, 140, 255, 0.15);
+            border-color: rgba(79, 140, 255, 0.4);
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.35);
+            outline: none;
+        }
+
+        /* Slide-in panel — fully opaque, top-anchored content */
+        .navbar-collapse {
+            position: fixed !important;
+            top: 0 !important;
+            left: -80% !important;
+            width: 80% !important;
+            max-width: 320px;
+            height: 100vh !important;
+            background-color: #0f172a !important;
+            transition: left 0.3s ease !important;
+            z-index: 1080 !important;
+            padding: 60px 0 0 0 !important;
+            margin: 0 !important;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.55);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            display: block !important;
+
+            /* Aligns content to top */
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+
+        /* Off-screen — hide completely */
+        .navbar-collapse:not(.show) {
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .navbar-collapse.show {
+            left: 0 !important;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        /* Nav list — VERTICAL, TOP-ALIGNED */
+        .navbar-nav {
+            flex-direction: column !important;
+            justify-content: flex-start !important;   /* ← KEY FIX: was "evenly" from HTML */
+            align-items: stretch !important;
+            width: 100%;
+            padding: 0 !important;
+            gap: 0 !important;
+            margin: 0 !important;
+        }
+
+        .nav-item {
+            width: 100% !important;
+            padding: 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Nav links — mobile: top-left aligned, full width */
+        .nav-link {
+            color: #cbd5e1 !important;
+            display: block !important;
+            padding: 14px 20px !important;
+            width: 100%;
+            font-weight: 500;
+            font-size: 0.98rem;
+            letter-spacing: 0.2px;
+            text-align: left !important;
+            border-left: 3px solid transparent !important;
+            border-radius: 0 !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
+            transition: all 0.18s ease;
+        }
+
+        .nav-link:hover {
+            color: #ffffff !important;
+            background-color: rgba(79, 140, 255, 0.08) !important;
+            border-left-color: #4f8cff !important;
+        }
+
+        .nav-link.active {
+            color: #ffffff !important;
+            font-weight: 600;
+            background-color: rgba(79, 140, 255, 0.14) !important;
+            border-left-color: #4f8cff !important;
+            box-shadow: none !important;
+        }
+
+        /* Overlay — NO blur, sits BELOW the panel */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.72);
+            z-index: 1060;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .navbar-collapse.show ~ .menu-overlay {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Hide tooltips in mobile */
+        .tooltip-text {
+            display: none !important;
+        }
+    }
+
+    /* ============================================================
+       DESKTOP STYLES  (min-width: 1024px)
+       ============================================================ */
+    @media (min-width: 1024px) {
+        .navbar {
+            padding: 0.55rem 1.75rem !important;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            padding-top: 0;
+        }
+
+        /* Hide overlay + hamburger on desktop */
+        .menu-overlay {
+            display: none !important;
+        }
+        .navbar-toggler {
+            display: none !important;
+        }
+
+        /* Container: brand LEFT, nav right */
+        .navbar > .container-fluid {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 2rem;
+            padding: 0 !important;
+        }
+
+        /* Reset all mobile props */
+        .navbar-collapse {
+            position: static !important;
+            left: auto !important;
+            top: auto !important;
+            width: auto !important;
+            height: auto !important;
+            max-width: none !important;
+            background-color: transparent !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            overflow: visible !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            flex-grow: 0 !important;
+            pointer-events: auto !important;
+            visibility: visible !important;
+        }
+
+        /* Nav list – horizontal */
+        .navbar-nav {
+            flex-direction: row !important;
+            justify-content: flex-end !important;
+            align-items: center;
+            gap: 0.35rem;
+            margin-left: auto;
             padding: 0;
         }
-        
-        /* Mobile Menu Styles */
-        @media (max-width: 991.98px) {
-            /* Show only toggle button */
-            .navbar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 60px;
-                background-color: transparent !important;
-                padding: 0 !important;
-                z-index: 1030;
-            }
-            
-            body {
-                padding-top: 60px;
-            }
-            
-            /* Toggle button styling */
-            .navbar-toggler {
-                position: fixed;
-                left: 15px;
-                top: 15px;
-                z-index: 1060;
-                background-color: #343a40;
-                border: 1px solid rgba(255,255,255,0.1);
-            }
-            
-            /* Mobile menu panel - initially inactive */
-            .navbar-collapse {
-                position: fixed;
-                top: 0;
-                left: -80%;
-                width: 80%;
-                height: 100vh;
-                background-color: #343a40;
-                transition: left 0.3s ease;
-                z-index: 1050;
-                padding-top: 60px;
-                overflow-y: auto;
-            }
-            
-            /* Active state when shown */
-            .navbar-collapse.show {
-                left: 0;
-                pointer-events: auto;
-            }
-            
-            /* Nav links styling */
-            .navbar-nav {
-                flex-direction: column;
-                width: 100%;
-            }
-            
-            .nav-item {
-                width: 100%;
-                padding: 12px 15px;
-                border-bottom: 1px solid rgba(255,255,255,0.1);
-            }
-            
-            .nav-link {
-                color: white !important;
-                display: block;
-                padding: 8px 0;
-                width: 100%;
-            }
-            
-            /* Active link styling */
-            .nav-link.active {
-                font-weight: bold;
-                background-color: rgba(255,255,255,0.1);
-            }
-            
-            /* Overlay */
-            .menu-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.5);
-                z-index: 1040;
-                display: none;
-            }
-            
-            .navbar-collapse.show + .menu-overlay {
-                display: block;
-            }
-              /* Hide tooltips when either mobile menu is open */
-            .navbar-collapse-mobile.show ~ .tooltip-text,
-            .profile-collapse-mobile.show ~ .tooltip-text,
-            .navbar-collapse-mobile.show ~ * .tooltip-text,
-            .profile-collapse-mobile.show ~ * .tooltip-text,
-            .navbar-collapse-mobile.show .tooltip-text,
-            .profile-collapse-mobile.show .tooltip-text {
-              display: none !important;
-              visibility: hidden !important;
-              opacity: 0 !important;
-              pointer-events: none !important;
-            }
 
-            /* Optional: Hide ALL tooltips by default in mobile view */
-            .tooltip-text {
-              display: none !important;
-            }
+        .nav-item {
+            width: auto;
+            padding: 0;
+            border-bottom: none;
         }
-        
-        /* Desktop Styles */
-        @media (min-width: 992px) {
-            .navbar {
-                background-color: #343a40 !important;
-                padding: 0.5rem 1rem !important;
-            }
-            
-            body {
-                padding-top: 0;
-            }
-            
-            .menu-overlay {
-                display: none !important;
-            }
-            
-            /* Reset mobile-specific styles */
-            .navbar-collapse {
-                position: relative;
-                left: auto;
-                width: auto;
-                height: auto;
-                background-color: transparent;
-                padding-top: 0;
-            }
-            
-            .navbar-nav {
-                flex-direction: row !important;
-            }
-            
-            .nav-item {
-                width: auto;
-                padding: 0;
-                border-bottom: none;
-            }
-            
-            .nav-link {
-                padding: 0.5rem 1rem !important;
-            }
-            
-            .nav-link.active {
-                font-weight: bold;
-                background-color: rgba(255,255,255,0.1);
-            }
+
+        /* Nav links – desktop */
+        .nav-link {
+            color: #cbd5e1 !important;
+            padding: 0.55rem 1.15rem !important;
+            font-weight: 500;
+            font-size: 0.93rem;
+            letter-spacing: 0.25px;
+            border-radius: 8px;
+            position: relative;
+            border-left: none !important;
+            background-color: transparent !important;
+            transition: color 0.2s ease, background-color 0.2s ease;
         }
-    </style>
+
+        .nav-link:hover {
+            color: #ffffff !important;
+            background-color: rgba(79, 140, 255, 0.12) !important;
+        }
+
+        .nav-link.active {
+            color: #ffffff !important;
+            font-weight: 600;
+            background-color: #4f8cff !important;
+            box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+        }
+
+        .nav-link.active:hover {
+            background-color: #3b7bf0 !important;
+            color: #ffffff !important;
+        }
+    }
+</style>
+    {% block extra_head %}{% endblock %}
     {% block extra_css %}{% endblock %}
 </head>
 
@@ -175,6 +385,17 @@
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
+
+            <!-- Brand image (LEFT on all devices) -->
+            <a href="/" class="navbar-brand-img" aria-label="Go to Home">
+                <img src="{% static 'favicon/favicon.webp' %}" alt="Brand Logo">
+                <div class="app-brand-text">
+                    <span class="name">MF Recommender</span>
+                    <span class="tag">AI Powered</span>
+                </div>
+            </a>
+
+            <!-- Hamburger toggle (RIGHT on mobile/tablet) -->
             <button class="navbar-toggler" type="button"
                     data-bs-toggle="collapse" data-bs-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false"
@@ -185,27 +406,28 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav w-100 d-flex justify-content-evenly">
                     <li class="nav-item px-2">
-                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'landing_page' %}active{% endif %}" 
+                        href="{% url 'landing_page' %}">Home</a>
                     </li>
                     <li class="nav-item px-2">
-                        <a class="nav-link {% if request.path == about_url %}active{% endif %}" 
-                           href="{% url 'about' %}">About Us</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" 
+                        href="{% url 'about' %}">About Us</a>
                     </li>
                     <li class="nav-item px-2">
-                        <a class="nav-link {% if request.path == sip_url %}active{% endif %}" 
-                           href="{% url 'sip_calculator' %}">SIP Calculator</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'sip_calculator' %}active{% endif %}" 
+                        href="{% url 'sip_calculator' %}">SIP Calculator</a>
                     </li>
                     <li class="nav-item px-2">
-                        <a class="nav-link {% if request.path == contact_url %}active{% endif %}" 
-                           href="{% url 'contact' %}">Contact Us</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" 
+                        href="{% url 'contact' %}">Contact Us</a>
                     </li>
                     <li class="nav-item px-2">
-                        <a class="nav-link {% if request.path == login_url %}active{% endif %}" 
-                           href="{% url 'login' %}">User Login</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" 
+                        href="{% url 'login' %}">User Login</a>
                     </li>
                     <li class="nav-item px-2">
-                        <a class="nav-link {% if request.path == '/admin/' %}active{% endif %}" 
-                           href="/admin">Admin Login</a>
+                        <a class="nav-link {% if request.path|slice:':7' == '/admin/' %}active{% endif %}" 
+                        href="/admin">Admin Login</a>
                     </li>
                 </ul>
             </div>
@@ -232,45 +454,90 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Bootstrap Collapse
-        const navbar = document.getElementById('navbarNav');
-        const bsCollapse = new bootstrap.Collapse(navbar, {
-            toggle: false
-        });
-        
-        // Overlay click handler
-        document.querySelector('.menu-overlay').addEventListener('click', function() {
-            bsCollapse.hide();
-        });
-        
-        // Handle window resize
-        function handleResize() {
-            if (window.innerWidth >= 992) {
-                // Always show navbar in desktop view
-                bsCollapse.show();
-                document.querySelector('.menu-overlay').style.display = 'none';
-            } else {
-                // Hide navbar in mobile view by default
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const navbarEl = document.getElementById('navbarNav');
+    const overlay  = document.querySelector('.menu-overlay');
+
+    // Initialize Bootstrap Collapse (don't auto-toggle)
+    const bsCollapse = new bootstrap.Collapse(navbarEl, {
+        toggle: false
+    });
+
+    // ----------------------------------------------------------
+    // FORCE CLOSE on page load if on mobile width
+    // ----------------------------------------------------------
+    function ensureCorrectState() {
+        if (window.innerWidth < 1024) {
+            // Mobile/tablet: menu must be closed by default
+            if (navbarEl.classList.contains('show')) {
                 bsCollapse.hide();
             }
+            overlay.style.display = 'none';
+        } else {
+            // Desktop: menu must be visible (no off-screen effect)
+            navbarEl.classList.remove('show');
+            navbarEl.style.removeProperty('left');
+            overlay.style.display = 'none';
         }
-        
-        window.addEventListener('resize', handleResize);
-        handleResize(); // Initialize
-        
-        // Make all links always clickable in both views
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth < 992) {
-                    // Close menu after clicking a link in mobile view
-                    bsCollapse.hide();
-                }
-            });
+    }
+
+    ensureCorrectState();
+
+    // Run again after a short delay to catch any Bootstrap init race conditions
+    setTimeout(ensureCorrectState, 50);
+
+    // ----------------------------------------------------------
+    // Overlay click closes menu
+    // ----------------------------------------------------------
+    overlay.addEventListener('click', function() {
+        bsCollapse.hide();
+    });
+
+    // ----------------------------------------------------------
+    // Handle window resize
+    // ----------------------------------------------------------
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(ensureCorrectState, 100);
+    });
+
+    // ----------------------------------------------------------
+    // Close menu on nav link click (mobile only)
+    // ----------------------------------------------------------
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+        link.addEventListener('click', function() {
+            if (window.innerWidth < 1024) {
+                bsCollapse.hide();
+            }
         });
     });
-    </script>
+
+    // ----------------------------------------------------------
+    // Sync overlay display with collapse state
+    // ----------------------------------------------------------
+    navbarEl.addEventListener('show.bs.collapse', function() {
+        if (window.innerWidth < 1024) {
+            overlay.style.display = 'block';
+            requestAnimationFrame(function() {
+                overlay.style.opacity = '1';
+            });
+        }
+    });
+
+    navbarEl.addEventListener('hide.bs.collapse', function() {
+        overlay.style.opacity = '0';
+        setTimeout(function() {
+            if (window.innerWidth < 1024) {
+                overlay.style.display = 'none';
+            }
+        }, 250);
+    });
+
+});
+</script>
     {% block js_code %}{% endblock %}
 </body>
 </html>

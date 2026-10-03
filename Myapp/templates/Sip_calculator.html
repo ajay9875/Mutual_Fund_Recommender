@@ -1,161 +1,436 @@
+{% extends "Base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/Sip_calculator.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Header.css' %}">
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
-    <title>SIP Calculator & Portfolio Tracker | Django Automation</title>
-    <meta name="description" content="Reduce manual calculation time by 89% with our automated SIP tracker and financial planning tool.">
 
-    <script type="application/ld+json">
-    {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Django SIP Calculator",
-    "description": "Automated portfolio tracking and SIP calculation platform.",
-    "category": "FinancialTool"
+{% block title %}SIP Calculator | AI Powered Mutual Fund Recommendation{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sip-page {
+        background-color: #f5f7fa;
+        min-height: calc(100vh - 120px);
+        padding: 2.5rem 1rem 4rem;
     }
-    </script>
-</head>
-<body>
-    <!-- Reusable Header -->
-    <header class="header">
-        SIP Calculator
-    </header>
-    <div class="home">
-        <a href="/" class="btn">
-            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
-        </a>
-        <div class="tooltip-text">
-            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
+
+    .sip-container { max-width: 1100px; margin: 0 auto; }
+
+    .page-header { text-align: center; margin-bottom: 2.5rem; }
+    .page-header h1 {
+        font-size: 2rem; font-weight: 700; color: #0f172a;
+        margin: 0 0 0.5rem; letter-spacing: -0.5px;
+    }
+    .page-header p {
+        font-size: 1rem; color: #64748b; margin: 0 auto; max-width: 620px;
+    }
+
+    /* ============================================================
+       TWO-COLUMN LAYOUT — both cards stretch to same height
+       ============================================================ */
+    .sip-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        align-items: stretch;   /* ← equal-height cards */
+    }
+
+    .form-card, .result-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 2.25rem 2rem;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;       /* ← prevents internal overflow */
+    }
+
+    /* ---------- FORM CARD ---------- */
+    .form-card h2 {
+        font-size: 1.4rem; font-weight: 700; color: #0f172a;
+        margin: 0 0 1.75rem; text-align: center;
+    }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label {
+        display: block; font-size: 0.9rem; font-weight: 600;
+        color: #334155; margin-bottom: 0.5rem;
+    }
+    .form-group input {
+        width: 100%; padding: 0.85rem 1rem;
+        border: 1.5px solid #e2e8f0; border-radius: 10px;
+        font-size: 1rem; color: #0f172a; background: #f8fafc;
+        transition: all 0.2s ease; box-sizing: border-box;
+    }
+    .form-group input:focus {
+        outline: none; border-color: #4f8cff; background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+    }
+    .form-group input::placeholder { color: #94a3b8; }
+
+    .btn-calculate {
+        width: 100%; padding: 0.95rem 1.5rem;
+        background: linear-gradient(135deg, #4f8cff 0%, #3b7bf0 100%);
+        color: #fff; border: none; border-radius: 10px;
+        font-size: 1rem; font-weight: 600; cursor: pointer;
+        margin-top: 0.5rem; transition: all 0.25s ease;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+    }
+    .btn-calculate:hover {
+        background: linear-gradient(135deg, #3b7bf0 0%, #2563eb 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+    }
+
+    /* ---------- RESULT CARD ---------- */
+    .result-title {
+        font-size: 0.95rem; color: #64748b; text-align: center;
+        margin: 0 0 0.5rem; font-weight: 500;
+    }
+    .result-total {
+        font-size: 1.9rem; font-weight: 700; color: #2e7d32;
+        text-align: center; margin: 0 0 1.25rem;
+        letter-spacing: -0.5px;
+    }
+
+    .result-details {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 0.85rem; margin-bottom: 1rem;
+    }
+    .result-detail {
+        background: #f8fafc; border-radius: 12px;
+        padding: 0.85rem 0.75rem; text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+    .result-detail h3 {
+        font-size: 0.75rem; color: #64748b; margin: 0 0 0.35rem;
+        font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .result-detail p {
+        font-size: 1.05rem; font-weight: 700; margin: 0;
+        letter-spacing: -0.3px;
+    }
+    .result-detail:nth-child(1) p { color: #f76a06; }
+    .result-detail:nth-child(2) p { color: #4bc0c0; }
+
+    /* ---------- PIE CHART WRAPPER ----------
+       flex: 1 → fills remaining vertical space in the result card
+       so the chart area matches the form card height exactly
+    */
+    .chart-wrap {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;    /* ← charts stack vertically with legend below */
+        align-items: center;
+        justify-content: center;
+        min-height: 0;              /* allow flex to shrink */
+        padding: 0.5rem 0;
+    }
+    .chart-inner {
+        position: relative;
+        width: 100%;
+        max-width: 240px;
+        max-height: 100%;
+        aspect-ratio: 1 / 1;
+    }
+
+    /* Center label overlay showing Total */
+    .pie-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        pointer-events: none;
+        z-index: 2;
+        width: 90px;
+    }
+    .pie-center .pie-center-lbl {
+        display: block;
+        font-size: 0.58rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 2px;
+    }
+    .pie-center .pie-center-val {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #0f172a;
+        letter-spacing: -0.3px;
+        line-height: 1.15;
+    }
+
+    /* ---------- EMPTY STATE ---------- */
+    .empty-state {
+        flex: 1;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 2rem 1rem; text-align: center; color: #64748b;
+    }
+    .empty-state i {
+        font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem; display: block;
+    }
+    .empty-state p { font-size: 0.95rem; margin: 0; max-width: 260px; }
+
+    /* ---------- FLASH ---------- */
+    .msg-wrap { margin-bottom: 1.25rem; }
+    .msg-box {
+        padding: 0.85rem 1.1rem; border-radius: 10px;
+        font-size: 0.92rem; font-weight: 500;
+        margin-bottom: 0.75rem; border-left: 4px solid;
+    }
+    .msg-box.error   { background: #fef2f2; color: #991b1b; border-left-color: #dc2626; }
+    .msg-box.success { background: #f0fdf4; color: #166534; border-left-color: #16a34a; }
+    .msg-box.warning { background: #fffbeb; color: #92400e; border-left-color: #f59e0b; }
+    .msg-box.info    { background: #eff6ff; color: #1e40af; border-left-color: #3b82f6; }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 991.98px) {
+        .sip-page { padding: 1.75rem 1rem 3rem; }
+        .sip-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+        .page-header h1 { font-size: 1.7rem; }
+        .form-card, .result-card { padding: 1.75rem 1.5rem; }
+        .chart-wrap { min-height: 240px; }
+        .chart-inner { max-width: 220px; }
+    }
+    @media (max-width: 767.98px) {
+        .sip-page { padding: 1.25rem 0.75rem 2.5rem; }
+        .page-header { margin-bottom: 1.75rem; }
+        .page-header h1 { font-size: 1.4rem; }
+        .page-header p { font-size: 0.9rem; }
+        .form-card, .result-card { padding: 1.5rem 1.25rem; border-radius: 14px; }
+        .form-card h2 { font-size: 1.2rem; margin-bottom: 1.35rem; }
+        .form-group input { padding: 0.75rem 0.9rem; font-size: 0.95rem; }
+        .btn-calculate { padding: 0.85rem 1.25rem; font-size: 0.95rem; }
+        .result-total { font-size: 1.6rem; }
+        .result-detail h3 { font-size: 0.7rem; }
+        .result-detail p { font-size: 0.98rem; }
+        .chart-wrap { min-height: 220px; }
+        .chart-inner { max-width: 200px; }
+        .pie-center { width: 80px; }
+        .pie-center .pie-center-val { font-size: 0.8rem; }
+    }
+    @media (max-width: 420px) {
+        .result-details { grid-template-columns: 1fr; }
+        .chart-wrap { min-height: 200px; }
+        .chart-inner { max-width: 180px; }
+    }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+
+<div class="sip-page">
+    <div class="sip-container">
+
+        <div class="page-header">
+            <h1>SIP Calculator</h1>
+            <p>Estimate the future value of your systematic investment plan with accurate projections.</p>
         </div>
-    </div>
 
-    <div class="left">
-      <div class="form-container">
-        <h2 style="text-align: center; color: #333;">SIP Calculator</h2>
-        <form method="post">
-            {% csrf_token %}
-            <label>Monthly Investment (₹)</label>
-            <input type="number" name="monthly_investment" placeholder="eg. 1000, 2000 or 3000..." required>
-
-            <label>Expected Annual Return (%)</label>
-            <input type="number" name="annual_return" step="0.1" placeholder="eg. 8 or 8.0..." required>
-
-            <label>Investment Duration (Years)</label>
-            <input type="number" name="investment_duration" placeholder="eg. 8 or 10...." required>
-
-            <button type="submit">Calculate</button>
-        </form>
-          <div class="home-btn">
-            <a href="/">← Back to Home</a>
-           </div>
-        </div>
-    </div>
-      <div class="right">
-        {% if calculated %}
-        {% for message in messages %}
-            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                <div class='msg'> {{ message }} </div>
-              </div> 
-            </div>
+        {% if messages %}
+        <div class="msg-wrap">
+            {% for message in messages %}
+                <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
             {% endfor %}
-        <div class="result">
-            <p class="result-title">The total value of your investment after {{ investment_duration }} Years will be</p>
-            <p class="result-total">₹{{ future_value }}</p>
-            
-            <div class="result-details">
-                <div class="result-detail">
-                    <h3>Invested Amount</h3>
-                    <p>₹{{ invested_amount }}</p>
-                </div>
-                <div class="result-detail">
-                    <h3>Est. Returns</h3>
-                    <p>₹{{ gain }}</p>
-                </div>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="sipChart"></canvas>
-            </div>
         </div>
+        {% endif %}
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const ctx = document.getElementById('sipChart').getContext('2d');
-                const invested = parseFloat("{{ invested_amount }}".replace(/,/g, ''));
-                const returns = parseFloat("{{ gain }}".replace(/,/g, ''));
-                
-                const sipChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Invested Amount', 'Estimated Returns'],
-                        datasets: [{
-                            data: [invested, returns],
-                            backgroundColor: [
-                                'rgb(247, 106, 6)',
-                                '#4bc0c0'
-                            ],
-                            borderColor: [
-                                '#ffffff',
-                                '#ffffff'
-                            ],
-                            borderWidth: 2,
-                            cutout: '70%'
-                        }]
+        <div class="sip-layout">
+
+            <!-- FORM -->
+            <div class="form-card">
+                <h2>Enter Investment Details</h2>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="monthly_investment">Monthly Investment (₹)</label>
+                        <input type="number" id="monthly_investment" name="monthly_investment"
+                               placeholder="e.g. 1000, 2000 or 3000" required min="1" step="any">
+                    </div>
+                    <div class="form-group">
+                        <label for="annual_return">Expected Annual Return (%)</label>
+                        <input type="number" id="annual_return" name="annual_return"
+                               step="0.1" placeholder="e.g. 8 or 8.0" required min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="investment_duration">Investment Duration (Years)</label>
+                        <input type="number" id="investment_duration" name="investment_duration"
+                               placeholder="e.g. 8 or 10" required min="1" step="1">
+                    </div>
+                    <button type="submit" class="btn-calculate">
+                        <i class="fas fa-calculator me-2"></i> Calculate
+                    </button>
+                </form>
+            </div>
+
+            <!-- RESULT -->
+            <div class="result-card">
+                {% if calculated %}
+                    <p class="result-title">Total value of your investment after {{ investment_duration }} years</p>
+                    <p class="result-total">₹{{ future_value }}</p>
+
+                    <div class="result-details">
+                        <div class="result-detail">
+                            <h3>Invested Amount</h3>
+                            <p>₹{{ invested_amount }}</p>
+                        </div>
+                        <div class="result-detail">
+                            <h3>Est. Returns</h3>
+                            <p>₹{{ gain }}</p>
+                        </div>
+                    </div>
+
+                    <div class="chart-wrap">
+                        <div class="chart-inner">
+                            <canvas id="sipChart"></canvas>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-chart-pie"></i>
+                        <p>Your result will appear here once the calculation is complete.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block js_code %}
+{% if calculated %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    function fmtFull(v) {
+        return '₹' + v.toLocaleString('en-IN');
+    }
+
+    function renderChart() {
+        const canvas = document.getElementById('sipChart');
+        if (!canvas) return false;
+        if (typeof Chart === 'undefined') return false;
+        if (canvas.dataset.rendered === '1') return true;
+
+        const invested = parseFloat("{{ invested_amount }}".replace(/,/g, '')) || 0;
+        const returns  = parseFloat("{{ gain }}".replace(/,/g, '')) || 0;
+        const total    = invested + returns;
+
+        if (total <= 0) return false;
+
+        canvas.dataset.rendered = '1';
+        const ctx = canvas.getContext('2d');
+
+        // ============================================================
+        // MINIMUM VISUAL SHARE — ensures the smaller slice is always
+        // visible on the pie chart. The REAL values are still shown
+        // in tooltips and in the result detail cards above.
+        // ============================================================
+        const MIN_SHARE = 0.06;   // 6% minimum visible slice
+        let vInvested = invested;
+        let vReturns  = returns;
+
+        if (invested > 0 && invested / total < MIN_SHARE) {
+            vInvested = MIN_SHARE * total;
+            vReturns  = total - vInvested;
+        } else if (returns > 0 && returns / total < MIN_SHARE) {
+            vReturns  = MIN_SHARE * total;
+            vInvested = total - vReturns;
+        }
+
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Invested Amount', 'Estimated Returns'],
+                datasets: [{
+                    data: [vInvested, vReturns],   // visual values only
+                    backgroundColor: ['#f76a06', '#4bc0c0'],
+                    hoverBackgroundColor: ['#e05a00', '#3aa8a8'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: { padding: 4 },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        align: 'center',           /* ← items are centered horizontally */
+                        maxHeight: 60,  
+                        labels: {
+                            boxWidth: 12,
+                            padding: 12,
+                            font: { size: 12, weight: '500' },
+                            color: '#334155',
+                            /* ✅ ONLY labels — no amount, no percentage */
+                            generateLabels: function (chart) {
+                                const data = chart.data;
+                                if (!data.labels.length || !data.datasets.length) return [];
+                                const ds = data.datasets[0];
+                                return data.labels.map(function (label, i) {
+                                    return {
+                                        text: label,
+                                        fillStyle: ds.backgroundColor[i],
+                                        strokeStyle: ds.backgroundColor[i],
+                                        lineWidth: 0,
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                        }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    boxWidth: 12,
-                                    padding: 20,
-                                    font: {
-                                        size: 12
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.raw || 0;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = Math.round((value / total) * 100);
-                                        return `${label}: ₹${value.toLocaleString()} (${percentage}%)`;
-                                    }
-                                }
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: { size: 13, weight: '600' },
+                        bodyFont: { size: 12 },
+                        callbacks: {
+                            label: function (context) {
+                                // ✅ Show the REAL value, not the visual share
+                                const isInvested = context.dataIndex === 0;
+                                const realValue  = isInvested ? invested : returns;
+                                const realPct    = total > 0
+                                    ? ((realValue / total) * 100).toFixed(2)
+                                    : '0.00';
+                                return ' ' + fmtFull(realValue) + ' (' + realPct + '%)';
                             }
                         }
                     }
-                });
-            });
-        </script>
-        {% elif error %}
-        <!-- Flashed message will be appear here -->
-        {% for message in messages %}
-                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                   <div class='msg'> {{ message }} </div>
-                  </div> 
-                </div>
-            {% endfor %}
-       {% else %}
-            <p>Your result will appear here once the calculation is complete.</p>
-        {% endif %}
-      </div>
-  </div>
-          <!-- Footer -->
-            <footer class="footer">
-                <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
-            </footer>
-</body>
-</html>
+                }
+            }
+        });
+
+        // Fill the center overlay with total value
+        const pieTotal = document.getElementById('pieTotal');
+        if (pieTotal) {
+            pieTotal.textContent = fmtFull(total);
+        }
+
+        return true;
+    }
+
+    if (!renderChart()) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderChart);
+        }
+        let tries = 0;
+        const timer = setInterval(function () {
+            tries++;
+            if (renderChart() || tries > 30) clearInterval(timer);
+        }, 100);
+    }
+})();
+</script>
+{% endif %}
+{% endblock %}

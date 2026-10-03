@@ -4,607 +4,1398 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mutual Fund Recommender | AI-Powered Financial Tool by Ajay Kumar Sah</title>
-  <meta name="description" content="An AI-powered engine using TF-IDF and cosine similarity to provide 95% accurate mutual fund recommendations for over 500 users.">
+  <title>Dashboard | Mutual Fund Recommender</title>
+  <meta name="description" content="AI-powered mutual fund recommendations. Track your funds, get personalised suggestions, and grow your wealth with confidence.">
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Mutual Fund Recommender",
-    "url": "https://myportfolio98.pythonanywhere.com/",
-    "author": {
-      "@type": "Person",
-      "name": "Ajay Kumar Sah",
-      "jobTitle": "Software Engineer",
-      "url": "https://www.linkedin.com/in/ajay-kumar-sah-97b14630a/"
-    }
-  }
-  </script>
   <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
-  
-  <!-- CSS Links -->
+
+  <!-- Bootstrap 5 + Font Awesome -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-  <link rel="stylesheet" href="{% static 'css/Index.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    /* Mobile Menu Overrides (Only applies below 992px) */
-    @media (max-width: 991.98px) {
-      /* Hide desktop header */
-      .header {
+    /* ============================================================
+       BASE
+       ============================================================ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      background: #f5f7fa;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body {
+      padding-bottom: 80px;
+    }
+
+    /* ============================================================
+       HEADER
+       ============================================================ */
+    .app-header {
+      background: #0f172a;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.20);
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .app-header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1.75rem;
+      gap: 1rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Brand */
+    .app-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .app-brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .app-brand:hover img {
+      transform: scale(1.06);
+      border-color: #4f8cff;
+    }
+    .app-brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .app-brand-text .name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.2px;
+    }
+    .app-brand-text .tag {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 2px;
+    }
+
+    /* Nav */
+    .app-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-left: auto;
+    }
+    .app-nav a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .app-nav a:hover {
+      color: #ffffff;
+      background: rgba(79, 140, 255, 0.12);
+    }
+    .app-nav a.active {
+      color: #ffffff;
+      background: #4f8cff;
+      box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+    }
+
+    /* Profile */
+    .app-profile {
+      position: relative;
+      flex-shrink: 0;
+    }
+    .app-profile-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+    .app-profile-btn img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      background: #64748b;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .app-profile-btn:hover img {
+      transform: scale(1.06);
+      border-color: #4f8cff;
+    }
+    .app-profile-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 32px rgba(15, 23, 42, 0.15);
+      border: 1px solid #e2e8f0;
+      min-width: 200px;
+      padding: 0.4rem;
+      z-index: 1050;
+    }
+    .app-profile-dropdown.open { display: block; }
+    .app-profile-dropdown a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      color: #334155;
+      text-decoration: none;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    .app-profile-dropdown a:hover {
+      background: #eff6ff;
+      color: #1e40af;
+    }
+    .app-profile-dropdown a i {
+      width: 16px;
+      color: #94a3b8;
+    }
+    .app-profile-dropdown a:hover i {
+      color: #4f8cff;
+    }
+
+    /* ============================================================
+       MOBILE HEADER
+       ============================================================ */
+    @media (max-width: 1024px) {
+      .app-header-inner {
+        padding: 0.55rem 1rem;
+      }
+    .app-profile {
         display: none;
+    }
+      .app-nav { display: none; }
+      .mobile-toggle {
+        display: inline-flex !important;
       }
-
-      /* Hide tooltips when either mobile menu is open */
-      .navbar-collapse-mobile.show ~ .tooltip-text,
-      .profile-collapse-mobile.show ~ .tooltip-text,
-      .navbar-collapse-mobile.show ~ * .tooltip-text,
-      .profile-collapse-mobile.show ~ * .tooltip-text,
-      .navbar-collapse-mobile.show .tooltip-text,
-      .profile-collapse-mobile.show .tooltip-text {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-
-      /* Optional: Hide ALL tooltips by default in mobile view */
-      .tooltip-text {
-        display: none !important;
-      }
-      
-      /* Mobile navbar container */
-      .navbar-mobile {
-        background-color: transparent !important;
-        padding: 0 !important;
-        height: 60px;
-      }
-      
-      /* Mobile menu panel (left side) */
-      .navbar-collapse-mobile {
-        position: fixed !important;
-        top: 0 !important;
-        left: -50% !important;
-        width: 50% !important;
-        height: 100vh !important;
-        background-color: #343a40 !important;
-        padding-top: 60px !important;
-        transition: left 0.3s ease !important;
-        z-index: 1050 !important;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
-        overflow-y: auto;
-      }
-      
-      .navbar-collapse-mobile.show {
-        left: 0 !important;
-      }
-      
-      /* Profile menu panel (right side) */
-      .profile-collapse-mobile {
-        position: fixed !important;
-        top: 0 !important;
-        right: -50% !important;
-        width: 50% !important;
-        height: 100vh !important;
-        background-color: #343a40 !important;
-        padding-top: 60px !important;
-        transition: right 0.3s ease !important;
-        z-index: 1050 !important;
-        box-shadow: -2px 0 10px rgba(0,0,0,0.2);
-        overflow-y: auto;
-      }
-      
-      .profile-collapse-mobile.show {
-        right: 0 !important;
-      }
-      
-      /* Toggle button styling */
-      .navbar-toggler-mobile {
+      .mobile-drawer {
         position: fixed;
-        left: 15px;
-        top: 15px;
-        z-index: 1060;
-        background-color: #343a40;
-        border-radius: 4px;
-        padding: 0.25rem 0.5rem;
+        top: 0;
+        left: -85%;
+        width: 85%;
+        max-width: 300px;
+        height: 100vh;
+        background: #0f172a;
+        z-index: 1080;
+        transition: left 0.3s ease;
+        padding: 1.25rem 0;
+        overflow-y: auto;
+        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.45);
       }
-      
-      /* Profile button styling */
-      .profile-toggler-mobile {
-        position: fixed;
-        right: 15px;
-        top: 15px;
-        z-index: 1060;
-        background-color: #343a40;
-        border-radius: 4px;
-        padding: 0.25rem 0.5rem;
+      .mobile-drawer.open { left: 0; }
+      .mobile-drawer .drawer-header {
+        padding: 0 1.25rem 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .mobile-drawer .drawer-header span {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+      .mobile-drawer .drawer-close {
+        background: transparent;
         border: none;
+        color: #cbd5e1;
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 4px 8px;
       }
-      
-      .profile-toggler-mobile img {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
+      .mobile-drawer a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #cbd5e1;
+        text-decoration: none;
+        padding: 0.85rem 1.25rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border-left: 3px solid transparent;
+        transition: all 0.18s ease;
       }
-      
-      /* Mobile menu items */
-      .nav-links-mobile {
-        flex-direction: column !important;
-        padding: 1rem;
+      .mobile-drawer a:hover,
+      .mobile-drawer a.active {
+        color: #ffffff;
+        background: rgba(79, 140, 255, 0.10);
+        border-left-color: #4f8cff;
       }
-      
-      .nav-links-mobile li,
-      .profile-links-mobile li {
-        width: 100%;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
+      .mobile-drawer a i {
+        width: 18px;
+        color: #64748b;
       }
-      
-      /* Ensure forms are visible when toggled */
-      .form-container.show {
-        display: block !important;
+      .mobile-drawer a:hover i,
+      .mobile-drawer a.active i {
+        color: #4f8cff;
       }
     }
-    
-    /* Desktop styles (original behavior) */
-    @media (min-width: 992px) {
-      .navbar-mobile {
-        display: none !important;
-      }
-      .header {
-        display: block !important;
-      }
-      .profile-collapse-mobile {
-        display: none !important;
-      }
+    @media (min-width: 1024px) {
+      .mobile-toggle { display: none !important; }
+      .mobile-drawer { display: none !important; }
+    }
+    .mobile-toggle {
+      display: none;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mobile-toggle:hover {
+      background: rgba(79, 140, 255, 0.15);
+      border-color: rgba(79, 140, 255, 0.4);
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 1075;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .drawer-overlay.open {
+      display: block;
+      opacity: 1;
+    }
+
+    /* ============================================================
+       PAGE CONTENT
+       ============================================================ */
+    .page-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.75rem 1.75rem 2rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-radius: 18px;
+      padding: 2.25rem 2rem;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 36px rgba(15, 23, 42, 0.20);
+      margin-bottom: 1.75rem;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -80px;
+      right: -80px;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(79, 140, 255, 0.35), transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+    .hero-text h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.5px;
+      line-height: 1.25;
+    }
+    .hero-text p {
+      font-size: 0.98rem;
+      color: #cbd5e1;
+      line-height: 1.65;
+      margin: 0 0 1.25rem;
+      max-width: 580px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.25rem;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .hero-btn-primary {
+      background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(79, 140, 255, 0.4);
+    }
+    .hero-btn-primary:hover {
+      background: linear-gradient(135deg, #3b7bf0, #2563eb);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(79, 140, 255, 0.5);
+      color: #ffffff;
+    }
+    .hero-btn-outline {
+      background: transparent;
+      color: #ffffff;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+    }
+    .hero-btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #ffffff;
+      color: #ffffff;
+    }
+
+    .session-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.9rem;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 100px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .session-pill.warning {
+      color: #fbbf24;
+      border-color: rgba(251, 191, 36, 0.3);
+      background: rgba(251, 191, 36, 0.10);
+    }
+    .session-pill.danger {
+      color: #fca5a5;
+      border-color: rgba(252, 165, 165, 0.35);
+      background: rgba(252, 165, 165, 0.10);
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+    .stat-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1rem 0.9rem;
+      backdrop-filter: blur(6px);
+    }
+    .stat-card .stat-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: rgba(79, 140, 255, 0.20);
+      color: #4f8cff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+    .stat-card .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+      line-height: 1;
+    }
+    .stat-card .stat-label {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* ---------- HOW IT WORKS ---------- */
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 0 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .section-title h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      letter-spacing: -0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title h2 i { color: #4f8cff; }
+    .section-title .muted {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .step-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 1.35rem 1.1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      position: relative;
+    }
+    .step-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(79, 140, 255, 0.12);
+      border-color: rgba(79, 140, 255, 0.35);
+    }
+    .step-num {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+      box-shadow: 0 4px 12px rgba(79, 140, 255, 0.35);
+    }
+    .step-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.2px;
+    }
+    .step-card p {
+      font-size: 0.84rem;
+      color: #64748b;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    /* ---------- RECOMMENDATION FORM ---------- */
+    .form-container {
+      display: none;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 2rem;
+    }
+    .form-container.show { display: block; }
+    .form-container h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .form-container h2 i { color: #4f8cff; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 0.4rem;
+    }
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 0.9rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      color: #0f172a;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: #4f8cff;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+    }
+    .btn-recommend {
+      width: 100%;
+      padding: 0.9rem 1.5rem;
+      background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: inherit;
+    }
+    .btn-recommend:hover {
+      background: linear-gradient(135deg, #3b7bf0, #2563eb);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+    }
+
+    /* ---------- FUNDS PANEL ---------- */
+    .funds-panel {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+    }
+    .funds-panel-head {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .funds-panel-head h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0;
+      color: #0f172a;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .funds-panel-head h3 i { color: #4f8cff; }
+    .funds-panel-head .head-sub {
+      font-size: 0.83rem;
+      color: #64748b;
+      margin: 0.25rem 0 0;
+    }
+
+    .funds-empty {
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      color: #64748b;
+    }
+    .funds-empty .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(79, 140, 255, 0.10);
+      color: #4f8cff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .funds-empty h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 0.4rem;
+    }
+    .funds-empty p {
+      font-size: 0.9rem;
+      margin: 0 auto 1.25rem;
+      max-width: 420px;
+      line-height: 1.55;
+    }
+    .funds-empty .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.4rem;
+      background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+      font-family: inherit;
+    }
+    .funds-empty .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+      color: #ffffff;
+    }
+
+    .fund-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .fund-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.87rem;
+      min-width: 820px;
+    }
+    .fund-table thead th {
+      background: #f8fafc;
+      color: #475569;
+      text-align: left;
+      padding: 0.85rem 0.9rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    .fund-table tbody td {
+      padding: 0.9rem 0.9rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      vertical-align: middle;
+    }
+    .fund-table tbody tr:hover { background: #f8fafc; }
+    .fund-table tbody tr:last-child td { border-bottom: none; }
+    .fund-table .fund-name {
+      font-weight: 600;
+      color: #0f172a;
+      max-width: 320px;
+    }
+    .fund-table .nav-value {
+      font-weight: 600;
+      color: #0f172a;
+      font-variant-numeric: tabular-nums;
+    }
+    .fund-table .risk-low      { color: #16a34a; font-weight: 600; }
+    .fund-table .risk-moderate { color: #f59e0b; font-weight: 600; }
+    .fund-table .risk-high     { color: #dc2626; font-weight: 600; }
+
+    .fund-table .action-buttons {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    .action-btn.view-btn {
+      background: rgba(79, 140, 255, 0.10);
+      color: #2563eb;
+      border-color: rgba(79, 140, 255, 0.25);
+    }
+    .action-btn.view-btn:hover {
+      background: #4f8cff;
+      color: #ffffff;
+      border-color: #4f8cff;
+    }
+    .action-btn.save-btn {
+      background: rgba(34, 197, 94, 0.10);
+      color: #16a34a;
+      border-color: rgba(34, 197, 94, 0.25);
+    }
+    .action-btn.save-btn:hover {
+      background: #22c55e;
+      color: #ffffff;
+      border-color: #22c55e;
+    }
+
+    .badge-rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.6rem;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    /* ============================================================
+       FLASH MESSAGES
+       ============================================================ */
+    .msg-wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 1.75rem 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .msg-box {
+      padding: 0.85rem 1.1rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      border-left: 4px solid;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .msg-box.error   { background: #fef2f2; color: #991b1b; border-left-color: #dc2626; }
+    .msg-box.success { background: #f0fdf4; color: #166534; border-left-color: #16a34a; }
+    .msg-box.warning { background: #fffbeb; color: #92400e; border-left-color: #f59e0b; }
+    .msg-box.info    { background: #eff6ff; color: #1e40af; border-left-color: #3b82f6; }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .app-footer {
+      background: #0b1120;
+      color: #94a3b8;
+      padding: 1rem 0;
+      font-size: 0.85rem;
+      text-align: center;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1020;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .app-footer p { margin: 0; }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1024px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-content { padding: 1.25rem 1rem 2rem; }
+      .msg-wrap { padding: 1rem 1rem 0; }
+    }
+    @media (max-width: 768px) {
+      .hero { padding: 1.5rem 1.25rem; border-radius: 14px; }
+      .hero-text h1 { font-size: 1.35rem; }
+      .hero-text p { font-size: 0.9rem; }
+      .hero-stats { gap: 0.6rem; }
+      .stat-card { padding: 0.85rem 0.75rem; }
+      .stat-card .stat-value { font-size: 1.15rem; }
+      .steps-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+      .step-card { padding: 1.1rem 1rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-container { padding: 1.5rem 1.25rem; }
+      .funds-panel-head { padding: 1rem 1.15rem; }
+      .funds-panel-head h3 { font-size: 0.98rem; }
+    }
+    @media (max-width: 420px) {
+      .hero { padding: 1.25rem 1rem; }
+      .hero-stats { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; }
+      .hero-btn { width: 100%; justify-content: center; }
     }
   </style>
 </head>
 
 <body>
-  <!-- Mobile Navbar (Only shows on mobile) -->
-  <nav class="navbar-mobile navbar-expand-lg navbar-dark bg-dark sticky-top d-lg-none">
-    <div class="container-fluid">
-      <!-- Main menu toggle -->
-      <button class="navbar-toggler-mobile navbar-toggler" type="button"
-              data-bs-toggle="collapse" data-bs-target="#mobileMenu"
-              aria-controls="mobileMenu" aria-expanded="false"
-              aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-header-inner">
+
+      <a href="/" class="app-brand" aria-label="Go to Home">
+        <img src="{% static 'favicon/favicon.webp' %}" alt="Brand">
+        <div class="app-brand-text">
+          <span class="name">MF Recommender</span>
+          <span class="tag">AI Powered</span>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" type="button" aria-label="Open menu" onclick="openDrawer()">
+        <i class="fas fa-bars"></i>
       </button>
 
-      <!-- Profile menu toggle -->
-      <button class="profile-toggler-mobile" type="button"
-              data-bs-toggle="collapse" data-bs-target="#profileMenu"
-              aria-controls="profileMenu" aria-expanded="false"
-              aria-label="Toggle profile">
+      <nav class="app-nav">
+        <a href="{% url 'sip_calculator' %}">SIP Calculator</a>
+        <a href="{% url 'fund_details' %}">Fund Details</a>
+        <a href="#" onclick="toggleRecommendationForm(event)">Get Recommendation</a>
+        <a href="{% url 'fund_result' %}">All Funds</a>
+        <a href="{% url 'your_funds' %}">Your Funds</a>
+        <a href="/contact">Contact</a>
+      </nav>
+
+      <div class="app-profile">
+        <button class="app-profile-btn" type="button" onclick="toggleProfileDropdown(event)" aria-label="Profile menu">
           {% if profilepic %}
-            <img src="{{ MEDIA_URL }}{{ profilepic|cut:MEDIA_URL }}" 
-                onerror="this.src='{% static 'icons/image.png' %}'; this.style.backgroundColor='gray'"
-                class="profile-icon">
+            <img src="{{ profilepic }}" alt="Profile" onerror="this.src='{% static 'icons/image.png' %}'">
           {% else %}
-            <img src="{% static 'icons/image.png' %}" 
-                class="profile-icon" 
-                style="background-color: gray;">
+            <img src="{% static 'icons/image.png' %}" alt="Profile">
           {% endif %}
-      </button>
-
-      <!-- Main mobile menu (left side) -->
-      <div class="collapse navbar-collapse-mobile navbar-collapse" id="mobileMenu">
-        <ul class="nav-links-mobile navbar-nav">
-          <li class="nav-item">
-            <a href="/" class="nav-link d-flex align-items-center">
-              <img src="{% static 'icons/homeicon.png' %}" alt="Home" width="20" class="me-2"> 
-              Home
-            </a>
-          </li>
-          <li class="nav-item"><a href="{% url 'sip_calculator' %}" class="nav-link">SIP Calculator</a></li>
-          <li class="nav-item"><a href="{% url 'fund_details' %}" class="nav-link">Fund Detail Search</a></li>
-          <li class="nav-item"><a href="#" onclick="showRecommendationForm(); return false;" class="nav-link">Get Recommendation</a></li>
-          <li class="nav-item"><a href="{% url 'fund_result' %}" class="nav-link">All Mutual Funds</a></li>
-          <li class="nav-item"><a href="{% url 'your_funds' %}" class="nav-link">Your Mutual Funds</a></li>
-          <li class="nav-item"><a href="\contact" class="nav-link">Contact</a></li>
-        </ul>
+        </button>
+        <div class="app-profile-dropdown" id="profileDropdown">
+          <a href="{% url 'your_info' %}"><i class="fas fa-user"></i> Your Info</a>
+          <a href="{% url 'your_funds' %}"><i class="fas fa-layer-group"></i> Your Funds</a>
+          <a href="{% url 'account_settings' %}"><i class="fas fa-cog"></i> Settings</a>
+          <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
       </div>
 
-      <!-- Profile menu (right side) -->
-      <div class="collapse profile-collapse-mobile navbar-collapse" id="profileMenu">
-        <ul class="nav-links-mobile navbar-nav">
-          <li class="nav-item"><a href="{% url 'your_info' %}" class="nav-link">Your Info</a></li>
-          <li class="nav-item"><a href="{% url 'your_funds' %}" class="nav-link">Your Funds</a></li>
-          <li class="nav-item"><a href="{% url 'account_settings' %}" class="nav-link">Settings</a></li>
-          <li class="nav-item"><a href="/logout" class="nav-link">Logout</a></li>
-        </ul>
-      </div>
     </div>
-  </nav>
-
-  <!-- Original Desktop Header (Hidden on mobile) -->
-  <header class="header d-none d-lg-block">
-    <nav class="nav-links">
-      <ul>
-        <div class="home">
-          <a href="/" class="btn">
-            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
-          </a>
-          <div class="tooltip-text">
-            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
-          </div>
-        </div>
-        <li><a href="{% url 'sip_calculator' %}">SIP Calculator</a></li>
-        <li><a href="{% url 'fund_details' %}">Fund Detail Search</a></li>
-        <li><a href="#" onclick="showRecommendationForm(); return false;" id='rec'>Get Recommendation</a></li>
-        <li><a href="{% url 'fund_result' %}">All Mutual Funds</a></li>
-        <li><a href="{% url 'your_funds' %}">Your Mutual Funds</a></li>
-        <li><a href="\contact">Contact</a></li>
-        <div class="profile-container">
-          <a href="#" onclick="toggleProfileMenu(); return false;" class="profile-btn">
-            {% if profilepic %}
-              <img src="{{ profilepic }}" class="profile-icon">
-            {% else %}
-              <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;">
-            {% endif %}
-          </a>
-          <div class="profile-dropdown">
-            <a href="{% url 'your_info' %}">Your Info</a>
-            <a href="{% url 'your_funds' %}">Your Funds</a>
-            <a href="{% url 'account_settings' %}">Settings</a>
-            <a href="/logout">Logout</a>
-          </div>
-        </div>
-      </ul>  
-    </nav>
   </header>
 
-  <!-- Session Timer -->
-  {% if remaining_time %}
-    <div class="timer" id="session-timer" style="margin: 8px 20px; font-weight: bolder"></div>
-  {% endif %} 
-  
-  <!-- Flashed messages -->
+  <!-- MOBILE DRAWER -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <aside class="mobile-drawer" id="mobileDrawer">
+    <div class="drawer-header">
+      <span>Menu</span>
+      <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <a href="/"><i class="fas fa-home"></i> Home</a>
+    <a href="{% url 'sip_calculator' %}"><i class="fas fa-calculator"></i> SIP Calculator</a>
+    <a href="{% url 'fund_details' %}"><i class="fas fa-search"></i> Fund Details</a>
+    <a href="#" onclick="toggleRecommendationForm(event)"><i class="fas fa-magic"></i> Get Recommendation</a>
+    <a href="{% url 'fund_result' %}"><i class="fas fa-chart-line"></i> All Funds</a>
+    <a href="{% url 'your_funds' %}"><i class="fas fa-layer-group"></i> Your Funds</a>
+    <a href="/contact"><i class="fas fa-envelope"></i> Contact</a>
+    <div class="drawer-header" style="margin-top: 1.5rem;"><span>Account</span></div>
+    <a href="{% url 'your_info' %}"><i class="fas fa-user"></i> Your Info</a>
+    <a href="{% url 'your_funds' %}"><i class="fas fa-layer-group"></i> Your Funds</a>
+    <a href="{% url 'account_settings' %}"><i class="fas fa-cog"></i> Settings</a>
+    <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </aside>
+
+  <!-- FLASH MESSAGES -->
   {% if messages %}
+  <div class="msg-wrap">
     {% for message in messages %}
-      <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-        <div class='msg'> {{ message }} </div>
-      </div> 
+      <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
+        {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>
+        {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle"></i>
+        {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+        {% else %}<i class="fas fa-info-circle"></i>{% endif %}
+        <span>{{ message }}</span>
+      </div>
     {% endfor %}
+  </div>
   {% endif %}
 
-  <!-- Recommendation form (shown/hidden by JavaScript) -->
-        <!-- Recommendation form-->
-        <div class="form-container" id="recommendationForm">
-          <h2>Mutual Fund Recommendation Form</h2>
-      
-          <form action="/dashboard/" method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="recommendation" value="recommendation">
-            <!-- Company Type (Full Width) -->
-            <div class="form-group">
-              <label for="fund_type">Fund Type:</label>
-              <select id="fund_type" name="fund_type" onchange="handleCompanyTypeChange(this)">
-                <option value="" selected>Please select a mutual fund type</option>
-                <option value="Debt">Debt Funds</option>
-                <option value="Equity">Equity Funds</option>
-                <option value="Hybrid">Hybrid Funds</option>
-                <option value="Solutions Oriented">Solution Oriented Funds</option>
-                <option value="Global Fund of Funds">Fund of Funds(FoFs)</option>
-                <option value="Index Funds">Index Funds</option>
-                <option value="Other">Other Funds</option>
-                <!--<option value="manually">Enter Manually</option>-->
-              </select>
+  <!-- PAGE CONTENT -->
+  <main class="page-content">
 
-              <input type="text" id="manual_company_type" name="manual_company_type" style="display:none;" placeholder="Enter company type" />
-            </div>          
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-inner">
 
-            <div class="form-group">
-                <label for="fund_subtype">Fund Subtype:</label>
-                <select id="fund_subtype" name="fund_subtype">
-                    <option value="" selected>Please Select a mutual fund subtype</option>
-                    <option value="Floating Rate">Floating Rate</option>
-                    <option value="Fixed Maturity Intermediate-Term Bond">Fixed Maturity Intermediate-Term Bond</option>
-                    <option value="Dynamic Bond">Dynamic Bond</option>
-                    <option value="Ultra Short Duration">Ultra Short Duration</option>
-                    <option value="Corporate Bond">Corporate Bond</option>
-                    <option value="Short Duration">Short Duration</option>
-                    <option value="10 yr Government Bond">10 yr Government Bond</option>
-                    <option value="Government Bond">Government Bond</option>
-                    <option value="Money Market">Money Market</option>
-                    <option value="Long Duration">Long Duration</option>
-                    <option value="Other Bond">Other Bond</option>
-                    <option value="Low Duration">Low Duration</option>
-                    <option value="Credit Risk">Credit Risk</option>
-                    <option value="Banking & PSU">Banking & PSU</option>
-                    <option value="Medium to Long Duration">Medium to Long Duration</option>
-                    <option value="Fixed Maturity Short-Term Bond">Fixed Maturity Short-Term Bond</option>
-                    <option value="Medium Duration">Medium Duration</option>
-                    <option value="Fixed Maturity Ultrashort Bond">Fixed Maturity Ultrashort Bond</option>
-                    <option value="Children">Children</option>
-                    <option value="Retirement">Retirement</option>
-                    <option value="Focused Fund">Focused Fund</option>
-                    <option value="Equity - Other">Equity - Other</option>
-                    <option value="Contra">Contra</option>
-                    <option value="Flexi Cap">Flexi Cap</option>
-                    <option value="Equity - Consumption">Equity - Consumption</option>
-                    <option value="Sector - FMCG">Sector - FMCG</option>
-                    <option value="Sector - Financial Services">Sector - Financial Services</option>
-                    <option value="Mid-Cap">Mid-Cap</option>
-                    <option value="Equity - Infrastructure">Equity - Infrastructure</option>
-                    <option value="Multi-Cap">Multi-Cap</option>
-                    <option value="Large-Cap">Large-Cap</option>
-                    <option value="Small-Cap">Small-Cap</option>
-                    <option value="Dividend Yield">Dividend Yield</option>
-                    <option value="ELSS (Tax Savings)">ELSS (Tax Savings)</option>
-                    <option value="Large & Mid-Cap">Large & Mid-Cap</option>
-                    <option value="Sector - Healthcare">Sector - Healthcare</option>
-                    <option value="Value">Value</option>
-                    <option value="Equity - ESG">Equity - ESG</option>
-                    <option value="Sector - Technology">Sector - Technology</option>
-                    <option value="Fund of Funds">Fund of Funds</option>
-                    <option value="Multi Asset Allocation">Multi Asset Allocation</option>
-                    <option value="Equity Savings">Equity Savings</option>
-                    <option value="Balanced Allocation">Balanced Allocation</option>
-                    <option value="Dynamic Asset Allocation">Dynamic Asset Allocation</option>
-                    <option value="Aggressive Allocation">Aggressive Allocation</option>
-                    <option value="Conservative Allocation">Conservative Allocation</option>
-                    <option value="Global - Other">Global - Other</option>
-                    <option value="Index Funds">Index Funds</option>
-                    <option value="Index Funds - Fixed Income">Index Funds - Fixed Income</option>
-                    <option value="Liquid">Liquid</option>
-                    <option value="Overnight">Overnight</option>
-                    <option value="Arbitrage Fund">Arbitrage Fund</option>
-                </select>
-                </div>
-      
-              <div class="form-row">
-                  <div class="form-group">
-                      <label for="tenure">Investment Tenure:</label>
-                      <select id="tenure" name="tenure">
-                        <option value="" selected>Please select a investment tenure</option>
-                          <option value="1_month_return">1 Month</option>
-                          <option value="3_month_return">3 Months</option>
-                          <option value="6_month_return">6 Months</option>
+        <div class="hero-text">
+          {% if remaining_time %}
+            <div class="session-pill" id="session-pill">
+              <i class="fas fa-clock"></i>
+              <span id="session-timer-text">Session expires in —</span>
+            </div>
+          {% endif %}
 
-                          <option value="1_year_return">1 Year</option>
-                          <option value="3_year_return">3 Years</option>
-                          <option value="5_year_return">5+ Years</option>
-                      </select>
-                  </div>
-      
-              <!-- Profit Type -->
-                  <div class="form-group">
-                      <label for="return_type">Expected Return Type:</label>
-                      <select id="return_type" name="return_type">
-                        <option value="" selected>Please select a return type</option>
-                          <option value="high">High</option>
-                          <option value="medium">Medium</option>
-                          <option value="low">Low</option>
-                      </select>
-                  </div>
-              </div>
-              <!-- Submit Button -->
-              <button class="get-recommendation-btn" type="submit">Get Recommendation</button>
-          </form>
+          <h1>Welcome back, {{ full_name|default:"Investor" }}! 👋</h1>
+          <p>
+            Your AI-powered dashboard for smarter mutual fund investing. Get personalised
+            recommendations, track your portfolio, and discover funds that match your goals —
+            all in one place.
+          </p>
+
+          <div class="hero-actions">
+            <button class="hero-btn hero-btn-primary" onclick="toggleRecommendationForm(event)">
+              <i class="fas fa-magic"></i> Get Recommendation
+            </button>
+            <a href="{% url 'fund_result' %}" class="hero-btn hero-btn-outline">
+              <i class="fas fa-chart-line"></i> Browse All Funds
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-brain"></i></div>
+            <div class="stat-value">AI</div>
+            <div class="stat-label">Smart Engine</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-chart-pie"></i></div>
+            <div class="stat-value">500+</div>
+            <div class="stat-label">Funds Covered</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+            <div class="stat-value">Instant</div>
+            <div class="stat-label">Recommendations</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Data-Driven</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <div class="section-title">
+      <h2><i class="fas fa-route"></i> How It Works</h2>
+      <span class="muted">4 simple steps to your personalised recommendation</span>
     </div>
 
-  <div class="greet"><h4>Welcome back, {{ full_name }}! 👋</h4></div>
-  
-      <div class='recommendation'>
-        <h3>All Recommended Mutual Funds</h3>
-            {% if recommended_funds %}
-                <table class="fund-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Fund Name</th>
-                            <th>Plan Type</th>
-                            <th>Scheme Type</th>
-                            <th>NAV (₹)</th>
-                            <th>    
-                                {% if form_data.tenure == "5_year_return" %}
-                                    5-Year Return (%)
-                                {% elif form_data.tenure == "3_year_return" %}
-                                    3-Year Return (%)
-                                {% elif form_data.tenure == "1_month_return" %}
-                                    1-Month Return (%)
-                                {% elif form_data.tenure == "3_month_return" %}
-                                    3-Month Return (%)
-                                {% elif form_data.tenure == "6_month_return" %}
-                                    6-Month Return (%)
-                                {% else %}
-                                    1-Year Return (%)
-                                {% endif %}
-                            </th>
-                            <th>Risk</th>
-                            <th>Rating</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for fund in recommended_funds %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ fund.fund_name }}</td>
-                                <td>{{ fund.category|default:"-" }}</td>
-                                <td>{{ fund.sub_category|default:"-" }}</td> {# not returned, but placeholder okay #}
-                                <td>{{ fund.nav|default:"-" }}</td>
-                                <td>
-                                    {% if form_data.tenure == "5_year_return" %}
-                                        {{ fund.5_year_return|default:"NA" }} ({{ fund.return_type }})
-                                    {% elif form_data.tenure == "3_year_return" %}
-                                        {{ fund.3_year_return|default:"NA" }} ({{ fund.return_type }})
-                                    {% elif form_data.tenure == "1_month_return" %}
-                                        {{ fund.1_month_return|default:"NA" }} ({{ fund.return_type }})
-                                    {% elif form_data.tenure == "3_month_return" %}
-                                        {{ fund.3_month_return|default:"NA" }} ({{ fund.return_type }})
-                                    {% elif form_data.tenure == "6_month_return" %}
-                                        {{ fund.6_month_return|default:"NA" }} ({{ fund.return_type }})
-                                    {% else %}
-                                        {{ fund.1_year_return|default:"NA" }} ({{ fund.return_type }})
-                                    {% endif %}
-                                </td>
-                                <td class="risk-{{ fund.risk|lower|slugify }}">
-                                    {{ fund.risk|default:"NA" }}
-                                </td>
-                                <td>{% if fund.star_rating %}
-                                       {{ fund.star_rating }}/5 ⭐
-                                    {% else %}
-                                        NA
-                                    {% endif %}
-                                </td>
-                                <td class="action-buttons">
-                                    <form action="{% url 'fund_result' %}" method="POST">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                        <input type="hidden" name="NAV" value="{{ fund.nav }}">
-                                        <input type="hidden" name="category" value="{{ fund.category }}">
-                                        <button type="submit" class="action-btn view-btn">View</button>
-                                    </form>
-                                    <form action="{% url 'your_funds' %}" method="POST">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="page_name" value="dashboard">
-                                        <input type="hidden" name="form_type" value="add-fund">
-                                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                        <input type="hidden" name="investment_type" value="{{ fund.category }}">
-                                        <input type="hidden" name="subcategory" value="{{ fund.sub_category }}">
-                                        <input type="hidden" name="nav" value="{{ fund.nav }}">
-                                        <input type="hidden" name="rating" value="{{ fund.star_rating }}">
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h4>Choose Fund Type</h4>
+        <p>Select from Equity, Debt, Hybrid, Index funds and more.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h4>Pick a Subtype</h4>
+        <p>Narrow down by Large Cap, Mid Cap, Sector funds, etc.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h4>Set Tenure & Return</h4>
+        <p>Tell us your investment horizon and expected returns.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <h4>Get Recommendations</h4>
+        <p>Instantly receive AI-matched funds ranked by performance.</p>
+      </div>
+    </div>
 
-                                        <button type="submit" class="action-btn save-btn">Save</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <!-- RECOMMENDATION FORM -->
+    <div class="form-container" id="recommendationForm">
+      <h2><i class="fas fa-magic"></i> Mutual Fund Recommendation Form</h2>
 
-                    {% else %}
-                        <p>No results yet. To get a personalized recommendation, click the <strong>"Get Recommendation"</strong> button above.</p>
-                    {% endif %}
-              </div>
+      <form action="/dashboard/" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="recommendation" value="recommendation">
 
-  <!-- Footer -->
-    <footer class="bg-dark text-white py-3 mt-auto fixed-bottom">
-        <div class="container-fluid">
-            <div class="row justify-content-center">
-                <div class="col-12 text-center">
-                    <p class="mb-0">
-                        &copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved
-                    </p>
-                </div>
-            </div>
+        <!-- Fund Type -->
+        <div class="form-group">
+          <label for="fund_type">Fund Type:</label>
+          <select id="fund_type" name="fund_type" onchange="handleCompanyTypeChange(this)">
+            <option value="" selected>Please select a mutual fund type</option>
+            <option value="Debt">Debt Funds</option>
+            <option value="Equity">Equity Funds</option>
+            <option value="Hybrid">Hybrid Funds</option>
+            <option value="Solutions Oriented">Solution Oriented Funds</option>
+            <option value="Global Fund of Funds">Fund of Funds(FoFs)</option>
+            <option value="Index Funds">Index Funds</option>
+            <option value="Other">Other Funds</option>
+          </select>
+
+          <input type="text" id="manual_company_type" name="manual_company_type"
+                style="display:none; margin-top: 0.5rem;"
+                placeholder="Enter company type">
         </div>
-    </footer>
 
-  <!-- JavaScript -->
+        <!-- Fund Subtype -->
+        <div class="form-group">
+          <label for="fund_subtype">Fund Subtype:</label>
+          <select id="fund_subtype" name="fund_subtype">
+            <option value="" selected>Please Select a mutual fund subtype</option>
+            <option value="Floating Rate">Floating Rate</option>
+            <option value="Fixed Maturity Intermediate-Term Bond">Fixed Maturity Intermediate-Term Bond</option>
+            <option value="Dynamic Bond">Dynamic Bond</option>
+            <option value="Ultra Short Duration">Ultra Short Duration</option>
+            <option value="Corporate Bond">Corporate Bond</option>
+            <option value="Short Duration">Short Duration</option>
+            <option value="10 yr Government Bond">10 yr Government Bond</option>
+            <option value="Government Bond">Government Bond</option>
+            <option value="Money Market">Money Market</option>
+            <option value="Long Duration">Long Duration</option>
+            <option value="Other Bond">Other Bond</option>
+            <option value="Low Duration">Low Duration</option>
+            <option value="Credit Risk">Credit Risk</option>
+            <option value="Banking & PSU">Banking & PSU</option>
+            <option value="Medium to Long Duration">Medium to Long Duration</option>
+            <option value="Fixed Maturity Short-Term Bond">Fixed Maturity Short-Term Bond</option>
+            <option value="Medium Duration">Medium Duration</option>
+            <option value="Fixed Maturity Ultrashort Bond">Fixed Maturity Ultrashort Bond</option>
+            <option value="Children">Children</option>
+            <option value="Retirement">Retirement</option>
+            <option value="Focused Fund">Focused Fund</option>
+            <option value="Equity - Other">Equity - Other</option>
+            <option value="Contra">Contra</option>
+            <option value="Flexi Cap">Flexi Cap</option>
+            <option value="Equity - Consumption">Equity - Consumption</option>
+            <option value="Sector - FMCG">Sector - FMCG</option>
+            <option value="Sector - Financial Services">Sector - Financial Services</option>
+            <option value="Mid-Cap">Mid-Cap</option>
+            <option value="Equity - Infrastructure">Equity - Infrastructure</option>
+            <option value="Multi-Cap">Multi-Cap</option>
+            <option value="Large-Cap">Large-Cap</option>
+            <option value="Small-Cap">Small-Cap</option>
+            <option value="Dividend Yield">Dividend Yield</option>
+            <option value="ELSS (Tax Savings)">ELSS (Tax Savings)</option>
+            <option value="Large & Mid-Cap">Large & Mid-Cap</option>
+            <option value="Sector - Healthcare">Sector - Healthcare</option>
+            <option value="Value">Value</option>
+            <option value="Equity - ESG">Equity - ESG</option>
+            <option value="Sector - Technology">Sector - Technology</option>
+            <option value="Fund of Funds">Fund of Funds</option>
+            <option value="Multi Asset Allocation">Multi Asset Allocation</option>
+            <option value="Equity Savings">Equity Savings</option>
+            <option value="Balanced Allocation">Balanced Allocation</option>
+            <option value="Dynamic Asset Allocation">Dynamic Asset Allocation</option>
+            <option value="Aggressive Allocation">Aggressive Allocation</option>
+            <option value="Conservative Allocation">Conservative Allocation</option>
+            <option value="Global - Other">Global - Other</option>
+            <option value="Index Funds">Index Funds</option>
+            <option value="Index Funds - Fixed Income">Index Funds - Fixed Income</option>
+            <option value="Liquid">Liquid</option>
+            <option value="Overnight">Overnight</option>
+            <option value="Arbitrage Fund">Arbitrage Fund</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tenure">Investment Tenure:</label>
+            <select id="tenure" name="tenure">
+              <option value="" selected>Please select a investment tenure</option>
+              <option value="1_month_return">1 Month</option>
+              <option value="3_month_return">3 Months</option>
+              <option value="6_month_return">6 Months</option>
+              <option value="1_year_return">1 Year</option>
+              <option value="3_year_return">3 Years</option>
+              <option value="5_year_return">5+ Years</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="return_type">Expected Return Type:</label>
+            <select id="return_type" name="return_type">
+              <option value="" selected>Please select a return type</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-recommend" type="submit">
+          <i class="fas fa-bolt"></i> Get Recommendation
+        </button>
+      </form>
+    </div>
+
+    <!-- FUNDS PANEL -->
+    <div class="funds-panel">
+
+      <div class="funds-panel-head">
+        <div>
+          <h3>
+            {% if recommended_funds %}
+              <i class="fas fa-star"></i> All Recommended Mutual Funds
+            {% else %}
+              <i class="fas fa-fire"></i> Trending Mutual Funds
+            {% endif %}
+          </h3>
+          <p class="head-sub">
+            {% if recommended_funds %}
+              AI-matched funds based on your preferences
+            {% else %}
+              Popular funds to help you get started — fill the form above for personalised picks
+            {% endif %}
+          </p>
+        </div>
+      </div>
+
+      {% if recommended_funds %}
+        <div class="fund-table-wrap">
+          <table class="fund-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Fund Name</th>
+                <th>Plan Type</th>
+                <th>Scheme Type</th>
+                <th>NAV (₹)</th>
+                <th>
+                  {% if form_data.tenure == "5_year_return" %}
+                    5-Year Return (%)
+                  {% elif form_data.tenure == "3_year_return" %}
+                    3-Year Return (%)
+                  {% elif form_data.tenure == "1_month_return" %}
+                    1-Month Return (%)
+                  {% elif form_data.tenure == "3_month_return" %}
+                    3-Month Return (%)
+                  {% elif form_data.tenure == "6_month_return" %}
+                    6-Month Return (%)
+                  {% else %}
+                    1-Year Return (%)
+                  {% endif %}
+                </th>
+                <th>Risk</th>
+                <th>Rating</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fund in recommended_funds %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td class="fund-name">{{ fund.fund_name }}</td>
+                  <td>{{ fund.category|default:"-" }}</td>
+                  <td>{{ fund.sub_category|default:"-" }}</td>
+                  <td class="nav-value">{{ fund.nav|default:"-" }}</td>
+                  <td>
+                    {% if form_data.tenure == "5_year_return" %}
+                      {{ fund.5_year_return|default:"NA" }} ({{ fund.return_type }})
+                    {% elif form_data.tenure == "3_year_return" %}
+                      {{ fund.3_year_return|default:"NA" }} ({{ fund.return_type }})
+                    {% elif form_data.tenure == "1_month_return" %}
+                      {{ fund.1_month_return|default:"NA" }} ({{ fund.return_type }})
+                    {% elif form_data.tenure == "3_month_return" %}
+                      {{ fund.3_month_return|default:"NA" }} ({{ fund.return_type }})
+                    {% elif form_data.tenure == "6_month_return" %}
+                      {{ fund.6_month_return|default:"NA" }} ({{ fund.return_type }})
+                    {% else %}
+                      {{ fund.1_year_return|default:"NA" }} ({{ fund.return_type }})
+                    {% endif %}
+                  </td>
+                  <td class="risk-{{ fund.risk|lower|slugify }}">
+                    {{ fund.risk|default:"NA" }}
+                  </td>
+                  <td>
+                    {% if fund.star_rating %}
+                      <span class="badge-rating"><i class="fas fa-star"></i> {{ fund.star_rating }}/5</span>
+                    {% else %}
+                      NA
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <form action="{% url 'fund_result' %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                        <input type="hidden" name="NAV" value="{{ fund.nav }}">
+                        <input type="hidden" name="category" value="{{ fund.category }}">
+                        <button type="submit" class="action-btn view-btn">
+                          <i class="fas fa-eye"></i> View
+                        </button>
+                      </form>
+                      <form action="{% url 'your_funds' %}" method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="page_name" value="dashboard">
+                        <input type="hidden" name="form_type" value="add-fund">
+                        <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                        <input type="hidden" name="investment_type" value="{{ fund.category }}">
+                        <input type="hidden" name="subcategory" value="{{ fund.sub_category }}">
+                        <input type="hidden" name="nav" value="{{ fund.nav }}">
+                        <input type="hidden" name="rating" value="{{ fund.star_rating }}">
+                        <button type="submit" class="action-btn save-btn">
+                          <i class="fas fa-bookmark"></i> Save
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+      {% else %}
+        <div class="funds-empty">
+          <div class="empty-icon"><i class="fas fa-chart-line"></i></div>
+          <h4>No results yet</h4>
+          <p>
+            To get a personalized recommendation, click the
+            <strong>"Get Recommendation"</strong> button above.
+          </p>
+          <button class="cta-btn" onclick="toggleRecommendationForm(event)">
+            <i class="fas fa-magic"></i> Get My Recommendation
+          </button>
+        </div>
+      {% endif %}
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
+  </footer>
+
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{% static 'javascript/allmessage.js' %}"></script>
-  
-  <!-- JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{% static 'javascript/allmessage.js' %}"></script>
-  
+  {% if messages %}<script src="{% static 'javascript/allmessage.js' %}"></script>{% endif %}
+
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize Bootstrap collapse components
-      const mobileMenu = new bootstrap.Collapse(document.getElementById('mobileMenu'), {
-        toggle: false
-      });
-      const profileMenu = new bootstrap.Collapse(document.getElementById('profileMenu'), {
-        toggle: false
-      });
-      
-      // Close other menu when one opens
-      document.getElementById('mobileMenu').addEventListener('show.bs.collapse', function() {
-        profileMenu.hide();
-        hideRecommendationForm();
-      });
-      
-      document.getElementById('profileMenu').addEventListener('show.bs.collapse', function() {
-        mobileMenu.hide();
-        hideRecommendationForm();
-      });
+  (function() {
 
-      // Show/hide recommendation form
-      window.showRecommendationForm = function() {
-        const recommendationForm = document.getElementById('recommendationForm');
-        // Close any open menus
-        mobileMenu.hide();
-        profileMenu.hide();
-        
-        // Toggle form visibility
-        if (recommendationForm.style.display === "block") {
-          recommendationForm.style.display = "none";
-        } else {
-          recommendationForm.style.display = "block";
-          recommendationForm.scrollIntoView({ behavior: 'smooth' });
-        }
-        return false;
-      }
-
-      function hideRecommendationForm() {
-        document.getElementById('recommendationForm').style.display = "none";
-      }
-      
-      // Close menus when clicking outside
-      document.addEventListener('click', function(e) {
-        const isMobileMenuButton = e.target.classList.contains('navbar-toggler') || 
-                                 e.target.closest('.navbar-toggler');
-        const isProfileButton = e.target.classList.contains('profile-toggler-mobile') || 
-                              e.target.closest('.profile-toggler-mobile');
-        const isRecButton = e.target.id === 'rec' || 
-                          e.target.closest('#rec') ||
-                          e.target.closest('[onclick*="showRecommendationForm"]');
-        const isInForm = e.target.closest('#recommendationForm');
-        
-        if (!isMobileMenuButton && !document.getElementById('mobileMenu').contains(e.target)) {
-          mobileMenu.hide();
-        }
-        
-        if (!isProfileButton && !document.getElementById('profileMenu').contains(e.target)) {
-          profileMenu.hide();
-        }
-        
-        if (!isRecButton && !isInForm) {
-          hideRecommendationForm();
-        }
-      });
-
-      // Desktop profile menu toggle
-      window.toggleProfileMenu = function() {
-        const dropdown = document.querySelector('.profile-dropdown');
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        return false;
-      }
-
-      // Handle company type change
-      window.handleCompanyTypeChange = function(select) {
-        var input = document.getElementById("manual_company_type");
-        input.style.display = select.value === "manually" ? "block" : "none";
-      }
-
-      // Session timer
-      let remainingTime = {{ remaining_time|default:0 }};
-      function updateTimer() {
-        let timerElement = document.getElementById("session-timer");
-        if (remainingTime > 0) {
-          let minutes = Math.floor(remainingTime / 60);
-          let seconds = Math.floor(remainingTime % 60);
-          timerElement.innerText = `Session expires in ${minutes}m ${seconds}s`;
-          timerElement.style.color = remainingTime < 600 ? "red" : "lightgrey";
-          remainingTime--;
-          setTimeout(updateTimer, 1000);
-        } else {
-          timerElement.innerText = "Logging out...";
-          setTimeout(() => {
-            window.location.href = "{% url 'login' %}";
-          }, 2000);
-        }
-      }
-      if (remainingTime > 0) {
-        updateTimer();
-      }
+    /* ============================================================
+       PROFILE DROPDOWN
+       ============================================================ */
+    window.toggleProfileDropdown = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dd = document.getElementById('profileDropdown');
+      dd.classList.toggle('open');
+    };
+    document.addEventListener('click', function(e) {
+      const dd = document.getElementById('profileDropdown');
+      if (!dd) return;
+      if (!e.target.closest('.app-profile')) dd.classList.remove('open');
     });
+
+    /* ============================================================
+       MOBILE DRAWER
+       ============================================================ */
+    window.openDrawer = function() {
+      document.getElementById('mobileDrawer').classList.add('open');
+      document.getElementById('drawerOverlay').classList.add('open');
+    };
+    window.closeDrawer = function() {
+      document.getElementById('mobileDrawer').classList.remove('open');
+      document.getElementById('drawerOverlay').classList.remove('open');
+    };
+
+    /* ============================================================
+       RECOMMENDATION FORM TOGGLE
+       ============================================================ */
+    window.toggleRecommendationForm = function(e) {
+      if (e) e.preventDefault();
+      const form = document.getElementById('recommendationForm');
+      if (!form) return;
+
+      window.closeDrawer();
+      const dd = document.getElementById('profileDropdown');
+      if (dd) dd.classList.remove('open');
+
+      if (form.classList.contains('show')) {
+        form.classList.remove('show');
+      } else {
+        form.classList.add('show');
+        setTimeout(function() {
+          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      }
+    };
+
+    /* ============================================================
+       MANUAL COMPANY TYPE TOGGLE
+       ============================================================ */
+    window.handleCompanyTypeChange = function(select) {
+      const input = document.getElementById('manual_company_type');
+      if (!input) return;
+      input.style.display = (select.value === 'manually') ? 'block' : 'none';
+    };
+
+    /* ============================================================
+       SESSION TIMER + AUTO LOGOUT
+       ============================================================ */
+    let remainingTime = parseInt("{{ remaining_time|default:0 }}", 10) || 0;
+    const timerText = document.getElementById('session-timer-text');
+    const sessionPill = document.getElementById('session-pill');
+    const loginUrl = "{% url 'login' %}";
+
+    function updateTimer() {
+      if (!timerText) return;
+
+      if (remainingTime > 0) {
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+        timerText.textContent = 'Session expires in ' + minutes + 'm ' + seconds + 's';
+
+        if (sessionPill) {
+          sessionPill.classList.toggle('warning', remainingTime < 600 && remainingTime >= 120);
+          sessionPill.classList.toggle('danger',  remainingTime < 120);
+        }
+        remainingTime--;
+        setTimeout(updateTimer, 1000);
+      } else {
+        timerText.textContent = 'Session expired — logging out…';
+        if (sessionPill) sessionPill.classList.add('danger');
+        setTimeout(function() {
+          window.location.href = loginUrl;
+        }, 1500);
+      }
+    }
+
+    if (remainingTime > 0) updateTimer();
+
+  })();
   </script>
 </body>
 </html>

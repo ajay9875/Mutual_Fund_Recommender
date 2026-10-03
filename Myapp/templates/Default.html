@@ -1,100 +1,1551 @@
 {% extends "Base.html" %}
 {% load static %}
 
-{% block title %} AI-Powered Mutual Fund Recommendation {% endblock %}
+{% block title %}AI-Powered Mutual Fund Recommendation{% endblock %}
+
+{% block extra_head %}
+<meta name="description" content="Discover AI-powered mutual fund recommendations tailored to your goals. Trusted by 500+ investors. Free to start.">
+{% endblock %}
 
 {% block extra_css %}
-   <link rel="stylesheet" href="{% static 'css/Default.css' %}">
-   <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-   <script src="{% static 'javascript/allmessage.js' %}"></script>
+<style>
+    /* ============================================================
+       LANDING PAGE – PROFESSIONAL & ANIMATED
+       ============================================================ */
+
+    :root {
+        --navy: #0f172a;
+        --navy-2: #1e293b;
+        --blue: #4f8cff;
+        --blue-dark: #3b7bf0;
+        --blue-darker: #2563eb;
+        --green: #22c55e;
+        --amber: #f59e0b;
+        --red: #ef4444;
+        --slate-50: #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-200: #e2e8f0;
+        --slate-400: #94a3b8;
+        --slate-500: #64748b;
+        --slate-600: #475569;
+        --slate-700: #334155;
+    }
+
+    body {
+        background: #f5f7fa;
+        color: var(--navy);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+
+    /* ============================================================
+       SHARED SECTION WRAPPER
+       ============================================================ */
+    .lp-section {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 3.5rem 1.5rem;
+    }
+
+    .lp-section-tight {
+        padding: 2.5rem 1.5rem;
+    }
+
+    .lp-section-title {
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: var(--navy);
+        text-align: center;
+        letter-spacing: -0.5px;
+        margin: 0 0 0.6rem;
+    }
+
+    .lp-section-sub {
+        font-size: 1rem;
+        color: var(--slate-500);
+        text-align: center;
+        max-width: 620px;
+        margin: 0 auto 2.5rem;
+        line-height: 1.6;
+    }
+
+    /* ============================================================
+       HERO SECTION
+       ============================================================ */
+    .lp-hero {
+        position: relative;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f172a 100%);
+        color: #ffffff;
+        overflow: hidden;
+        padding: 4.5rem 1.5rem 5rem;
+        margin-bottom: 0;
+    }
+
+    .lp-hero::before,
+    .lp-hero::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .lp-hero::before {
+        top: -120px;
+        right: -120px;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(79, 140, 255, 0.35), transparent 70%);
+    }
+    .lp-hero::after {
+        bottom: -140px;
+        left: -100px;
+        width: 340px;
+        height: 340px;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.18), transparent 70%);
+    }
+
+    .lp-hero-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+
+    .lp-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.9rem;
+        background: rgba(79, 140, 255, 0.15);
+        border: 1px solid rgba(79, 140, 255, 0.35);
+        border-radius: 100px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #93c5fd;
+        margin-bottom: 1.25rem;
+        letter-spacing: 0.3px;
+    }
+    .lp-hero-badge i { color: #4f8cff; }
+
+    .lp-hero h1 {
+        font-size: 2.75rem;
+        font-weight: 800;
+        line-height: 1.12;
+        letter-spacing: -1px;
+        margin: 0 0 1.1rem;
+        color: #ffffff;
+    }
+    .lp-hero h1 .accent {
+        background: linear-gradient(135deg, #4f8cff, #22c55e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .lp-hero p.lead {
+        font-size: 1.05rem;
+        color: #cbd5e1;
+        line-height: 1.7;
+        margin: 0 0 1.75rem;
+        max-width: 560px;
+    }
+
+    .lp-hero-actions {
+        display: flex;
+        gap: 0.85rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .lp-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 1.6rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+        transition: all 0.25s ease;
+    }
+    .lp-btn-primary {
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        box-shadow: 0 6px 20px rgba(79, 140, 255, 0.45);
+    }
+    .lp-btn-primary:hover {
+        background: linear-gradient(135deg, #3b7bf0, #2563eb);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(79, 140, 255, 0.55);
+        color: #ffffff;
+    }
+    .lp-btn-outline {
+        background: transparent;
+        color: #ffffff;
+        border: 1.5px solid rgba(255, 255, 255, 0.35);
+    }
+    .lp-btn-outline:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: #ffffff;
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    /* Trust indicators below CTAs */
+    .lp-hero-trust {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+    .lp-hero-trust .trust-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .lp-hero-trust .trust-item i {
+        color: #22c55e;
+    }
+
+    /* Hero stats mini-row */
+    .lp-hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 2.5rem;
+        max-width: 520px;
+    }
+    .lp-hero-stat {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 1rem 0.85rem;
+        backdrop-filter: blur(6px);
+    }
+    .lp-hero-stat .num {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+        line-height: 1;
+    }
+    .lp-hero-stat .num.accent { color: #4f8cff; }
+    .lp-hero-stat .lbl {
+        font-size: 0.72rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-top: 6px;
+        font-weight: 600;
+    }
+
+    /* ---------- HERO VISUAL (animated mock chart) ---------- */
+    .lp-hero-visual {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .hero-card {
+        width: 100%;
+        max-width: 420px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 20px;
+        padding: 1.5rem;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        position: relative;
+        z-index: 1;
+    }
+    .hero-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+    }
+    .hero-card-head .title {
+        font-size: 0.85rem;
+        color: #cbd5e1;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+    .hero-card-head .live-dot {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.7rem;
+        color: #22c55e;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .hero-card-head .live-dot::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+        animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .hero-card-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -1px;
+        line-height: 1;
+        margin-bottom: 0.35rem;
+    }
+    .hero-card-change {
+        font-size: 0.85rem;
+        color: #22c55e;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+    .hero-card-change i { font-size: 0.7rem; margin-right: 4px; }
+
+    /* Animated bar chart (pure CSS) */
+    .hero-chart {
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+        height: 110px;
+        padding: 0 0.25rem;
+    }
+    .hero-chart .bar {
+        flex: 1;
+        background: linear-gradient(180deg, #4f8cff, #2563eb);
+        border-radius: 5px 5px 0 0;
+        animation: growBar 1.2s ease-out forwards;
+        transform-origin: bottom;
+        height: 0;
+        opacity: 0.9;
+    }
+    .hero-chart .bar:nth-child(1) { animation-delay: 0.05s; height: 35%; }
+    .hero-chart .bar:nth-child(2) { animation-delay: 0.15s; height: 55%; }
+    .hero-chart .bar:nth-child(3) { animation-delay: 0.25s; height: 40%; }
+    .hero-chart .bar:nth-child(4) { animation-delay: 0.35s; height: 72%; }
+    .hero-chart .bar:nth-child(5) { animation-delay: 0.45s; height: 58%; }
+    .hero-chart .bar:nth-child(6) { animation-delay: 0.55s; height: 88%; background: linear-gradient(180deg, #22c55e, #16a34a); }
+    .hero-chart .bar:nth-child(7) { animation-delay: 0.65s; height: 95%; background: linear-gradient(180deg, #22c55e, #16a34a); }
+
+    @keyframes growBar {
+        from { transform: scaleY(0); }
+        to   { transform: scaleY(1); }
+    }
+
+    /* Small floating badge */
+    .hero-float-badge {
+        position: absolute;
+        bottom: -14px;
+        right: -14px;
+        background: #ffffff;
+        color: var(--navy);
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.35);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        z-index: 2;
+        animation: float 4s ease-in-out infinite;
+    }
+    .hero-float-badge i {
+        color: #22c55e;
+        font-size: 1.1rem;
+    }
+    .hero-float-badge .fb-text {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--navy);
+        line-height: 1.2;
+    }
+    .hero-float-badge .fb-text span {
+        display: block;
+        font-weight: 500;
+        color: var(--slate-500);
+        font-size: 0.68rem;
+        margin-top: 2px;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    /* ============================================================
+       TRUST BAR (logos / stats strip)
+       ============================================================ */
+    .lp-trustbar {
+        background: #ffffff;
+        border-bottom: 1px solid var(--slate-200);
+        padding: 1.75rem 1.5rem;
+    }
+    .lp-trustbar-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        text-align: center;
+    }
+    .lp-trustbar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .lp-trustbar-item .tb-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: rgba(79, 140, 255, 0.10);
+        color: #4f8cff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-bottom: 0.35rem;
+    }
+    .lp-trustbar-item .tb-value {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--navy);
+        letter-spacing: -0.4px;
+        line-height: 1;
+    }
+    .lp-trustbar-item .tb-label {
+        font-size: 0.78rem;
+        color: var(--slate-500);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* ============================================================
+       WHY CHOOSE US – features grid
+       ============================================================ */
+    .lp-features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+    }
+
+    .lp-feature {
+        background: #ffffff;
+        border: 1px solid var(--slate-200);
+        border-radius: 16px;
+        padding: 1.75rem 1.4rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .lp-feature::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #4f8cff, #22c55e);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.35s ease;
+    }
+    .lp-feature:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 40px rgba(79, 140, 255, 0.14);
+        border-color: rgba(79, 140, 255, 0.35);
+    }
+    .lp-feature:hover::before {
+        transform: scaleX(1);
+    }
+
+    .lp-feature-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 13px;
+        background: linear-gradient(135deg, rgba(79, 140, 255, 0.14), rgba(34, 197, 94, 0.14));
+        color: #4f8cff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        margin-bottom: 1rem;
+    }
+    .lp-feature h3 {
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: var(--navy);
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.2px;
+    }
+    .lp-feature p {
+        font-size: 0.87rem;
+        color: var(--slate-500);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* ============================================================
+       HOW IT WORKS – timeline
+       ============================================================ */
+    .lp-how {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border-top: 1px solid var(--slate-200);
+        border-bottom: 1px solid var(--slate-200);
+    }
+
+    .lp-steps {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        position: relative;
+        margin-top: 1rem;
+    }
+
+    .lp-step {
+        background: #ffffff;
+        border: 1px solid var(--slate-200);
+        border-radius: 16px;
+        padding: 1.5rem 1.25rem;
+        position: relative;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .lp-step:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+    .lp-step-num {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 6px 16px rgba(79, 140, 255, 0.4);
+    }
+    .lp-step h4 {
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: var(--navy);
+        margin: 0 0 0.4rem;
+        letter-spacing: -0.2px;
+    }
+    .lp-step p {
+        font-size: 0.85rem;
+        color: var(--slate-500);
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    /* ============================================================
+       ANALYTICS / CHART SECTION
+       ============================================================ */
+    .lp-analytics {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+
+    .lp-analytics-text h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--navy);
+        letter-spacing: -0.5px;
+        margin: 0 0 1rem;
+        line-height: 1.25;
+    }
+    .lp-analytics-text p {
+        font-size: 0.98rem;
+        color: var(--slate-500);
+        line-height: 1.7;
+        margin: 0 0 1.5rem;
+    }
+    .lp-analytics-points {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+    }
+    .lp-analytics-points li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.7rem;
+        font-size: 0.92rem;
+        color: var(--slate-700);
+        line-height: 1.55;
+    }
+    .lp-analytics-points li i {
+        flex-shrink: 0;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(34, 197, 94, 0.14);
+        color: #16a34a;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        margin-top: 2px;
+    }
+
+    /* Animated line chart (SVG) */
+    .lp-chart-card {
+        background: #ffffff;
+        border: 1px solid var(--slate-200);
+        border-radius: 18px;
+        padding: 1.5rem;
+        box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+        position: relative;
+    }
+    .lp-chart-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    .lp-chart-head h4 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--navy);
+        margin: 0;
+    }
+    .lp-chart-head .pill {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #16a34a;
+        background: rgba(34, 197, 94, 0.12);
+        padding: 0.25rem 0.6rem;
+        border-radius: 100px;
+    }
+    .lp-chart-card svg {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    /* Animate the polyline drawing */
+    .chart-line {
+        stroke-dasharray: 600;
+        stroke-dashoffset: 600;
+        animation: drawLine 2.5s ease-out forwards;
+    }
+    .chart-area {
+        opacity: 0;
+        animation: fadeArea 1s 1.5s ease-out forwards;
+    }
+    @keyframes drawLine {
+        to { stroke-dashoffset: 0; }
+    }
+    @keyframes fadeArea {
+        to { opacity: 1; }
+    }
+    .chart-dot {
+        opacity: 0;
+        animation: popDot 0.4s ease-out forwards;
+    }
+    .chart-dot:nth-of-type(1) { animation-delay: 1.6s; }
+    .chart-dot:nth-of-type(2) { animation-delay: 1.75s; }
+    .chart-dot:nth-of-type(3) { animation-delay: 1.9s; }
+    .chart-dot:nth-of-type(4) { animation-delay: 2.05s; }
+    @keyframes popDot {
+        to { opacity: 1; }
+    }
+
+    /* ============================================================
+       TESTIMONIALS
+       ============================================================ */
+    .lp-testimonials {
+        background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+        border-top: 1px solid var(--slate-200);
+    }
+
+    .lp-testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+
+    .lp-testimonial {
+        background: #ffffff;
+        border: 1px solid var(--slate-200);
+        border-radius: 16px;
+        padding: 1.75rem 1.5rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .lp-testimonial:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+    }
+    .lp-testimonial .stars {
+        color: #f59e0b;
+        font-size: 0.9rem;
+        margin-bottom: 0.85rem;
+        letter-spacing: 2px;
+    }
+    .lp-testimonial p {
+        font-size: 0.92rem;
+        color: var(--slate-700);
+        line-height: 1.65;
+        margin: 0 0 1.25rem;
+        font-style: italic;
+    }
+    .lp-testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--slate-100);
+    }
+    .lp-testimonial-author .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+    .lp-testimonial-author .who {
+        line-height: 1.2;
+    }
+    .lp-testimonial-author .name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--navy);
+    }
+    .lp-testimonial-author .role {
+        font-size: 0.75rem;
+        color: var(--slate-500);
+        font-weight: 500;
+    }
+
+    /* ============================================================
+       SECURITY / TRANSPARENCY section (two-column)
+       ============================================================ */
+    .lp-twocol {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+    .lp-panel {
+        background: #ffffff;
+        border: 1px solid var(--slate-200);
+        border-radius: 16px;
+        padding: 2rem 1.75rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .lp-panel:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+    }
+    .lp-panel-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 13px;
+        background: linear-gradient(135deg, rgba(79, 140, 255, 0.14), rgba(34, 197, 94, 0.14));
+        color: #4f8cff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+    .lp-panel h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--navy);
+        margin: 0 0 0.6rem;
+        letter-spacing: -0.2px;
+    }
+    .lp-panel p {
+        font-size: 0.9rem;
+        color: var(--slate-500);
+        line-height: 1.65;
+        margin: 0;
+    }
+
+    /* ============================================================
+       FAQ
+       ============================================================ */
+    .lp-faq {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border-top: 1px solid var(--slate-200);
+    }
+    .lp-faq-list {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .lp-faq-item {
+        background: #ffffff;
+        border: 1px solid var(--slate-200);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .lp-faq-item[open] {
+        border-color: rgba(79, 140, 255, 0.4);
+        box-shadow: 0 8px 24px rgba(79, 140, 255, 0.10);
+    }
+    .lp-faq-item summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 1.1rem 1.25rem;
+        font-size: 0.98rem;
+        font-weight: 600;
+        color: var(--navy);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        transition: background 0.2s ease;
+    }
+    .lp-faq-item summary::-webkit-details-marker { display: none; }
+    .lp-faq-item summary:hover {
+        background: rgba(79, 140, 255, 0.04);
+    }
+    .lp-faq-item summary::after {
+        content: "\f067";  /* fa-plus */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #4f8cff;
+        transition: transform 0.25s ease;
+        flex-shrink: 0;
+    }
+    .lp-faq-item[open] summary::after {
+        content: "\f068";  /* fa-minus */
+        transform: rotate(180deg);
+    }
+    .lp-faq-body {
+        padding: 0 1.25rem 1.25rem;
+        font-size: 0.9rem;
+        color: var(--slate-500);
+        line-height: 1.65;
+    }
+
+    /* ============================================================
+       FINAL CTA SECTION
+       ============================================================ */
+    .lp-final-cta {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f172a 100%);
+        border-radius: 20px;
+        padding: 3.5rem 2rem;
+        text-align: center;
+        color: #ffffff;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+    }
+    .lp-final-cta::before {
+        content: "";
+        position: absolute;
+        top: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(79, 140, 255, 0.30), transparent 70%);
+        border-radius: 50%;
+    }
+    .lp-final-cta > * {
+        position: relative;
+        z-index: 1;
+    }
+    .lp-final-cta h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+        margin: 0 0 0.85rem;
+        color: #ffffff;
+    }
+    .lp-final-cta p {
+        font-size: 1rem;
+        color: #cbd5e1;
+        margin: 0 auto 2rem;
+        max-width: 560px;
+        line-height: 1.65;
+    }
+    .lp-final-cta .cta-row {
+        display: flex;
+        gap: 0.85rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .lp-final-cta .lp-btn-outline {
+        border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    /* ============================================================
+       CONTACT CARD
+       ============================================================ */
+    .lp-contact-card {
+        background: #ffffff;
+        border: 1px solid var(--slate-200);
+        border-radius: 16px;
+        padding: 2rem 1.75rem;
+        max-width: 720px;
+        margin: 0 auto;
+        text-align: center;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+    }
+    .lp-contact-card .contact-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 22px rgba(79, 140, 255, 0.35);
+    }
+    .lp-contact-card h3 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--navy);
+        margin: 0 0 0.5rem;
+    }
+    .lp-contact-card p {
+        font-size: 0.92rem;
+        color: var(--slate-500);
+        line-height: 1.65;
+        margin: 0 0 1.25rem;
+    }
+    .lp-contact-card a.mail {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.35rem;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.92rem;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+    }
+    .lp-contact-card a.mail:hover {
+        background: linear-gradient(135deg, #3b7bf0, #2563eb);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+        color: #ffffff;
+    }
+
+    .lp-disclaimer {
+        background-color: #fff8e1;
+        color: #7a5c00;
+        padding: 1rem 1.25rem;
+        border-left: 4px solid #f0b400;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        margin-top: 1.5rem;
+        text-align: left;
+    }
+
+    /* ============================================================
+       SCROLL REVEAL ANIMATION
+       ============================================================ */
+    .reveal {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1024px) {
+        .lp-hero { padding: 3.5rem 1.25rem 4rem; }
+        .lp-hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+        .lp-hero h1 { font-size: 2.2rem; }
+        .lp-hero p.lead { font-size: 1rem; }
+        .lp-hero-visual { order: -1; }
+        .hero-card { max-width: 380px; }
+
+        .lp-trustbar-inner { grid-template-columns: repeat(2, 1fr); }
+        .lp-features-grid { grid-template-columns: repeat(2, 1fr); }
+        .lp-steps { grid-template-columns: repeat(2, 1fr); }
+        .lp-analytics { grid-template-columns: 1fr; gap: 2rem; }
+        .lp-testimonial-grid { grid-template-columns: 1fr; }
+        .lp-twocol { grid-template-columns: 1fr; }
+        .lp-section { padding: 2.5rem 1.25rem; }
+        .lp-section-title { font-size: 1.6rem; }
+        .lp-analytics-text h2 { font-size: 1.5rem; }
+        .lp-final-cta { padding: 2.5rem 1.5rem; }
+        .lp-final-cta h2 { font-size: 1.6rem; }
+    }
+
+    @media (max-width: 768px) {
+        .lp-hero { padding: 2.5rem 1rem 3rem; }
+        .lp-hero h1 { font-size: 1.7rem; letter-spacing: -0.5px; }
+        .lp-hero p.lead { font-size: 0.95rem; }
+        .lp-hero-actions { flex-direction: column; }
+        .lp-hero-actions .lp-btn { width: 100%; justify-content: center; }
+        .lp-hero-stats { grid-template-columns: 1fr; gap: 0.65rem; max-width: 100%; }
+        .lp-hero-stat { padding: 0.85rem; }
+        .lp-hero-stat .num { font-size: 1.25rem; }
+
+        .hero-card { padding: 1.25rem; }
+        .hero-card-value { font-size: 1.65rem; }
+        .hero-chart { height: 90px; }
+
+        .lp-trustbar-inner { grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .lp-features-grid { grid-template-columns: 1fr; gap: 0.9rem; }
+        .lp-steps { grid-template-columns: 1fr; gap: 0.9rem; }
+        .lp-testimonial { padding: 1.5rem 1.25rem; }
+        .lp-panel { padding: 1.5rem 1.25rem; }
+        .lp-section { padding: 2rem 1rem; }
+        .lp-section-title { font-size: 1.35rem; }
+        .lp-section-sub { font-size: 0.9rem; margin-bottom: 1.75rem; }
+        .lp-analytics-text h2 { font-size: 1.3rem; }
+        .lp-analytics-points li { font-size: 0.86rem; }
+        .lp-final-cta { padding: 2rem 1.25rem; border-radius: 14px; }
+        .lp-final-cta h2 { font-size: 1.35rem; }
+        .lp-final-cta p { font-size: 0.9rem; }
+        .lp-final-cta .cta-row { flex-direction: column; }
+        .lp-final-cta .lp-btn { width: 100%; justify-content: center; }
+        .lp-faq-item summary { font-size: 0.9rem; padding: 0.95rem 1rem; }
+        .lp-faq-body { padding: 0 1rem 1rem; font-size: 0.85rem; }
+
+        .hero-float-badge {
+            bottom: -10px;
+            right: -6px;
+            padding: 0.6rem 0.85rem;
+        }
+        .hero-float-badge .fb-text { font-size: 0.7rem; }
+    }
+</style>
 {% endblock extra_css %}
 
 {% block content %}
-        <!-- Flashed message will be appear here -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                   <div class='msg'> {{ message }} </div>
-                  </div> 
+
+<!-- ============================================================
+     HERO SECTION
+     ============================================================ -->
+<section class="lp-hero">
+    <div class="lp-hero-inner">
+
+        <div class="lp-hero-text">
+            <span class="lp-hero-badge">
+                <i class="fas fa-bolt"></i> AI-Powered · Free to Start
+            </span>
+
+            <h1>
+                Invest smarter with <span class="accent">AI-driven</span> mutual fund recommendations.
+            </h1>
+
+            <p class="lead">
+                Discover personalised mutual fund picks tailored to your goals, risk appetite, and
+                investment horizon — powered by real-time market data and machine learning.
+            </p>
+
+            <div class="lp-hero-actions">
+                <a href="{% url 'newuser' %}" class="lp-btn lp-btn-primary">
+                    <i class="fas fa-rocket"></i> Get Started — It's Free
+                </a>
+                <a href="{% url 'login' %}" class="lp-btn lp-btn-outline">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </a>
+            </div>
+
+            <div class="lp-hero-trust">
+                <span class="trust-item"><i class="fas fa-check-circle"></i> No credit card required</span>
+                <span class="trust-item"><i class="fas fa-check-circle"></i> 100% free to explore</span>
+                <span class="trust-item"><i class="fas fa-check-circle"></i> Cancel anytime</span>
+            </div>
+
+            <div class="lp-hero-stats">
+                <div class="lp-hero-stat">
+                    <div class="num accent">500+</div>
+                    <div class="lbl">Investors</div>
                 </div>
-            {% endfor %}
-        {% endif %}
+                <div class="lp-hero-stat">
+                    <div class="num">95%</div>
+                    <div class="lbl">Accuracy</div>
+                </div>
+                <div class="lp-hero-stat">
+                    <div class="num">1000+</div>
+                    <div class="lbl">Funds Tracked</div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Hero Section -->
-    <div class="hero">
-        <a href="#top" class="logo">
-            <img src="{% static 'favicon/favicon.webp' %}" alt="Profile" class="profile-icon">
-        </a>
-        <br><br>
-        <h1>Welcome to AI-Powered Mutual Fund Recommendation</h1>
-        <p>Discover the best investment opportunities tailored to your financial goals and risk appetite with our AI-driven platform.</p>
-        <a href="{% url 'newuser' %}" class="cta-button">Get Started for Free</a>
+        <div class="lp-hero-visual">
+            <div class="hero-card">
+                <div class="hero-card-head">
+                    <span class="title">Portfolio Performance</span>
+                    <span class="live-dot">LIVE</span>
+                </div>
+                <div class="hero-card-value">₹ 12,48,320</div>
+                <div class="hero-card-change">
+                    <i class="fas fa-arrow-up"></i> +18.4% this year
+                </div>
+                <div class="hero-chart" aria-hidden="true">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+            </div>
+            <div class="hero-float-badge">
+                <i class="fas fa-shield-halved"></i>
+                <div class="fb-text">
+                    Bank-grade security
+                    <span>256-bit encryption</span>
+                </div>
+            </div>
+        </div>
+
     </div>
+</section>
 
-    <!-- Why Choose Us Section -->
-    <div class="features">
-        <h2>Why Choose Us?</h2>
-        <ul>
-            <li><strong>AI-Powered Insights:</strong> Our advanced algorithms analyze market data to provide the best investment options.</li>
-            <li><strong>Personalized Recommendations:</strong> Tailored fund suggestions based on your preferences.</li>
-            <li><strong>Real-Time Market Trends:</strong> Stay updated with the latest trends and mutual fund performance.</li>
-            <li><strong>Safe & Secure:</strong> Your data security is our top priority.</li>
-        </ul>
-    </div>
-
-    <!-- How It Works Section -->
-    <div class="features">
-        <h2>How It Works?</h2>
-        <div class="steps">
-            <div class="step"><strong>Step 1:</strong> Register and log in.</div>
-            <div class="step"><strong>Step 2:</strong> Enter your investment preferences.</div>
-            <div class="step"><strong>Step 3:</strong> Get instant AI-driven recommendations.</div>
-            <div class="step"><strong>Step 4:</strong> Track and manage your investments.</div>
+<!-- ============================================================
+     TRUST BAR
+     ============================================================ -->
+<section class="lp-trustbar">
+    <div class="lp-trustbar-inner">
+        <div class="lp-trustbar-item">
+            <div class="tb-icon"><i class="fas fa-users"></i></div>
+            <div class="tb-value">500+</div>
+            <div class="tb-label">Active Investors</div>
+        </div>
+        <div class="lp-trustbar-item">
+            <div class="tb-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="tb-value">1000+</div>
+            <div class="tb-label">Funds Analysed</div>
+        </div>
+        <div class="lp-trustbar-item">
+            <div class="tb-icon"><i class="fas fa-bullseye"></i></div>
+            <div class="tb-value">95%</div>
+            <div class="tb-label">Match Accuracy</div>
+        </div>
+        <div class="lp-trustbar-item">
+            <div class="tb-icon"><i class="fas fa-shield-halved"></i></div>
+            <div class="tb-value">100%</div>
+            <div class="tb-label">Data Secured</div>
         </div>
     </div>
+</section>
 
-    <!-- Testimonials Section -->
-    <div class="testimonials">
-        <h2>What Our Users Say</h2>
-        <p><em>"This platform helped me find the best mutual funds with ease. Highly recommended!"</em> – A Happy Investor</p>
-        <p><em>"The AI-driven recommendations saved me hours of research. Fantastic tool!"</em> – Financial Advisor</p>
+<!-- ============================================================
+     WHY CHOOSE US
+     ============================================================ -->
+<section class="lp-section reveal">
+    <h2 class="lp-section-title">Why Choose Us?</h2>
+    <p class="lp-section-sub">
+        Built by investors, powered by AI — a platform designed to give you clarity
+        and confidence in every mutual fund decision.
+    </p>
+
+    <div class="lp-features-grid">
+
+        <div class="lp-feature">
+            <div class="lp-feature-icon"><i class="fas fa-brain"></i></div>
+            <h3>AI-Powered Insights</h3>
+            <p>Advanced machine learning models analyse thousands of funds and market signals to surface the best options for you.</p>
+        </div>
+
+        <div class="lp-feature">
+            <div class="lp-feature-icon"><i class="fas fa-user-check"></i></div>
+            <h3>Personalised Picks</h3>
+            <p>Recommendations tailored to your risk appetite, investment horizon, and financial goals — never a one-size-fits-all list.</p>
+        </div>
+
+        <div class="lp-feature">
+            <div class="lp-feature-icon"><i class="fas fa-bolt"></i></div>
+            <h3>Real-Time Trends</h3>
+            <p>Stay updated with live NAV movements, top performers, and market shifts — refreshed continuously.</p>
+        </div>
+
+        <div class="lp-feature">
+            <div class="lp-feature-icon"><i class="fas fa-shield-halved"></i></div>
+            <h3>Safe & Secure</h3>
+            <p>256-bit encryption, zero data sharing, and full transparency. Your financial data stays yours — always.</p>
+        </div>
+
     </div>
+</section>
 
-    <!-- Additional Sections -->
-    <!-- Security & Transparency -->
-    <div class="features">
-        <h2>Security & Transparency</h2>
-        <p>We prioritize your financial security and ensure that all recommendations are based on transparent, unbiased data analysis.</p>
+<!-- ============================================================
+     HOW IT WORKS
+     ============================================================ -->
+<section class="lp-how">
+    <div class="lp-section reveal">
+        <h2 class="lp-section-title">How It Works</h2>
+        <p class="lp-section-sub">
+            From sign-up to smart investments in under two minutes.
+        </p>
+
+        <div class="lp-steps">
+
+            <div class="lp-step">
+                <div class="lp-step-num">1</div>
+                <h4>Register & Log In</h4>
+                <p>Create your free account in seconds — no credit card required.</p>
+            </div>
+
+            <div class="lp-step">
+                <div class="lp-step-num">2</div>
+                <h4>Enter Preferences</h4>
+                <p>Tell us your fund type, tenure, and expected returns.</p>
+            </div>
+
+            <div class="lp-step">
+                <div class="lp-step-num">3</div>
+                <h4>Get Recommendations</h4>
+                <p>Receive AI-matched funds ranked by performance and risk.</p>
+            </div>
+
+            <div class="lp-step">
+                <div class="lp-step-num">4</div>
+                <h4>Track & Manage</h4>
+                <p>Save favourites and monitor your portfolio anytime, anywhere.</p>
+            </div>
+
+        </div>
     </div>
+</section>
 
-    <!-- Market Trends & Insights -->
-    <div class="features">
-        <h2>Market Trends & Insights</h2>
-        <p>Stay ahead with the latest insights on market movements, investment strategies, and top-performing funds.</p>
+<!-- ============================================================
+     ANALYTICS / CHART SECTION
+     ============================================================ -->
+<section class="lp-section reveal">
+    <div class="lp-analytics">
+
+        <div class="lp-analytics-text">
+            <h2>Data-driven insights you can actually act on.</h2>
+            <p>
+                Every recommendation is backed by real market data — not opinions.
+                Our engine processes historical performance, volatility, expense ratios,
+                and fund manager track records to give you clarity.
+            </p>
+
+            <ul class="lp-analytics-points">
+                <li>
+                    <i class="fas fa-check"></i>
+                    <span>Compare funds side-by-side with live NAV and returns</span>
+                </li>
+                <li>
+                    <i class="fas fa-check"></i>
+                    <span>See risk-adjusted ratings across multiple time horizons</span>
+                </li>
+                <li>
+                    <i class="fas fa-check"></i>
+                    <span>Understand why a fund is recommended — full transparency</span>
+                </li>
+                <li>
+                    <i class="fas fa-check"></i>
+                    <span>Track performance over 1M, 6M, 1Y, 3Y, and 5Y periods</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="lp-chart-card">
+            <div class="lp-chart-head">
+                <h4>Average Return Growth</h4>
+                <span class="pill">
+                    <i class="fas fa-arrow-up"></i> +24.6%
+                </span>
+            </div>
+
+            <svg viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
+                <!-- Grid lines -->
+                <line x1="0" y1="40"  x2="400" y2="40"  stroke="#e2e8f0" stroke-width="1"/>
+                <line x1="0" y1="80"  x2="400" y2="80"  stroke="#e2e8f0" stroke-width="1"/>
+                <line x1="0" y1="120" x2="400" y2="120" stroke="#e2e8f0" stroke-width="1"/>
+                <line x1="0" y1="160" x2="400" y2="160" stroke="#e2e8f0" stroke-width="1"/>
+
+                <!-- Area under line -->
+                <path class="chart-area"
+                      d="M 0 170 L 60 150 L 130 120 L 200 90 L 270 70 L 340 40 L 400 20 L 400 200 L 0 200 Z"
+                      fill="url(#chartGradient)" />
+
+                <!-- Line -->
+                <polyline class="chart-line"
+                          points="0,170 60,150 130,120 200,90 270,70 340,40 400,20"
+                          fill="none"
+                          stroke="#4f8cff"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round" />
+
+                <!-- Dots at data points -->
+                <circle class="chart-dot" cx="0"   cy="170" r="4" fill="#ffffff" stroke="#4f8cff" stroke-width="2"/>
+                <circle class="chart-dot" cx="130" cy="120" r="4" fill="#ffffff" stroke="#4f8cff" stroke-width="2"/>
+                <circle class="chart-dot" cx="270" cy="70"  r="4" fill="#ffffff" stroke="#4f8cff" stroke-width="2"/>
+                <circle class="chart-dot" cx="400" cy="20"  r="5" fill="#22c55e" stroke="#ffffff" stroke-width="2"/>
+
+                <defs>
+                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%"   stop-color="#4f8cff" stop-opacity="0.30"/>
+                        <stop offset="100%" stop-color="#4f8cff" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
     </div>
+</section>
 
-    <!-- FAQs Section -->
-    <div class="features">
-        <h2>Frequently Asked Questions</h2>
-        <pre><strong>Q: How does the AI select mutual funds?</strong></pre>
-        <p>Ans: The AI analyzes market trends, historical data, and user preferences to recommend the best options.</p>
-        <pre><strong>Q: Is this platform free to use?</strong></pre>
-        <p>Ans: Yes, registration is free, and you can explore our recommendations without any charges.</p>
+<!-- ============================================================
+     TESTIMONIALS
+     ============================================================ -->
+<section class="lp-testimonials">
+    <div class="lp-section reveal">
+        <h2 class="lp-section-title">Loved by Investors</h2>
+        <p class="lp-section-sub">
+            Real feedback from people using AI-powered recommendations every day.
+        </p>
+
+        <div class="lp-testimonial-grid">
+
+            <div class="lp-testimonial">
+                <div class="stars">★★★★★</div>
+                <p>"This platform helped me find the best mutual funds with ease. The recommendations were spot on and saved me hours of research."</p>
+                <div class="lp-testimonial-author">
+                    <div class="avatar">R</div>
+                    <div class="who">
+                        <div class="name">Rahul Sharma</div>
+                        <div class="role">Software Engineer</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lp-testimonial">
+                <div class="stars">★★★★★</div>
+                <p>"The AI-driven insights are incredibly useful. It's like having a financial advisor available 24/7 — at zero cost."</p>
+                <div class="lp-testimonial-author">
+                    <div class="avatar">P</div>
+                    <div class="who">
+                        <div class="name">Priya Nair</div>
+                        <div class="role">Financial Advisor</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lp-testimonial">
+                <div class="stars">★★★★★</div>
+                <p>"I've tried multiple platforms, but the transparency here is unmatched. I can see exactly why a fund was recommended."</p>
+                <div class="lp-testimonial-author">
+                    <div class="avatar">A</div>
+                    <div class="who">
+                        <div class="name">Arjun Mehta</div>
+                        <div class="role">First-time Investor</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+</section>
 
-    <!-- Contact Us Section -->
-    <div id="down" class="features_contact">
-        <h2>Contact Us</h2>
-          <p>
-            If you have any questions or need assistance, reach out to us at 
-            <strong>
-              <a href="mailto:mutualfundrecommendation@gmail.com">mutualfundrecommendation@gmail.com</a>
-            </strong>
-          </p>
-      <div class="disclaimer">
-        Disclaimer: We’re here to help you make smarter investment choices with data and insights.
-        However, mutual fund investments are subject to market risks, and returns are not guaranteed.
-      </div>
-     </div>
+<!-- ============================================================
+     SECURITY & TRANSPARENCY
+     ============================================================ -->
+<section class="lp-section reveal">
+    <h2 class="lp-section-title">Security & Transparency</h2>
+    <p class="lp-section-sub">
+        Trust is built on what we protect and what we reveal.
+    </p>
+
+    <div class="lp-twocol">
+
+        <div class="lp-panel">
+            <div class="lp-panel-icon"><i class="fas fa-lock"></i></div>
+            <h3>Your Data, Protected</h3>
+            <p>
+                We use bank-grade 256-bit encryption to protect your personal and
+                financial information. We never sell, share, or misuse your data —
+                period. Your privacy is non-negotiable.
+            </p>
+        </div>
+
+        <div class="lp-panel">
+            <div class="lp-panel-icon"><i class="fas fa-eye"></i></div>
+            <h3>Full Transparency</h3>
+            <p>
+                Every recommendation comes with clear reasoning: why this fund,
+                what its past performance looks like, and what risks are involved.
+                You're always in control of your decisions.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================
+     FAQ
+     ============================================================ -->
+<section class="lp-faq">
+    <div class="lp-section reveal">
+        <h2 class="lp-section-title">Frequently Asked Questions</h2>
+        <p class="lp-section-sub">
+            Everything you need to know before getting started.
+        </p>
+
+        <div class="lp-faq-list">
+
+            <details class="lp-faq-item" open>
+                <summary>How does the AI select mutual funds?</summary>
+                <div class="lp-faq-body">
+                    Our AI analyses market trends, historical performance, volatility, fund manager track records,
+                    and your personal preferences to recommend the best-matched mutual funds for your goals.
+                </div>
+            </details>
+
+            <details class="lp-faq-item">
+                <summary>Is the platform free to use?</summary>
+                <div class="lp-faq-body">
+                    Yes — registration is completely free, and you can explore recommendations
+                    without any charges. No credit card required to get started.
+                </div>
+            </details>
+
+            <details class="lp-faq-item">
+                <summary>Are the recommendations guaranteed to make money?</summary>
+                <div class="lp-faq-body">
+                    No. Mutual fund investments are subject to market risks, and returns
+                    are not guaranteed. Our recommendations are based on data and analysis —
+                    not promises. Always invest responsibly.
+                </div>
+            </details>
+
+            <details class="lp-faq-item">
+                <summary>Do I need investing experience to use this?</summary>
+                <div class="lp-faq-body">
+                    Not at all. The platform is designed to be beginner-friendly.
+                    We explain every recommendation in plain language so you can learn as you invest.
+                </div>
+            </details>
+
+            <details class="lp-faq-item">
+                <summary>How is my data used?</summary>
+                <div class="lp-faq-body">
+                    Your data is used only to generate personalised recommendations.
+                    We never sell or share your information with third parties.
+                    All data is encrypted at rest and in transit.
+                </div>
+            </details>
+
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     FINAL CTA
+     ============================================================ -->
+<section class="lp-section">
+    <div class="lp-final-cta reveal">
+        <h2>Start investing smarter today.</h2>
+        <p>
+            Join 500+ investors using AI to find better mutual funds.
+            Free to start, no credit card required.
+        </p>
+        <div class="cta-row">
+            <a href="{% url 'newuser' %}" class="lp-btn lp-btn-primary">
+                <i class="fas fa-rocket"></i> Create Free Account
+            </a>
+            <a href="{% url 'login' %}" class="lp-btn lp-btn-outline">
+                <i class="fas fa-sign-in-alt"></i> Sign In Instead
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     CONTACT
+     ============================================================ -->
+<section class="lp-section">
+    <h2 class="lp-section-title">Get in Touch</h2>
+    <p class="lp-section-sub">
+        Questions, feedback, or partnership ideas? We'd love to hear from you.
+    </p>
+
+    <div class="lp-contact-card">
+        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+        <h3>Email Us</h3>
+        <p>Our team responds within 24 hours on business days.</p>
+        <a href="mailto:mutualfundrecommendation@gmail.com" class="mail">
+            <i class="fas fa-paper-plane"></i> mutualfundrecommendation@gmail.com
+        </a>
+
+        <div class="lp-disclaimer">
+            <strong>Disclaimer:</strong> We're here to help you make smarter investment choices
+            with data and insights. However, mutual fund investments are subject to market risks,
+            and returns are not guaranteed.
+        </div>
+    </div>
+</section>
 
 {% endblock content %}
+
+{% block js_code %}
+<script>
+/* ============================================================
+   SCROLL REVEAL ANIMATIONS
+   Uses IntersectionObserver to add .visible when a .reveal
+   element enters the viewport.
+   ============================================================ */
+(function() {
+    if (!('IntersectionObserver' in window)) {
+        // Fallback: show everything if IO isn't supported
+        document.querySelectorAll('.reveal').forEach(function(el) {
+            el.classList.add('visible');
+        });
+        return;
+    }
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -60px 0px'
+    });
+
+    document.querySelectorAll('.reveal').forEach(function(el) {
+        observer.observe(el);
+    });
+})();
+</script>
+{% endblock js_code %}

@@ -1,37 +1,596 @@
-{% extends 'Header.html' %}
+{% extends 'Base.html' %}
 {% load static %}
 
-{% block title %} {{ title }} {% endblock title %}
+{% block title %}{{ title }}{% endblock title %}
 
-{% block extra_css %} 
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Forgotusername.css' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
+{% block extra_head %}
+    <meta name="robots" content="noindex, nofollow">
+{% endblock extra_head %}
+
+{% block extra_css %}
+<style>
+    /* ============================================================
+       FORGOT USERNAME PAGE – PROFESSIONAL & RESPONSIVE
+       ============================================================ */
+
+    .forgot-page {
+        background-color: #f5f7fa;
+        min-height: calc(100vh - 120px);
+        padding: 2.5rem 1rem 4rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .forgot-layout {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1.15fr 1fr;
+        gap: 2rem;
+        align-items: stretch;
+    }
+
+    /* ============================================================
+       LEFT PANEL – INFO / HELP
+       ============================================================ */
+    .info-panel {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 18px;
+        padding: 2.75rem 2.25rem;
+        color: #ffffff;
+        box-shadow: 0 10px 40px rgba(15, 23, 42, 0.20);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-panel::before {
+        content: "";
+        position: absolute;
+        top: -80px;
+        right: -80px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(79, 140, 255, 0.30), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .info-panel::after {
+        content: "";
+        position: absolute;
+        bottom: -100px;
+        left: -60px;
+        width: 240px;
+        height: 240px;
+        background: radial-gradient(circle, rgba(75, 192, 192, 0.20), transparent 70%);
+        border-radius: 50%;
+    }
+
+    .info-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-brand .brand-mark {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.45);
+    }
+
+    .info-brand .brand-text {
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: -0.2px;
+        line-height: 1.2;
+    }
+    .info-brand .brand-text span {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: #94a3b8;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-top: 2px;
+    }
+
+    .info-panel h2 {
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin: 0 0 0.75rem;
+        letter-spacing: -0.5px;
+        line-height: 1.25;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-panel p.lead {
+        font-size: 1rem;
+        color: #cbd5e1;
+        margin: 0 0 2rem;
+        line-height: 1.65;
+        position: relative;
+        z-index: 1;
+    }
+
+    .steps-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.15rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .steps-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.9rem;
+        font-size: 0.94rem;
+        color: #e2e8f0;
+        line-height: 1.55;
+    }
+
+    .steps-list .step-num {
+        flex-shrink: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(79, 140, 255, 0.18);
+        color: #4f8cff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-top: 1px;
+    }
+
+    .steps-list strong {
+        color: #ffffff;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    /* Info box with note */
+    .info-note {
+        margin-top: 1.75rem;
+        padding: 0.9rem 1.1rem;
+        background: rgba(79, 140, 255, 0.10);
+        border-left: 3px solid #4f8cff;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        color: #cbd5e1;
+        line-height: 1.55;
+        display: flex;
+        gap: 0.65rem;
+        align-items: flex-start;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-note i {
+        color: #4f8cff;
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+
+    .info-footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.85rem;
+        color: #94a3b8;
+        position: relative;
+        z-index: 1;
+    }
+
+    .info-footer a {
+        color: #4f8cff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    .info-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* ============================================================
+       RIGHT PANEL – FORM CARD
+       ============================================================ */
+    .form-card {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 6px 28px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-head {
+        text-align: center;
+        margin-bottom: 1.75rem;
+    }
+
+    .form-head .form-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 6px 18px rgba(79, 140, 255, 0.40);
+    }
+
+    .form-head h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.35rem;
+        letter-spacing: -0.4px;
+    }
+
+    .form-head p {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.55;
+    }
+
+    /* ---------- FORM FIELDS ---------- */
+    .form-group {
+        margin-bottom: 1.15rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.45rem;
+        letter-spacing: 0.2px;
+    }
+
+    .input-wrap {
+        position: relative;
+        display: block;
+    }
+
+    .input-wrap input {
+        width: 100%;
+        padding: 0.85rem 1rem 0.85rem 2.75rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: #0f172a;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .input-wrap input:focus {
+        outline: none;
+        border-color: #4f8cff;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+    }
+
+    .input-wrap input::placeholder {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    .input-wrap .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 1rem;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.95rem;
+        pointer-events: none;
+        transition: color 0.2s ease;
+    }
+
+    .input-wrap input:focus + .input-icon {
+        color: #4f8cff;
+    }
+
+    /* ---------- SUBMIT BUTTON ---------- */
+    .btn-submit {
+        width: 100%;
+        padding: 0.95rem 1.5rem;
+        background: linear-gradient(135deg, #4f8cff 0%, #3b7bf0 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-family: inherit;
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #3b7bf0 0%, #2563eb 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ---------- BACK LINK ---------- */
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+        font-size: 0.87rem;
+        color: #64748b;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: #4f8cff;
+    }
+
+    /* ---------- HELPER NOTE ---------- */
+    .helper-note {
+        margin-top: 1.5rem;
+        padding: 0.85rem 1rem;
+        background: #eff6ff;
+        border-left: 4px solid #3b82f6;
+        border-radius: 8px;
+        font-size: 0.84rem;
+        color: #1e40af;
+        line-height: 1.55;
+        display: flex;
+        gap: 0.6rem;
+        align-items: flex-start;
+    }
+
+    .helper-note i {
+        color: #3b82f6;
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+
+    /* ============================================================
+       RESPONSIVE – TABLET
+       ============================================================ */
+    @media (max-width: 991.98px) {
+        .forgot-page {
+            padding: 1.75rem 1rem 3rem;
+        }
+        .forgot-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 520px;
+        }
+        .info-panel {
+            padding: 2rem 1.75rem;
+        }
+        .info-panel h2 { font-size: 1.45rem; }
+        .form-card {
+            padding: 2rem 1.75rem;
+        }
+    }
+
+    /* ============================================================
+       RESPONSIVE – MOBILE
+       ============================================================ */
+    @media (max-width: 767.98px) {
+        .forgot-page { padding: 1.25rem 0.75rem 2.5rem; }
+        .info-panel {
+            padding: 1.75rem 1.35rem;
+            border-radius: 14px;
+        }
+        .info-brand .brand-mark {
+            width: 40px; height: 40px; font-size: 1.15rem;
+        }
+        .info-brand .brand-text { font-size: 0.95rem; }
+        .info-brand .brand-text span { font-size: 0.65rem; }
+
+        .info-panel h2 { font-size: 1.25rem; }
+        .info-panel p.lead { font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .steps-list li { font-size: 0.88rem; }
+        .steps-list .step-num {
+            width: 26px; height: 26px; font-size: 0.78rem;
+        }
+        .info-note { font-size: 0.8rem; padding: 0.75rem 0.9rem; }
+
+        .form-card {
+            padding: 1.75rem 1.35rem;
+            border-radius: 14px;
+        }
+        .form-head .form-icon {
+            width: 48px; height: 48px; font-size: 1.25rem;
+        }
+        .form-head h3 { font-size: 1.3rem; }
+        .form-head p { font-size: 0.85rem; }
+
+        .input-wrap input {
+            padding: 0.75rem 0.9rem 0.75rem 2.5rem;
+            font-size: 0.92rem;
+        }
+        .input-wrap .input-icon { left: 0.85rem; font-size: 0.88rem; }
+
+        .btn-submit { padding: 0.85rem 1.25rem; font-size: 0.94rem; }
+        .back-link { font-size: 0.82rem; }
+        .helper-note { font-size: 0.8rem; }
+    }
+
+    /* ============================================================
+       VERY SMALL (≤ 420px)
+       ============================================================ */
+    @media (max-width: 420px) {
+        .info-panel { padding: 1.5rem 1.15rem; }
+        .form-card { padding: 1.5rem 1.15rem; }
+        .steps-list li { font-size: 0.84rem; }
+    }
+</style>
 {% endblock extra_css %}
-
-{% block header %} {{ header }} {% endblock header %}
 
 {% block content %}
 
-        <!-- Flashed message will be appear here -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                   <div class='msg'> {{ message }} </div>
-                  </div> 
+    <!-- FLASH MESSAGES -->
+    {% if messages %}
+    <div class="msg-wrap">
+        {% for message in messages %}
+            <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
+                {% if message.tags == 'success' %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == 'error' %}
+                    <i class="fas fa-exclamation-circle"></i>
+                {% elif message.tags == 'warning' %}
+                    <i class="fas fa-exclamation-triangle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <span>{{ message }}</span>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+<div class="forgot-page">
+
+    <div class="forgot-layout">
+
+        <!-- ============ LEFT: INFO PANEL ============ -->
+        <aside class="info-panel">
+
+            <div class="info-brand">
+                <div class="brand-mark">
+                    <i class="fas fa-user-tag"></i>
                 </div>
-            {% endfor %}
-        {% endif %}
+                <div class="brand-text">
+                    Username Recovery
+                    <span>Secure Lookup</span>
+                </div>
+            </div>
 
-    <div class="form">
-        <form  action="/forgetusername/" method="POST">
-            {% csrf_token %}
-                <label for="email">Registered email</label>
-                <input type="email" id="email" name="email" placeholder="" required>
+            <h2>Forgot your username?</h2>
+            <p class="lead">
+                No problem — enter the email address you registered with and we'll
+                help you recover your username securely.
+            </p>
 
-                <button>SUBMIT</button>
-                <p style="text-align: center; text-decoration: none;"><a href="/" style="text-decoration: none;">← Back to Home</a></p>
-        </form>
-  </div>
+            <ul class="steps-list">
+                <li>
+                    <span class="step-num">1</span>
+                    <div>
+                        <strong>Enter your registered email</strong>
+                        Use the same email you signed up with.
+                    </div>
+                </li>
+                <li>
+                    <span class="step-num">2</span>
+                    <div>
+                        <strong>We verify your identity</strong>
+                        We'll confirm that the email matches an account.
+                    </div>
+                </li>
+                <li>
+                    <span class="step-num">3</span>
+                    <div>
+                        <strong>Your username is sent</strong>
+                        You'll receive it on the registered email address.
+                    </div>
+                </li>
+            </ul>
+
+            <div class="info-note">
+                <i class="fas fa-shield-alt"></i>
+                <span>For your security, we never reveal whether an email is registered.</span>
+            </div>
+
+            <div class="info-footer">
+                Remembered your credentials? <a href="{% url 'login' %}">Back to Login</a>
+            </div>
+
+        </aside>
+
+        <!-- ============ RIGHT: FORM CARD ============ -->
+        <div class="form-card">
+
+            <div class="form-head">
+                <div class="form-icon">
+                    <i class="fas fa-magnifying-glass"></i>
+                </div>
+                <h3>Recover Your Username</h3>
+                <p>Enter your registered email to receive your username.</p>
+            </div>
+
+            <form action="/forgetusername/" method="POST" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="email">Registered Email</label>
+                    <div class="input-wrap">
+                        <input type="email" id="email" name="email"
+                               placeholder="Enter your registered email"
+                               autocomplete="email" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-paper-plane"></i> Send Username
+                </button>
+            </form>
+
+            <div class="helper-note">
+                <i class="fas fa-info-circle"></i>
+                <span>Check your inbox and spam folder — the email should arrive within a few minutes.</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock content %}
+
+{% block js_code %}
+<script src="{% static 'javascript/allmessage.js' %}"></script>
+{% endblock js_code %}

@@ -1,69 +1,475 @@
-{% extends 'Header.html' %}
+{% extends 'Base.html' %}
 {% load static %}
 
-{% block title %} {{ title }} {% endblock title %}
+{% block title %}Contact Us | AI Powered Mutual Fund Recommendation{% endblock title %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Contact.css' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
+<style>
+    /* ============================================================
+       CONTACT PAGE – PROFESSIONAL & RESPONSIVE
+       ============================================================ */
+
+    .contact-page {
+        background-color: #f5f7fa;
+        min-height: calc(100vh - 120px);
+        padding: 2.5rem 1rem 4rem;
+    }
+
+    .contact-container-narrow {
+        max-width: 1150px;
+        margin: 0 auto;
+    }
+
+    /* ---------- PAGE HEADER ---------- */
+    .contact-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    .contact-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.5px;
+    }
+    .contact-header p {
+        font-size: 1rem;
+        color: #64748b;
+        margin: 0 auto;
+        max-width: 620px;
+    }
+
+    /* ---------- TWO-COLUMN GRID ---------- */
+    .contact-layout {
+        display: grid;
+        grid-template-columns: 1fr 1.25fr;
+        gap: 2rem;
+        align-items: start;
+        margin-bottom: 3rem;
+    }
+
+    /* ---------- INFO PANEL (LEFT) ---------- */
+    .info-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .info-card {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 1.35rem 1.5rem;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .info-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 26px rgba(79, 140, 255, 0.12);
+    }
+
+    .info-icon {
+        flex-shrink: 0;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        background: rgba(79, 140, 255, 0.1);
+        color: #4f8cff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .info-body h4 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.25rem;
+        letter-spacing: -0.2px;
+    }
+    .info-body p {
+        font-size: 0.88rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.55;
+        word-break: break-word;
+    }
+    .info-body a {
+        color: #4f8cff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .info-body a:hover {
+        text-decoration: underline;
+    }
+
+    /* Business hours mini-card */
+    .hours-card {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        border-radius: 14px;
+        padding: 1.35rem 1.5rem;
+        color: #ffffff;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, 0.18);
+        position: relative;
+        overflow: hidden;
+    }
+    .hours-card::before {
+        content: "";
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 140px;
+        height: 140px;
+        background: radial-gradient(circle, rgba(79, 140, 255, 0.35), transparent 70%);
+        border-radius: 50%;
+    }
+    .hours-card h4 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin: 0 0 0.75rem;
+        position: relative;
+        z-index: 1;
+    }
+    .hours-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+    .hours-card li {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: #cbd5e1;
+        padding: 0.3rem 0;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    .hours-card li:last-child {
+        border-bottom: none;
+    }
+    .hours-card li span:last-child {
+        color: #ffffff;
+        font-weight: 600;
+    }
+
+    /* ---------- FORM CARD (RIGHT) ---------- */
+    .form-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 2.25rem 2rem;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+    }
+
+    .form-card h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.4rem;
+        letter-spacing: -0.3px;
+    }
+    .form-card .form-sub {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0 0 1.75rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.15rem;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.45rem;
+    }
+    .form-group label .req {
+        color: #dc2626;
+        margin-left: 2px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        color: #0f172a;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+        line-height: 1.55;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #4f8cff;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: #94a3b8;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 0.95rem 1.5rem;
+        background: linear-gradient(135deg, #4f8cff 0%, #3b7bf0 100%);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.98rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #3b7bf0 0%, #2563eb 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+    }
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* ---------- MAP PLACEHOLDER ---------- */
+    .map-section {
+        margin-top: 3rem;
+    }
+    .map-section h2 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 1.25rem;
+        text-align: center;
+        letter-spacing: -0.3px;
+    }
+    .map-wrapper {
+        background: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        height: 340px;
+        position: relative;
+    }
+    .map-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+    }
+
+    /* ============================================================
+       RESPONSIVE – TABLET
+       ============================================================ */
+    @media (max-width: 991.98px) {
+        .contact-page { padding: 1.75rem 1rem 3rem; }
+        .contact-layout {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        .contact-header h1 { font-size: 1.7rem; }
+        .form-card { padding: 1.75rem 1.5rem; }
+        .map-wrapper { height: 300px; }
+    }
+
+    /* ============================================================
+       RESPONSIVE – MOBILE
+       ============================================================ */
+    @media (max-width: 767.98px) {
+        .contact-page { padding: 1.25rem 0.75rem 2.5rem; }
+        .contact-header { margin-bottom: 1.75rem; }
+        .contact-header h1 { font-size: 1.4rem; }
+        .contact-header p { font-size: 0.9rem; }
+
+        .form-card {
+            padding: 1.5rem 1.25rem;
+            border-radius: 14px;
+        }
+        .form-card h2 { font-size: 1.2rem; }
+        .form-card .form-sub { font-size: 0.85rem; margin-bottom: 1.35rem; }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 0.7rem 0.85rem;
+            font-size: 0.92rem;
+        }
+        .form-group textarea { min-height: 110px; }
+
+        .btn-submit {
+            padding: 0.85rem 1.25rem;
+            font-size: 0.92rem;
+        }
+
+        .info-card { padding: 1.1rem 1.15rem; }
+        .info-icon { width: 40px; height: 40px; font-size: 1rem; }
+        .info-body h4 { font-size: 0.9rem; }
+        .info-body p  { font-size: 0.82rem; }
+
+        .hours-card { padding: 1.1rem 1.15rem; }
+        .hours-card li { font-size: 0.8rem; }
+
+        .map-section h2 { font-size: 1.15rem; }
+        .map-wrapper { height: 240px; }
+    }
+
+    /* ============================================================
+       VERY SMALL (≤ 420px)
+       ============================================================ */
+    @media (max-width: 420px) {
+        .info-card { flex-direction: row; align-items: flex-start; }
+        .form-card { padding: 1.25rem 1rem; }
+        .map-wrapper { height: 220px; }
+    }
+</style>
 {% endblock extra_css %}
 
-<!-- Header details -->
-{% block header %} {{ header }} {% endblock %}
+{% block content %}
 
-{% block content %} 
-    <div class="home">
-        <a href="/" class="btn">
-            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
-        </a>
-        <div class="tooltip-text">
-            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
+<div class="contact-page">
+    <div class="contact-container-narrow">
+
+        <!-- PAGE HEADER -->
+        <div class="contact-header">
+            <h1>Contact Us</h1>
+            <p>Have a question, feedback, or partnership enquiry? We'd love to hear from you.</p>
         </div>
-    </div>
 
-        <!-- Flashed message will be appear here -->
+        <!-- FLASH MESSAGES -->
         {% if messages %}
+        <div class="msg-wrap">
             {% for message in messages %}
-                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                   <div class='msg'> {{ message }} </div>
+                <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
+                    {{ message }}
                 </div>
             {% endfor %}
+        </div>
         {% endif %}
-  
-    <div class="contact-container">
 
-        <form action="/contact/" method="POST">
-            
-            {% csrf_token %}
-            
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="" required>
+        <!-- TWO-COLUMN LAYOUT -->
+        <div class="contact-layout">
+
+            <!-- LEFT: INFO PANEL -->
+            <div class="info-panel">
+
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="info-body">
+                        <h4>Our Office</h4>
+                        <p>AI Powered Mutual Fund Recommendation<br>
+                           123 Financial District, Mumbai,<br>
+                           Maharashtra 400001, India</p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="info-body">
+                        <h4>Email Us</h4>
+                        <p><a href="mailto:support@mfundrecommend.com">support@mfundrecommend.com</a><br>
+                           <a href="mailto:info@mfundrecommend.com">info@mfundrecommend.com</a></p>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div class="info-body">
+                        <h4>Call Us</h4>
+                        <p><a href="tel:+911234567890">+91 12345 67890</a><br>
+                           <a href="tel:+919876543210">+91 98765 43210</a></p>
+                    </div>
+                </div>
+
+                <div class="hours-card">
+                    <h4><i class="fas fa-clock me-2"></i> Business Hours</h4>
+                    <ul>
+                        <li><span>Monday – Friday</span><span>9:00 AM – 6:00 PM</span></li>
+                        <li><span>Saturday</span><span>10:00 AM – 2:00 PM</span></li>
+                        <li><span>Sunday</span><span>Closed</span></li>
+                    </ul>
+                </div>
+
             </div>
 
-            <div class="form-group">
-                <label for="phone">Contact Number</label>
-                <input type="phone" class="form-control" id="phone" name="phone" placeholder="" required>
+            <!-- RIGHT: CONTACT FORM -->
+            <div class="form-card">
+                <h2>Send Us a Message</h2>
+                <p class="form-sub">Fill in the form below and our team will get back to you within 24 hours.</p>
+
+                <form action="/contact/" method="POST" novalidate>
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="name">Full Name <span class="req">*</span></label>
+                        <input type="text" id="name" name="name"
+                               placeholder="e.g. Rahul Sharma" required maxlength="80">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Contact Number <span class="req">*</span></label>
+                        <input type="tel" id="phone" name="phone"
+                               placeholder="e.g. +91 98765 43210"
+                               pattern="[0-9+\-\s()]{7,20}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address <span class="req">*</span></label>
+                        <input type="email" id="email" name="email"
+                               placeholder="e.g. rahul@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Your Message <span class="req">*</span></label>
+                        <textarea id="message" name="message"
+                                  placeholder="Tell us how we can help you..."
+                                  required maxlength="1000"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </form>
             </div>
 
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="" required>
-            </div>
+        </div>
 
-            <div class="form-group">
-                <label for="message">Your Message</label>
-                <textarea class="form-control" id="message" name="message" placeholder="Type your message here..." required></textarea>
+        <!-- MAP SECTION -->
+        <div class="map-section">
+            <h2>Find Us Here</h2>
+            <div class="map-wrapper">
+                <iframe
+                    src="https://www.openstreetmap.org/export/embed.html?bbox=72.8%2C18.9%2C72.95%2C19.05&amp;layer=mapnik"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Office Location">
+                </iframe>
             </div>
+        </div>
 
-            <button type="submit">SUBMIT</button>
-        </form>
-            <p style="text-align: center; text-decoration: none;"><a href="/" style="text-decoration: none;">← Back to Home</a></p>
     </div>
 </div>
 
+{% endblock content %}
+
 {% block js_code %}
 {% endblock js_code %}
-
-{% endblock content %}
