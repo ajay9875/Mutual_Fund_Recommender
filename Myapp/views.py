@@ -862,6 +862,10 @@ from django.shortcuts import get_object_or_404
 @login_required
 def your_info(request, username=None):
     # If no username provided, show current user's profile
+    if request.user.is_anonymous:
+        messages.info(request, "Session expired! Please login again.")
+        return redirect('landing_page')
+    
     target_username = username or request.user.username
     
     try:
@@ -890,74 +894,81 @@ def your_info(request, username=None):
         messages.error(request, f"Error loading profile: {str(e)}")
         return redirect('dashboard')
     
-# Calculate sip
 def sip_calculator(request):
+    if request.user.is_anonymous:
+        messages.info(request, "Session expired! Please login again.")
+        return redirect('landing_page')
+
     if request.method != 'POST':
         return render(request, 'Sip_calculator.html')
-    
+
+    # ---------- Limits ----------
+    MAX_MONTHLY_INVESTMENT = 100_000_000   # 10 crore
+    MAX_DURATION           = 80            # 80 years
+    MAX_RETURN             = 100           # 100%
+
+    # ---------- Parse inputs ----------
     try:
-        # Get and validate inputs
-        monthly_investment = float(request.POST.get('monthly_investment', 0))
-        investment_duration = int(request.POST.get('investment_duration', 0))
-        annual_return = float(request.POST.get('annual_return', 0))
-        
-        # Input validation with immediate returns on error
-        MAX_MONTHLY_INVESTMENT = 100000000  # 10 crore
-        MAX_DURATION = 80  # 80 years
-        MAX_RETURN = 100  # 100%
-        
-        if monthly_investment <= 0:
-            raise ValueError("Monthly investment must be positive")
-        if monthly_investment > MAX_MONTHLY_INVESTMENT:
-            messages.error(request, f"Monthly investment cannot exceed ₹{MAX_MONTHLY_INVESTMENT:,}")
-            return render(request, 'Sip_calculator.html', {'error': True})
-        
-        if investment_duration <= 0:
-            messages.error(request, "Investment duration must be positive")
-            return render(request, 'Sip_calculator.html', {'error': True})
-        if investment_duration > MAX_DURATION:
-            messages.error(request, f"Investment duration cannot exceed {MAX_DURATION} years")
-            return render(request, 'Sip_calculator.html', {'error': True})
-        
-        if annual_return <= 0:
-            messages.error(request, "Expected return must be positive")
-            return render(request, 'Sip_calculator.html', {'error': True})
-        if annual_return > MAX_RETURN:
-            messages.error(request, f"Expected return cannot exceed {MAX_RETURN}%")
-            return render(request, 'Sip_calculator.html', {'error': True})
-
-        # Calculation (only reaches here if all validations pass)
-        r = annual_return / 12 / 100  # monthly interest rate
-        n = investment_duration * 12  # total months
-
-        fv = monthly_investment * (((1 + r) ** n - 1) / r) * (1 + r)
-        
-        return render(request, 'Sip_calculator.html', {
-            'monthly_investment': round(monthly_investment),
-            'investment_duration': investment_duration,
-            'annual_return': round(annual_return),
-            'future_value': round(fv),
-            'invested_amount': round(monthly_investment * n),
-            'gain': round(fv - monthly_investment * n),
-            'calculated': True,
-        })
-
-    except ValueError as e:
-        messages.error(request, str(e))
+        monthly_investment  = float(request.POST.get('monthly_investment', 0) or 0)
+        investment_duration = int(request.POST.get('investment_duration', 0) or 0)
+        annual_return       = float(request.POST.get('annual_return', 0) or 0)
+    except (TypeError, ValueError):
+        messages.error(request, "Please enter valid numeric values.")
         return render(request, 'Sip_calculator.html', {'error': True})
-    except Exception as e:
-        messages.error(request, "Invalid input format. Please enter numeric values")
+
+    # ---------- Validate ----------
+    if not monthly_investment or not investment_duration or not annual_return:
+        messages.error(request, "All fields are required.")
         return render(request, 'Sip_calculator.html', {'error': True})
+
+    if monthly_investment <= 0 or investment_duration <= 0 or annual_return <= 0:
+        messages.error(request, "All inputs must be positive numbers.")
+        return render(request, 'Sip_calculator.html', {'error': True})
+
+    if monthly_investment > MAX_MONTHLY_INVESTMENT:
+        messages.error(request, f"Monthly investment cannot exceed ₹{MAX_MONTHLY_INVESTMENT:,}.")
+        return render(request, 'Sip_calculator.html', {'error': True})
+
+    if investment_duration > MAX_DURATION:
+        messages.error(request, f"Investment duration cannot exceed {MAX_DURATION} years.")
+        return render(request, 'Sip_calculator.html', {'error': True})
+
+    if annual_return > MAX_RETURN:
+        messages.error(request, f"Expected return cannot exceed {MAX_RETURN}%.")
+        return render(request, 'Sip_calculator.html', {'error': True})
+
+    # ---------- Calculate ----------
+    # Safe: annual_return > 0 guaranteed above
+    r = annual_return / 12 / 100        # monthly rate (decimal)
+    n = investment_duration * 12        # total months
+
+    fv = monthly_investment * (((1 + r) ** n - 1) / r) * (1 + r)
+    invested_amount = monthly_investment * n
+    gain = fv - invested_amount
+
+    return render(request, 'Sip_calculator.html', {
+        'monthly_investment':  round(monthly_investment),
+        'investment_duration': investment_duration,
+        'annual_return':       annual_return,
+        'future_value':        round(fv),
+        'invested_amount':     round(invested_amount),
+        'gain':                round(gain),
+        'calculated':          True,
+    })
 
 # Handle login request by user
 def loginUser(request):
     if request.user.is_authenticated:
         return redirect("dashboard")  # Prevent logged-in users from seeing login page
-    
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
 
+        if not username or not password:
+            messages.error(request, "Missing fields: Username and Password are required.")
+            return redirect('login')
+        
         user = authenticate(request, username=username, password=password)
 
         if user is not None:

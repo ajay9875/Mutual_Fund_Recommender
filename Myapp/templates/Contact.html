@@ -355,17 +355,6 @@
             <p>Have a question, feedback, or partnership enquiry? We'd love to hear from you.</p>
         </div>
 
-        <!-- FLASH MESSAGES -->
-        {% if messages %}
-        <div class="msg-wrap">
-            {% for message in messages %}
-                <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
         <!-- TWO-COLUMN LAYOUT -->
         <div class="contact-layout">
 

@@ -1,108 +1,470 @@
+{% extends "BaseLoggedIn.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Funds</title>
-    <link rel="stylesheet" href="{% static 'css/Your_funds.css' %}">
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Header.css' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
-</head>
-<body>
-    <!-- Reusable Header -->
-    <header class="header">
-        Your Funds
-    </header>
 
-    <div class="home">
-        <a href="/" class="btn">
-            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
-        </a>
-        <div class="tooltip-text">
-            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
-        </div>
+{% block title %}Your Funds | MF Recommender{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ============================================================
+     YOUR FUNDS PAGE
+     ============================================================ */
+
+  /* ---------- PAGE HEADER ---------- */
+  .yf-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .yf-header-left { flex: 1 1 auto; min-width: 0; }
+  .yf-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+  }
+  .yf-subtitle {
+    font-size: 0.92rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.55;
+  }
+  .yf-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+  .yf-breadcrumb a {
+    color: #4f8cff;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .yf-breadcrumb a:hover { text-decoration: underline; }
+  .yf-breadcrumb i { font-size: 0.65rem; color: #94a3b8; }
+
+  /* ---------- STATS STRIP (top of page) ---------- */
+  .yf-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .yf-stat {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .yf-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(79, 140, 255, 0.12);
+  }
+  .yf-stat-icon {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  .yf-stat-icon.blue   { background: rgba(79, 140, 255, 0.12); color: #2563eb; }
+  .yf-stat-icon.green  { background: rgba(34, 197, 94, 0.12);  color: #16a34a; }
+  .yf-stat-icon.amber  { background: rgba(245, 158, 11, 0.12); color: #b45309; }
+  .yf-stat-body { min-width: 0; }
+  .yf-stat-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .yf-stat-label {
+    font-size: 0.72rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-top: 3px;
+  }
+
+  /* ---------- CARD ---------- */
+  .yf-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.35rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    margin-bottom: 1.25rem;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .yf-card:hover {
+    box-shadow: 0 8px 26px rgba(79, 140, 255, 0.10);
+    border-color: rgba(79, 140, 255, 0.3);
+  }
+
+  .yf-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .yf-card-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .yf-card-head h2 i { color: #4f8cff; font-size: 1rem; }
+
+  /* ---------- TABLE ---------- */
+  .yf-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .yf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+    min-width: 780px;
+  }
+  .yf-table thead th {
+    background: #f8fafc;
+    color: #475569;
+    text-align: left;
+    padding: 0.85rem 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+  .yf-table tbody td {
+    padding: 0.85rem 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+  }
+  .yf-table tbody tr:last-child td { border-bottom: none; }
+  .yf-table tbody tr:hover { background: #f8fafc; }
+
+  .yf-table .fund-name {
+    font-weight: 600;
+    color: #0f172a;
+    max-width: 260px;
+  }
+  .yf-table .nav-value {
+    font-weight: 600;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+  }
+  .yf-table .index-cell {
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 0.82rem;
+  }
+
+  /* Rating badge */
+  .yf-badge-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.6rem;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+  .yf-badge-na {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  /* Action buttons */
+  .yf-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .yf-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .yf-btn-view {
+    background: rgba(79, 140, 255, 0.10);
+    color: #2563eb;
+    border-color: rgba(79, 140, 255, 0.25);
+  }
+  .yf-btn-view:hover {
+    background: #4f8cff;
+    color: #ffffff;
+    border-color: #4f8cff;
+  }
+  .yf-btn-delete {
+    background: rgba(220, 38, 38, 0.08);
+    color: #b91c1c;
+    border-color: rgba(220, 38, 38, 0.25);
+  }
+  .yf-btn-delete:hover {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+  }
+
+  /* ---------- EMPTY STATE ---------- */
+  .yf-empty {
+    text-align: center;
+    padding: 3rem 1.5rem;
+  }
+  .yf-empty-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(79, 140, 255, 0.10);
+    color: #4f8cff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+  .yf-empty h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.3px;
+  }
+  .yf-empty p {
+    font-size: 0.92rem;
+    color: #64748b;
+    margin: 0 auto 1.5rem;
+    max-width: 400px;
+    line-height: 1.6;
+  }
+  .yf-empty .yf-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.4rem;
+    background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+  }
+  .yf-empty .yf-cta:hover {
+    background: linear-gradient(135deg, #3b7bf0, #2563eb);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(79, 140, 255, 0.5);
+    color: #ffffff;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .yf-title { font-size: 1.3rem; }
+    .yf-subtitle { font-size: 0.86rem; }
+    .yf-card { padding: 1.25rem 1.15rem 1.15rem; border-radius: 12px; }
+    .yf-card-head h2 { font-size: 0.98rem; }
+    .yf-stat { padding: 0.9rem 1rem; }
+    .yf-stat-icon { width: 40px; height: 40px; font-size: 1rem; }
+    .yf-stat-value { font-size: 1.15rem; }
+    .yf-table thead th,
+    .yf-table tbody td { padding: 0.7rem 0.75rem; font-size: 0.82rem; }
+  }
+  @media (max-width: 480px) {
+    .yf-stats { grid-template-columns: 1fr; }
+    .yf-actions { flex-direction: column; }
+    .yf-btn { width: 100%; justify-content: center; }
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="yf-header">
+  <div class="yf-header-left">
+
+    <div class="yf-breadcrumb">
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Your Funds</span>
     </div>
 
+    <h1 class="yf-title">Your Mutual Funds</h1>
+    <p class="yf-subtitle">
+      Track, view, and manage the funds you've saved. Add more from the dashboard.
+    </p>
+  </div>
+</div>
 
-        <!-- Display messages -->
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="message {{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-    <div class="container">
-        <h1>Your Mutual Funds</h1>
-
-        <!-- Fund Details Section -->
-        <div class="fund-list">
-        {% if fund_details %}
-            <table class="fund-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Fund Name</th>
-                        <th>Plan Type</th>
-                        <th>Scheme Type</th>
-                        <th>NAV (₹)</th>
-                        <th>Rating</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for fund in fund_details %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                            <td>{{ fund.fund_name }}</td>
-                            <td>{{ fund.investment_type }}</td>
-                            <td>{{ fund.subcategory }}</td>
-                            <td>{{ fund.nav }}</td>
-                        <td>
-                            {% if fund.rating == 'None' %}
-                                NA
-                            {% else %}
-                                {{fund.rating }}/5⭐
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="action-btns">
-                                <form action="{% url 'fund_result' %}" method="POST">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                    <button type="submit" class="action-btn view-btn">View</button>
-                                </form>
-                                <form action="{% url 'your_funds' %}" method="POST" onsubmit="return confirmDelete()">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="form_type" value="delete-fund">
-                                    <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
-                                    <button type="submit" class="action-btn save-btn">Delete</button> 
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p class="no-data">No funds added yet. Please add some funds.</p>
-        {% endif %}
+<!-- STATS STRIP -->
+<div class="yf-stats">
+  <div class="yf-stat">
+    <div class="yf-stat-icon blue"><i class="fas fa-layer-group"></i></div>
+    <div class="yf-stat-body">
+      <div class="yf-stat-value">{{ fund_details|length|default:"0" }}</div>
+      <div class="yf-stat-label">Total Funds</div>
     </div>
+  </div>
+
+  <div class="yf-stat">
+    <div class="yf-stat-icon green"><i class="fas fa-chart-line"></i></div>
+    <div class="yf-stat-body">
+      <div class="yf-stat-value">{% if fund_details %}Active{% else %}—{% endif %}</div>
+      <div class="yf-stat-label">Portfolio Status</div>
     </div>
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
-        </footer>
-        <script>
-            function confirmDelete() {
-                return confirm("Are you sure you want to delete this fund?");
-            }
-        </script>
-</body>
-</html>
+  </div>
+
+  <div class="yf-stat">
+    <div class="yf-stat-icon amber"><i class="fas fa-star"></i></div>
+    <div class="yf-stat-body">
+      <div class="yf-stat-value">5/5</div>
+      <div class="yf-stat-label">Max Rating</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CARD -->
+<div class="yf-card">
+
+  <div class="yf-card-head">
+    <h2><i class="fas fa-list-check"></i> Saved Funds</h2>
+  </div>
+
+  {% if fund_details %}
+    <div class="yf-table-wrap">
+      <table class="yf-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Fund Name</th>
+            <th>Plan Type</th>
+            <th>Scheme Type</th>
+            <th>NAV (₹)</th>
+            <th>Rating</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for fund in fund_details %}
+            <tr>
+              <td class="index-cell">{{ forloop.counter }}</td>
+              <td class="fund-name">{{ fund.fund_name }}</td>
+              <td>{{ fund.investment_type|default:"—" }}</td>
+              <td>{{ fund.subcategory|default:"—" }}</td>
+              <td class="nav-value">₹{{ fund.nav|default:"—" }}</td>
+              <td>
+                {% if fund.rating == 'None' or fund.rating == None %}
+                  <span class="yf-badge-na">NA</span>
+                {% else %}
+                  <span class="yf-badge-rating">
+                    <i class="fas fa-star"></i> {{ fund.rating }}/5
+                  </span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="yf-actions">
+                  <form action="{% url 'fund_result' %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                    <button type="submit" class="yf-btn yf-btn-view">
+                      <i class="fas fa-eye"></i> View
+                    </button>
+                  </form>
+                  <form action="{% url 'your_funds' %}" method="POST"
+                        onsubmit="return confirmDelete()" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="delete-fund">
+                    <input type="hidden" name="fund_name" value="{{ fund.fund_name }}">
+                    <button type="submit" class="yf-btn yf-btn-delete">
+                      <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+    <!-- EMPTY STATE -->
+    <div class="yf-empty">
+      <div class="yf-empty-icon">
+        <i class="fas fa-folder-open"></i>
+      </div>
+      <h3>No funds added yet</h3>
+      <p>
+        You haven't saved any mutual funds to your portfolio.
+        Head over to the dashboard, get a recommendation, and save funds you like.
+      </p>
+      <a href="{% url 'dashboard' %}" class="yf-cta">
+        <i class="fas fa-magic"></i> Get a Recommendation
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock content %}
+
+{% block js_code %}
+<script>
+  /* ============================================================
+     DELETE CONFIRMATION
+     ============================================================ */
+  function confirmDelete() {
+    return confirm("Are you sure you want to delete this fund?");
+  }
+</script>
+{% endblock js_code %}

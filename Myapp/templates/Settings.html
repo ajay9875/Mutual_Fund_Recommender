@@ -1,94 +1,418 @@
-{% extends "Header.html" %}
+{% extends "BaseLoggedIn.html" %}
 {% load static %}
 
-{% block title %} {{ title }} {% endblock title %}
+{% block title %}Account Settings | MF Recommender{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/Settings.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
-{% endblock extra_css %}
+<style>
+  /* ============================================================
+     ACCOUNT SETTINGS PAGE
+     ============================================================ */
 
-<!-- Header details -->
-{% block header %} <meta name="robots" content="noindex, nofollow"> {{ header }} {% endblock %}
+  /* ---------- PAGE HEADER ---------- */
+  .as-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .as-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+  .as-breadcrumb a { color: #4f8cff; text-decoration: none; font-weight: 500; }
+  .as-breadcrumb a:hover { text-decoration: underline; }
+  .as-breadcrumb i { font-size: 0.65rem; color: #94a3b8; }
+
+  .as-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.5px;
+  }
+  .as-subtitle {
+    font-size: 0.92rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  /* ---------- GRID ---------- */
+  .as-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  /* ---------- CARD ---------- */
+  .as-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.35rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .as-card:hover {
+    box-shadow: 0 8px 26px rgba(79, 140, 255, 0.10);
+    border-color: rgba(79, 140, 255, 0.3);
+  }
+  .as-card.danger {
+    border-color: rgba(220, 38, 38, 0.25);
+  }
+  .as-card.danger:hover {
+    box-shadow: 0 8px 26px rgba(220, 38, 38, 0.12);
+    border-color: rgba(220, 38, 38, 0.4);
+  }
+
+  .as-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .as-card-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .as-card-head h2 i { color: #4f8cff; font-size: 1rem; }
+  .as-card.danger .as-card-head h2 i { color: #dc2626; }
+
+  /* ---------- FORM ---------- */
+.new-password-section {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.new-password-section .as-form-group, .as-form-group {
+  flex: 1 1 220px;   /* grow, shrink, min-width 220px */
+  min-width: 0;
+  margin-bottom: 1rem;  /* remove default bottom margin */
+}
+  .as-form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.4rem;
+  }
+  .as-input-wrap {
+    position: relative;
+    display: block;
+  }
+  .as-input-wrap input {
+    width: 100%;
+    padding: 0.75rem 2.75rem 0.75rem 2.75rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+  .as-input-wrap input:focus {
+    outline: none;
+    border-color: #4f8cff;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+  }
+  .as-input-wrap .icon-left {
+    position: absolute;
+    left: 1rem; top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 0.92rem;
+    pointer-events: none;
+    transition: color 0.2s ease;
+  }
+  .as-input-wrap input:focus ~ .icon-left { color: #4f8cff; }
+  .as-input-wrap .icon-toggle {
+    position: absolute;
+    right: 1rem; top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 0.92rem;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s ease;
+  }
+  .as-input-wrap .icon-toggle:hover { color: #4f8cff; }
+
+  .as-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.35rem;
+    border-radius: 10px;
+    font-size: 0.93rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    width: 100%;
+    margin-top: 0.35rem;
+  }
+  .as-btn-primary {
+    background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(79, 140, 255, 0.35);
+  }
+  .as-btn-primary:hover {
+    background: linear-gradient(135deg, #3b7bf0, #2563eb);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(79, 140, 255, 0.45);
+  }
+  .as-btn-danger {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+  }
+  .as-btn-danger:hover {
+    background: linear-gradient(135deg, #b91c1c, #991b1b);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(220, 38, 38, 0.45);
+  }
+
+  /* ---------- FILE INPUT ---------- */
+  .as-file-wrap {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.85rem;
+  }
+  .as-file-wrap:hover {
+    border-color: #4f8cff;
+    background: rgba(79, 140, 255, 0.04);
+  }
+  .as-file-wrap input[type="file"] {
+    display: none;
+  }
+  .as-file-wrap .file-icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(79, 140, 255, 0.10);
+    color: #4f8cff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.65rem;
+  }
+  .as-file-wrap .file-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f172a;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+  .as-file-wrap .file-hint {
+    font-size: 0.78rem;
+    color: #64748b;
+    display: block;
+  }
+  .as-file-name {
+    display: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #16a34a;
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    background: rgba(34, 197, 94, 0.10);
+    border-radius: 6px;
+    word-break: break-all;
+  }
+  .as-file-name.visible { display: inline-block; }
+
+  /* ---------- DANGER ZONE NOTE ---------- */
+  .as-danger-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: rgba(220, 38, 38, 0.06);
+    border-left: 3px solid #dc2626;
+    color: #991b1b;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+  }
+  .as-danger-note i { color: #dc2626; margin-top: 2px; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .as-title { font-size: 1.3rem; }
+    .as-subtitle { font-size: 0.86rem; }
+    .as-card { padding: 1.25rem 1.15rem 1.15rem; border-radius: 12px; }
+    .as-card-head h2 { font-size: 0.98rem; }
+    .as-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock extra_css %}
 
 {% block content %}
 
-    <!-- Home Button-->
-    <div class="home">
-        <a href="/" class="btn"><img src="{% static 'icons/homeicon.png'%}"></a>
+<!-- HEADER -->
+<div class="as-header">
+  <div>
+    <div class="as-breadcrumb">
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Account Settings</span>
+    </div>
+    <h1 class="as-title">Account Settings</h1>
+    <p class="as-subtitle">Manage your password, profile picture, and account preferences.</p>
+  </div>
+</div>
+
+<div class="as-grid">
+
+  <!-- ============================================================
+       CHANGE PASSWORD
+       ============================================================ -->
+  <div class="as-card">
+    <div class="as-card-head">
+      <h2><i class="fas fa-lock"></i> Change Password</h2>
+    </div>
+
+    <form method="POST" action="{% url 'account_settings' %}" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="changepass">
+
+      <div class="as-form-group">
+        <label for="old_password">Old Password</label>
+        <div class="as-input-wrap">
+          <input type="password" id="old_password" name="old_password"
+                 placeholder="Enter your current password" required>
+          <i class="fas fa-key icon-left"></i>
+        </div>
       </div>
-        <!-- Flashed message will be appear here -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                   <div class='msg'> {{ message }} </div>
-                  </div> 
-                </div>
-            {% endfor %}
-        {% endif %}
-   
 
-      <div class="container">
-        <h2>Account Settings</h2>
-        <!-- Change Password Form -->
-        <form method="POST" action="{% url 'account_settings' %}">
-            {% csrf_token %}
-            <input type="hidden" name="form_type" value="changepass">
-            <label for="old_password">Old Password:</label>
-            <input type="password" id="old_password" name="old_password" required>
+      <div class="new-password-section">
+        <div class="as-form-group">
+            <label for="new_password">New Password</label>
+            <div class="as-input-wrap">
+            <input type="password" id="new_password" name="new_password"
+                    placeholder="Enter a strong new password" required>
+            <i class="fas fa-lock icon-left"></i>
+            </div>
+        </div>
 
-            <label for="new_password">New Password:</label>
-            <input type="password" id="new_password" name="new_password" required>
+        <div class="as-form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <div class="as-input-wrap">
+            <input type="password" id="confirm_password" name="confirm_password"
+                    placeholder="Re-enter the new password" required>
+            <i class="fas fa-shield-halved icon-left"></i>
+            </div>
+        </div>
+    </div>
 
-            <label for="confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
+    <button type="submit" class="as-btn as-btn-primary">
+    <i class="fas fa-check-circle"></i> Change Password
+    </button>
+    </form>
+  </div>
 
-            <button type="submit">Change Password</button>
-        </form>
+  <!-- ============================================================
+       UPLOAD PROFILE PICTURE
+       ============================================================ -->
+  <div class="as-card">
+    <div class="as-card-head">
+      <h2><i class="fas fa-image"></i> Profile Picture</h2>
+    </div>
 
-        <hr>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'account_settings' %}" id="uploadForm">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="uploadpic">
 
-        <!-- Upload Profile Photo Form -->
-        <form method="POST" enctype="multipart/form-data" action="{% url 'account_settings' %}">
-            {% csrf_token %}
-            <input type="hidden" name="form_type" value="uploadpic">
-            <label for="profile_photo">Upload Profile Picture:</label>
-            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required>
+      <label for="profile_picture" class="as-file-wrap">
+        <input type="file" id="profile_picture" name="profile_picture"
+               accept="image/*" onchange="showFileName(this)">
+        <div class="file-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+        <span class="file-label">Click to upload a new picture</span>
+        <span class="file-hint">PNG, JPG, or WEBP — max 2 MB</span>
+      </label>
 
-            <button type="submit">Upload Picture</button>
-        </form>
-        <hr>
-        <br>
-           <label>Delete Account Forever:</label>
-           <button class="delete-account-btn" type="button" onclick="window.location.href='{% url 'delete_account' %}'">
-               Delete Account Forever
-           </button>
-        
-       </div>
+      <div class="as-file-name" id="fileNameDisplay"></div>
+
+      <button type="submit" class="as-btn as-btn-primary">
+        <i class="fas fa-upload"></i> Upload Picture
+      </button>
+    </form>
+  </div>
+
+  <!-- ============================================================
+       DELETE ACCOUNT (danger zone)
+       ============================================================ -->
+  <!-- DELETE ACCOUNT BUTTON
+  <div class="as-card danger">
+    <div class="as-card-head">
+      <h2><i class="fas fa-triangle-exclamation"></i> Delete Account</h2>
+    </div>
+
+    <div class="as-danger-note">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>
+        This will <strong>permanently delete</strong> your account and all associated
+        data. This action <strong>cannot be undone</strong>.
+      </span>
+    </div>
+
+    <button type="button" class="as-btn as-btn-danger"
+            onclick="window.location.href='{% url 'delete_account' %}'">
+      <i class="fas fa-trash-alt"></i> Delete Account Forever
+    </button>
+    -->
+  </div>
+
+</div>
 
 {% endblock content %}
 
-{% block js_code %} 
+{% block js_code %}
 <script>
-    // Wait for DOM to load
-    document.addEventListener('DOMContentLoaded', function() {
-        const confirmInput = document.getElementById('confirm');
-        const deleteButton = document.getElementById('deleteButton');
-        const deleteForm = document.getElementById('deleteForm');
-
-        // Enable/disable delete button
-        confirmInput.addEventListener('input', function(e) {
-            deleteButton.disabled = e.target.value.trim().toUpperCase() !== 'DELETE';
-        });
-
-        // Form submission handler
-        deleteForm.addEventListener('submit', function(e) {
-            if (!confirm('Are you absolutely sure? This cannot be undone!')) {
-                e.preventDefault(); // Cancel form submission
-            }
-        });
-    });
+  /* ============================================================
+     Show selected filename
+     ============================================================ */
+  function showFileName(input) {
+    const display = document.getElementById('fileNameDisplay');
+    if (!display) return;
+    if (input.files && input.files.length > 0) {
+      display.textContent = '✓ ' + input.files[0].name;
+      display.classList.add('visible');
+    } else {
+      display.textContent = '';
+      display.classList.remove('visible');
+    }
+  }
 </script>
 {% endblock js_code %}
-

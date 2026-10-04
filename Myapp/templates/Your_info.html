@@ -1,111 +1,436 @@
+{% extends "BaseLoggedIn.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Profile | WealthHub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">  
-    <link rel="stylesheet" href="{% static 'css/Header.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Your_info.css' %}">
-</head>
-<body>
-    <!-- Reusable Header -->
-    <header class="header">
-        Your Info
-    </header>
 
-    <div class="home">
-        <a href="/" class="btn">
-            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
-        </a>
-        <div class="tooltip-text">
-            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
-        </div>
-    </div>
+{% block title %}Your Profile | MF Recommender{% endblock %}
 
-    <div class="profile-card">
-        <div class="profile-header">
-            {% if profilepic %}
-              <img src="{{ profilepic }}" alt="Profile" class="avatar">
-            {% else %}
-              <span style="font-size: 3rem;"> <img src="{% static 'icons/image.png' %}" class="profile-icon" style="background-color: gray;"></span>
-            {% endif %}
-              <h1>{{ user_info.get_full_name|default:user_info.username }}</h1>
-              <p>{{ user_info.email }}</p>
-        </div>
-        
-        <div class="profile-body">
-            <div class="info-group">
-                <span class="info-label">Username</span>
-                <div class="info-value">{{ user_info.username }}</div>
-            </div>
-            
-            <div class="info-group">
-                <span class="info-label">Email</span>
-                <div class="info-value">{{ user_info.email }}</div>
-            </div>
-            
-            <div class="info-group">
-                <span class="info-label">Account Created</span>
-                <div class="info-value">{{ user_info.date_joined|date:"F j, Y" }}</div>
-            </div>
-            
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-value">12</div>
-                    <div class="stat-label">Investments</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">₹1,42,000</div>
-                    <div class="stat-label">Portfolio Value</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">14.5%</div>
-                    <div class="stat-label">Avg. Returns</div>
-                </div>
-            </div>
-        </div>
+{% block extra_css %}
+<style>
+  /* ============================================================
+     YOUR INFO / PROFILE PAGE
+     ============================================================ */
+
+  /* ---------- PAGE HEADER ---------- */
+  .yi-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .yi-header-left { flex: 1 1 auto; min-width: 0; }
+  .yi-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+  .yi-breadcrumb a {
+    color: #4f8cff;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .yi-breadcrumb a:hover { text-decoration: underline; }
+  .yi-breadcrumb i { font-size: 0.65rem; color: #94a3b8; }
+
+  .yi-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+  }
+  .yi-subtitle {
+    font-size: 0.92rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  /* ---------- PROFILE HERO CARD ---------- */
+  .yi-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 18px;
+    padding: 2.25rem 2rem;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 36px rgba(15, 23, 42, 0.20);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .yi-hero::before {
+    content: "";
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(79, 140, 255, 0.35), transparent 70%);
+    border-radius: 50%;
+  }
+
+  .yi-avatar-wrap {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+  .yi-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    background: #475569;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    display: block;
+  }
+  .yi-avatar-status {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #22c55e;
+    border: 3px solid #0f172a;
+  }
+
+  .yi-hero-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+  }
+  .yi-hero-info h1 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    color: #ffffff;
+    word-break: break-word;
+  }
+  .yi-hero-info .email {
+    font-size: 0.92rem;
+    color: #cbd5e1;
+    margin: 0 0 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    word-break: break-all;
+  }
+  .yi-hero-info .email i { color: #4f8cff; }
+  .yi-hero-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .yi-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.8rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 100px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+  .yi-badge i { color: #22c55e; font-size: 0.7rem; }
+
+  /* ---------- STATS GRID ---------- */
+  .yi-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .yi-stat {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.25rem 1.35rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .yi-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(79, 140, 255, 0.14);
+    border-color: rgba(79, 140, 255, 0.3);
+  }
+  .yi-stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    margin-bottom: 0.85rem;
+  }
+  .yi-stat-icon.blue   { background: rgba(79, 140, 255, 0.12); color: #2563eb; }
+  .yi-stat-icon.green  { background: rgba(34, 197, 94, 0.12);  color: #16a34a; }
+  .yi-stat-icon.amber  { background: rgba(245, 158, 11, 0.12); color: #b45309; }
+  .yi-stat-icon.purple { background: rgba(139, 92, 246, 0.12); color: #7c3aed; }
+
+  .yi-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .yi-stat-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  /* ---------- DETAILS CARD ---------- */
+  .yi-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.35rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    margin-bottom: 1.25rem;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .yi-card:hover {
+    box-shadow: 0 8px 26px rgba(79, 140, 255, 0.10);
+    border-color: rgba(79, 140, 255, 0.3);
+  }
+
+  .yi-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .yi-card-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .yi-card-head h2 i { color: #4f8cff; font-size: 1rem; }
+
+  /* ---------- KEY-VALUE GRID ---------- */
+  .yi-kv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem 1.5rem;
+  }
+  .yi-kv {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0.85rem 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .yi-kv:hover {
+    background: #ffffff;
+    border-color: rgba(79, 140, 255, 0.35);
+  }
+  .yi-kv .lbl {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .yi-kv .lbl i {
+    color: #4f8cff;
+    font-size: 0.75rem;
+  }
+  .yi-kv .val {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #0f172a;
+    word-break: break-word;
+  }
+  .yi-kv .val.muted { color: #64748b; font-weight: 500; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .yi-title { font-size: 1.3rem; }
+    .yi-subtitle { font-size: 0.86rem; }
+
+    .yi-hero {
+      padding: 1.75rem 1.35rem;
+      gap: 1.15rem;
+      border-radius: 14px;
+      text-align: center;
+      flex-direction: column;
+    }
+    .yi-avatar { width: 84px; height: 84px; }
+    .yi-hero-info { text-align: center; }
+    .yi-hero-info h1 { font-size: 1.3rem; }
+    .yi-hero-badges { justify-content: center; }
+
+    .yi-card { padding: 1.25rem 1.15rem 1.15rem; border-radius: 12px; }
+    .yi-card-head h2 { font-size: 0.98rem; }
+    .yi-kv-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    .yi-stat { padding: 1rem 1.1rem; }
+    .yi-stat-value { font-size: 1.25rem; }
+  }
+  @media (max-width: 480px) {
+    .yi-kv-grid { grid-template-columns: 1fr; }
+    .yi-stat-value { font-size: 1.15rem; }
+    .yi-avatar { width: 76px; height: 76px; }
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="yi-header">
+  <div class="yi-header-left">
+    <div class="yi-breadcrumb">
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Your Info</span>
     </div>
-    
-    <!-- Toast Notification -->
-    {% if messages %}
-    <div class="toast" id="toast">
-        {% for message in messages %}
-        <div>{{ message }}</div>
-        {% endfor %}
-    </div>
+    <h1 class="yi-title">Your Profile</h1>
+    <p class="yi-subtitle">
+      View your account details, portfolio summary, and activity at a glance.
+    </p>
+  </div>
+</div>
+
+<!-- PROFILE HERO -->
+<div class="yi-hero">
+
+  <div class="yi-avatar-wrap">
+    {% if profilepic %}
+      <img src="{{ profilepic }}" alt="Profile" class="yi-avatar">
+    {% else %}
+      <img src="{% static 'icons/image.png' %}" alt="Profile" class="yi-avatar">
     {% endif %}
-        
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
-        </footer>
-    
-    <script>
-        // Show toast notification
-        document.addEventListener('DOMContentLoaded', function() {
-            const toast = document.getElementById('toast');
-            if (toast) {
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Animate info groups sequentially
-            const infoGroups = document.querySelectorAll('.info-group');
-            infoGroups.forEach((group, index) => {
-                group.style.animationDelay = `${index * 0.1}s`;
-            });
-        });
-        
-        function toggleEditMode() {
-            // Implement edit functionality here
-            alert('Edit mode will be implemented here!');
-            // You would typically show a modal with a form to edit profile
-        }
-    </script>
-</body>
-</html>
+    <span class="yi-avatar-status" title="Active"></span>
+  </div>
+
+  <div class="yi-hero-info">
+    <h1>{{ user_info.get_full_name|default:user_info.username }}</h1>
+    <p class="email">
+      <i class="fas fa-envelope"></i>
+      {{ user_info.email|default:"No email on file" }}
+    </p>
+    <div class="yi-hero-badges">
+      <span class="yi-badge">
+        <i class="fas fa-circle"></i> Active Account
+      </span>
+      <span class="yi-badge">
+        <i class="fas fa-shield-halved"></i> Verified
+      </span>
+      {% if user_info.date_joined %}
+        <span class="yi-badge">
+          <i class="fas fa-calendar-check"></i>
+          Joined {{ user_info.date_joined|date:"M Y" }}
+        </span>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<!-- STATS GRID -->
+<div class="yi-stats">
+  <div class="yi-stat">
+    <div class="yi-stat-icon blue"><i class="fas fa-chart-pie"></i></div>
+    <div class="yi-stat-value">12</div>
+    <div class="yi-stat-label">Investments</div>
+  </div>
+  <div class="yi-stat">
+    <div class="yi-stat-icon green"><i class="fas fa-wallet"></i></div>
+    <div class="yi-stat-value">₹1,42,000</div>
+    <div class="yi-stat-label">Portfolio Value</div>
+  </div>
+  <div class="yi-stat">
+    <div class="yi-stat-icon amber"><i class="fas fa-arrow-trend-up"></i></div>
+    <div class="yi-stat-value">14.5%</div>
+    <div class="yi-stat-label">Avg. Returns</div>
+  </div>
+  <div class="yi-stat">
+    <div class="yi-stat-icon purple"><i class="fas fa-star"></i></div>
+    <div class="yi-stat-value">Premium</div>
+    <div class="yi-stat-label">Membership</div>
+  </div>
+</div>
+
+<!-- ACCOUNT DETAILS -->
+<div class="yi-card">
+  <div class="yi-card-head">
+    <h2><i class="fas fa-id-card"></i> Account Details</h2>
+  </div>
+
+  <div class="yi-kv-grid">
+    <div class="yi-kv">
+      <span class="lbl"><i class="fas fa-user"></i> Username</span>
+      <span class="val">{{ user_info.username|default:"—" }}</span>
+    </div>
+    <div class="yi-kv">
+      <span class="lbl"><i class="fas fa-envelope"></i> Email</span>
+      <span class="val">{{ user_info.email|default:"—" }}</span>
+    </div>
+    <div class="yi-kv">
+      <span class="lbl"><i class="fas fa-user-tag"></i> Full Name</span>
+      <span class="val">{{ user_info.get_full_name|default:"Not provided" }}</span>
+    </div>
+    <div class="yi-kv">
+      <span class="lbl"><i class="fas fa-calendar-alt"></i> Account Created</span>
+      <span class="val">
+        {% if user_info.date_joined %}
+          {{ user_info.date_joined|date:"F j, Y" }}
+        {% else %}—{% endif %}
+      </span>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block js_code %}
+<script>
+  /* ============================================================
+     Sequential fade-in for KV items
+     ============================================================ */
+  document.addEventListener('DOMContentLoaded', function() {
+    const kvs = document.querySelectorAll('.yi-kv');
+    kvs.forEach(function(el, i) {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(8px)';
+      el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      setTimeout(function() {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 80 * i + 100);
+    });
+  });
+</script>
+{% endblock js_code %}

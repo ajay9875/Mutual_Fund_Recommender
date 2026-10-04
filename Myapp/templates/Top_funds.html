@@ -1,76 +1,280 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Top Mutual Funds</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        h1 {
-            color: #2e7d32;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #dddddd;
-            padding: 12px;
-            text-align: center;
-        }
-        th {
-            background-color: #2e7d32;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f3f3f3;
-        }
-        .timestamp {
-            font-size: 14px;
-            color: gray;
-            margin-top: 10px;
-        }
-        .error {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
+{% extends "BaseLoggedIn.html" %}
+{% load static %}
 
-    <h1>Top Mutual Funds</h1>
+{% block title %}Top Mutual Funds | MF Recommender{% endblock %}
 
-    {% if error %}
-        <p class="error">{{ error }}</p>
-    {% endif %}
+{% block extra_css %}
+<style>
+  /* ============================================================
+     TOP MUTUAL FUNDS PAGE
+     ============================================================ */
 
-    <div class="timestamp">
-        Last Updated: {{ timestamp }}
+  /* ---------- PAGE HEADER ---------- */
+  .tf-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .tf-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+  .tf-breadcrumb a { color: #4f8cff; text-decoration: none; font-weight: 500; }
+  .tf-breadcrumb a:hover { text-decoration: underline; }
+  .tf-breadcrumb i { font-size: 0.65rem; color: #94a3b8; }
+
+  .tf-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.5px;
+  }
+  .tf-subtitle {
+    font-size: 0.92rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.55;
+  }
+  .tf-timestamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    background: rgba(79, 140, 255, 0.10);
+    color: #2563eb;
+    border: 1px solid rgba(79, 140, 255, 0.25);
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .tf-timestamp i { font-size: 0.75rem; }
+
+  /* ---------- CARD ---------- */
+  .tf-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.35rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    margin-bottom: 1.25rem;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .tf-card:hover {
+    box-shadow: 0 8px 26px rgba(79, 140, 255, 0.10);
+    border-color: rgba(79, 140, 255, 0.3);
+  }
+  .tf-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .tf-card-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .tf-card-head h2 i { color: #4f8cff; font-size: 1rem; }
+
+  /* ---------- ERROR ---------- */
+  .tf-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: rgba(220, 38, 38, 0.06);
+    border-left: 3px solid #dc2626;
+    color: #991b1b;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin-bottom: 1rem;
+  }
+  .tf-error i { color: #dc2626; margin-top: 2px; }
+
+  /* ---------- TABLE ---------- */
+  .tf-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .tf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+    min-width: 720px;
+  }
+  .tf-table thead th {
+    background: #f8fafc;
+    color: #475569;
+    text-align: left;
+    padding: 0.85rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+  .tf-table tbody td {
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+  }
+  .tf-table tbody tr:last-child td { border-bottom: none; }
+  .tf-table tbody tr:hover { background: #f8fafc; }
+
+  .tf-table .rank {
+    width: 42px;
+    text-align: center;
+  }
+  .tf-table .rank-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #475569;
+    font-weight: 700;
+    font-size: 0.78rem;
+  }
+  .tf-table tr:nth-child(1) .rank-num {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+  }
+  .tf-table tr:nth-child(2) .rank-num {
+    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+    color: #ffffff;
+  }
+  .tf-table tr:nth-child(3) .rank-num {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    color: #ffffff;
+  }
+
+  .tf-table .fund-name {
+    font-weight: 600;
+    color: #0f172a;
+    max-width: 280px;
+  }
+  .tf-table .nav-value {
+    font-weight: 700;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+  }
+  .tf-table .positive { color: #16a34a; font-weight: 700; }
+  .tf-table .negative { color: #dc2626; font-weight: 700; }
+  .tf-table .na       { color: #94a3b8; font-weight: 500; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .tf-title { font-size: 1.3rem; }
+    .tf-subtitle { font-size: 0.86rem; }
+    .tf-card { padding: 1.25rem 1.15rem 1.15rem; border-radius: 12px; }
+    .tf-card-head h2 { font-size: 0.98rem; }
+    .tf-table thead th,
+    .tf-table tbody td { padding: 0.7rem 0.75rem; font-size: 0.82rem; }
+    .tf-timestamp { font-size: 0.72rem; padding: 0.4rem 0.75rem; }
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+
+<!-- HEADER -->
+<div class="tf-header">
+  <div>
+    <div class="tf-breadcrumb">
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Top Mutual Funds</span>
     </div>
+    <h1 class="tf-title">Top Mutual Funds</h1>
+    <p class="tf-subtitle">Best performing funds across all categories, ranked by returns.</p>
+  </div>
 
-    <table>
+  {% if timestamp %}
+    <div class="tf-timestamp">
+      <i class="fas fa-clock"></i> Updated: {{ timestamp }}
+    </div>
+  {% endif %}
+</div>
+
+{% if error %}
+  <div class="tf-error">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ error }}</span>
+  </div>
+{% endif %}
+
+<!-- TABLE -->
+<div class="tf-card">
+  <div class="tf-card-head">
+    <h2><i class="fas fa-trophy"></i> Top Performers</h2>
+  </div>
+
+  {% if funds %}
+    <div class="tf-table-wrap">
+      <table class="tf-table">
         <thead>
-            <tr>
-                <th>Fund Name</th>
-                <th>NAV</th>
-                <th>1Y Return (%)</th>
-                <th>3Y Return (%)</th>
-                <th>5Y Return (%)</th>
-            </tr>
+          <tr>
+            <th class="rank">#</th>
+            <th>Fund Name</th>
+            <th>NAV (₹)</th>
+            <th>1Y Return</th>
+            <th>3Y Return</th>
+            <th>5Y Return</th>
+          </tr>
         </thead>
         <tbody>
-            {% for fund in funds %}
-                <tr>
-                    <td>{{ fund.name }}</td>
-                    <td>{{ fund.nav }}</td>
-                    <td>{{ fund.returns.1y }}</td>
-                    <td>{{ fund.returns.3y }}</td>
-                    <td>{{ fund.returns.5y }}</td>
-                </tr>
-            {% endfor %}
+          {% for fund in funds %}
+            <tr>
+              <td class="rank"><span class="rank-num">{{ forloop.counter }}</span></td>
+              <td class="fund-name">{{ fund.name|default:"—" }}</td>
+              <td class="nav-value">
+                {% if fund.nav %}₹{{ fund.nav }}{% else %}<span class="na">—</span>{% endif %}
+              </td>
+              <td class="{% if fund.returns.1y %}{% if fund.returns.1y >= 0 %}positive{% else %}negative{% endif %}{% else %}na{% endif %}">
+                {% if fund.returns.1y %}{{ fund.returns.1y }}%{% else %}NA{% endif %}
+              </td>
+              <td class="{% if fund.returns.3y %}{% if fund.returns.3y >= 0 %}positive{% else %}negative{% endif %}{% else %}na{% endif %}">
+                {% if fund.returns.3y %}{{ fund.returns.3y }}%{% else %}NA{% endif %}
+              </td>
+              <td class="{% if fund.returns.5y %}{% if fund.returns.5y >= 0 %}positive{% else %}negative{% endif %}{% else %}na{% endif %}">
+                {% if fund.returns.5y %}{{ fund.returns.5y }}%{% else %}NA{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align:center; padding:2.5rem 1rem; color:#64748b;">
+      <i class="fas fa-chart-line" style="font-size:2rem; color:#cbd5e1; margin-bottom:0.75rem; display:block;"></i>
+      <p style="margin:0; font-size:0.92rem;">No top fund data available at the moment.</p>
+    </div>
+  {% endif %}
+</div>
 
-</body>
-</html>
+{% endblock content %}

@@ -1,236 +1,520 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ fund_name|default:"Mutual Fund" }} - Fund Details</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #2962ff;
-            --secondary-color: #455a64;
-            --success-color: #00c853;
-            --warning-color: #ffab00;
-            --danger-color: #ff5252;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f7fa;
-        }
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
-        }
-        h1, h2 {
-            color: var(--secondary-color);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        h1 {
-            color: var(--primary-color);
-            margin-top: 0;
-        }
-        .card {
-            border: 1px solid #e0e0e0;
-            margin: 15px 0;
-            padding: 20px;
-            border-radius: 8px;
-            background: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .badge.risk-high { background: var(--danger-color); color: white; }
-        .badge.risk-medium { background: var(--warning-color); color: black; }
-        .badge.risk-low { background: var(--success-color); color: white; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        th {
-            background-color: #f5f7fa;
-            font-weight: 600;
-        }
-        tr:hover {
-            background-color: #f9f9f9;
-        }
-        .nav-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        .as-of-date {
-            font-size: 14px;
-            color: #757575;
-            margin-left: 10px;
-        }
-        .stale-data {
-            opacity: 0.7;
-            position: relative;
-        }
-        .stale-data::after {
-            content: "Data may be outdated";
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--warning-color);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-        .return-positive { color: var(--success-color); }
-        .return-negative { color: var(--danger-color); }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
+{% extends "BaseLoggedIn.html" %}
+{% load static %}
 
-<div class="container">
-    <h1>{{ fund_name|default:"Mutual Fund Details" }}</h1>
+{% block title %}{{ fund_name|default:"Fund Details" }} | MF Recommender{% endblock %}
 
-    <!-- Basic Information Card -->
-    <div class="card {% if is_stale %}stale-data{% endif %}">
-        <div class="card-header">
-            <h2>Basic Information</h2>
-            <span class="badge risk-{{ risk_level|lower }}">{{ risk_level|default:"Risk data unavailable" }}</span>
-        </div>
-        <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
-            <div>
-                <strong>Category:</strong> {{ category|default:"-" }}
-            </div>
-            <div>
-                <strong>Plan Type:</strong> {{ plan_type|default:"-" }}
-            </div>
-            <div>
-                <strong>Scheme Type:</strong> {{ scheme_type|default:"-" }}
-            </div>
-            <div>
-                <strong>Inception Date:</strong> {{ inception_date|default:"-" }}
-            </div>
-            <div>
-                <strong>Benchmark:</strong> {{ benchmark|default:"-" }} ({{ benchmark_name|default:"" }})
-            </div>
-            <div>
-                <strong>Fund Size:</strong> ₹{{ fund_size|floatformat:2|default:"-" }} Crores
-            </div>
-            <div>
-                <strong>Fund Manager:</strong> {{ fund_manager|default:"-" }}
-            </div>
-            <div>
-                <strong>Registrar Agent:</strong> {{ registrar_agent|default:"-" }}
-            </div>
-        </div>
+{% block extra_css %}
+<style>
+  /* ============================================================
+     FUND DETAILS PAGE
+     ============================================================ */
+
+  /* ---------- PAGE HEADER ---------- */
+  .fd-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .fd-header-left { flex: 1 1 auto; min-width: 0; }
+  .fd-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+  }
+  .fd-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 0.35rem;
+  }
+  .fd-breadcrumb a {
+    color: #4f8cff;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .fd-breadcrumb a:hover { text-decoration: underline; }
+  .fd-breadcrumb i { font-size: 0.65rem; color: #94a3b8; }
+
+  .fd-header-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+
+  /* ---------- BADGES ---------- */
+  .fd-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .fd-badge i { font-size: 0.7rem; }
+
+  .fd-badge.risk-high   { background: rgba(220, 38, 38, 0.10); color: #b91c1c; border: 1px solid rgba(220, 38, 38, 0.25); }
+  .fd-badge.risk-medium { background: rgba(245, 158, 11, 0.10); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.25); }
+  .fd-badge.risk-low    { background: rgba(34, 197, 94, 0.10); color: #15803d; border: 1px solid rgba(34, 197, 94, 0.25); }
+  .fd-badge.stale {
+    background: rgba(245, 158, 11, 0.10);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+  .fd-badge.plan {
+    background: rgba(79, 140, 255, 0.10);
+    color: #2563eb;
+    border: 1px solid rgba(79, 140, 255, 0.25);
+    text-transform: none;
+    letter-spacing: 0.2px;
+  }
+
+  /* ---------- CARDS ---------- */
+  .fd-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.35rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    margin-bottom: 1.25rem;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .fd-card:hover {
+    box-shadow: 0 8px 26px rgba(79, 140, 255, 0.10);
+    border-color: rgba(79, 140, 255, 0.3);
+  }
+
+  .fd-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .fd-card-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .fd-card-head h2 i {
+    color: #4f8cff;
+    font-size: 1rem;
+  }
+
+  /* ---------- KEY-VALUE GRID (Basic Info & Risk) ---------- */
+  .fd-kv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem 1.5rem;
+  }
+  .fd-kv {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+  .fd-kv .lbl {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .fd-kv .val {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #0f172a;
+    word-break: break-word;
+  }
+  .fd-kv .val.muted { color: #64748b; font-weight: 500; }
+
+  /* ---------- NAV HIGHLIGHT ---------- */
+  .fd-nav {
+    display: flex;
+    align-items: baseline;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+  }
+  .fd-nav-value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #2563eb;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .fd-nav-date {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .fd-stale-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(245, 158, 11, 0.08);
+    border-left: 3px solid #f59e0b;
+    color: #92400e;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    margin-top: 1rem;
+  }
+
+  /* ---------- RETURNS TABLE ---------- */
+  .fd-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .fd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 520px;
+  }
+  .fd-table thead th {
+    background: #f8fafc;
+    color: #475569;
+    text-align: left;
+    padding: 0.85rem 1rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+  .fd-table tbody td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+  }
+  .fd-table tbody tr:last-child td { border-bottom: none; }
+  .fd-table tbody tr:hover { background: #f8fafc; }
+
+  .fd-table .period {
+    font-weight: 700;
+    color: #0f172a;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    letter-spacing: 0.4px;
+  }
+
+  .fd-positive { color: #16a34a; font-weight: 700; }
+  .fd-negative { color: #dc2626; font-weight: 700; }
+  .fd-neutral  { color: #64748b; font-weight: 500; }
+
+  .fd-empty-row td {
+    text-align: center;
+    color: #94a3b8;
+    padding: 1.5rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  /* ---------- EXPENSE HISTORY LIST ---------- */
+  .fd-expense-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.6rem;
+  }
+  .fd-expense-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.82rem;
+  }
+  .fd-expense-item .date {
+    color: #64748b;
+    font-weight: 600;
+  }
+  .fd-expense-item .ratio {
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  .fd-expense-empty {
+    color: #94a3b8;
+    font-size: 0.86rem;
+    margin-top: 0.6rem;
+  }
+
+  /* ---------- BACK LINK ---------- */
+  .fd-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #4f8cff;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+  .fd-back:hover { text-decoration: underline; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .fd-title { font-size: 1.3rem; }
+    .fd-nav-value { font-size: 1.85rem; }
+    .fd-card { padding: 1.25rem 1.15rem 1.15rem; border-radius: 12px; }
+    .fd-card-head h2 { font-size: 0.98rem; }
+    .fd-kv-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem 1rem; }
+    .fd-table thead th,
+    .fd-table tbody td { padding: 0.7rem 0.75rem; font-size: 0.82rem; }
+  }
+  @media (max-width: 480px) {
+    .fd-kv-grid { grid-template-columns: 1fr; }
+    .fd-nav-value { font-size: 1.6rem; }
+    .fd-expense-list { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="fd-header">
+  <div class="fd-header-left">
+
+    <div class="fd-breadcrumb">
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <i class="fas fa-chevron-right"></i>
+      <a href="{% url 'fund_result' %}">All Funds</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>{{ fund_name|default:"Fund Details" }}</span>
     </div>
 
-    <!-- NAV Card -->
-    <div class="card {% if is_stale %}stale-data{% endif %}">
-        <h2>Current NAV</h2>
-        <div class="nav-value">
-            ₹{{ current_nav|floatformat:4|default:"-" }}
-            <span class="as-of-date">as of {{ nav_date|default:"-" }}</span>
-        </div>
-        {% if is_stale %}
-        <p style="color: var(--warning-color); margin-top: 10px;">
-            <i class="fas fa-exclamation-triangle"></i> NAV data is more than 24 hours old
-        </p>
-        {% endif %}
-    </div>
+    <h1 class="fd-title">{{ fund_name|default:"Mutual Fund Details" }}</h1>
 
-    <!-- Returns Card -->
-    <div class="card">
-        <h2>Returns</h2>
-        <table>
-            <tr>
-                <th>Period</th>
-                <th>Absolute Return</th>
-                <th>Annualized Return</th>
-            </tr>
-            {% for period, value in absolute_returns.items %}
-            <tr>
-                <td>{{ period|upper }}</td>
-                <td class="{% if value >= 0 %}return-positive{% else %}return-negative{% endif %}">
-                    {{ value|floatformat:2|default:"-" }}%
-                </td>
-                <td class="{% if cagr|get_item:period >= 0 %}return-positive{% else %}return-negative{% endif %}">
-                    {{ cagr|get_item:period|floatformat:2|default:"-" }}%
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" style="text-align: center;">Return data not available</td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+    <div class="fd-header-badges">
+      {% if plan_type %}
+        <span class="fd-badge plan"><i class="fas fa-layer-group"></i> {{ plan_type }}</span>
+      {% endif %}
 
-    <!-- Risk Metrics Card -->
-    <div class="card">
-        <h2>Risk Metrics</h2>
-        <div class="grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
-            <div>
-                <strong>Alpha:</strong> {{ risk_metrics.alpha|floatformat:2|default:"-" }}
-            </div>
-            <div>
-                <strong>Beta:</strong> {{ risk_metrics.beta|floatformat:2|default:"-" }}
-            </div>
-            <div>
-                <strong>Sharpe Ratio:</strong> {{ risk_metrics.sharpe_ratio|floatformat:2|default:"-" }}
-            </div>
-            <div>
-                <strong>Sortino Ratio:</strong> {{ risk_metrics.sortino_ratio|floatformat:2|default:"-" }}
-            </div>
-            <div>
-                <strong>Standard Deviation:</strong> {{ risk_metrics.standard_deviation|floatformat:2|default:"-" }}%
-            </div>
-        </div>
-    </div>
+      {% if risk_level %}
+        <span class="fd-badge risk-{{ risk_level|lower }}">
+          <i class="fas fa-shield-halved"></i> {{ risk_level }} Risk
+        </span>
+      {% endif %}
 
-    <!-- Expense Ratio Card -->
-    <div class="card">
-        <h2>Expense Ratio</h2>
-        <div>Current Expense Ratio: {{ expense_ratio|default:"-" }}%</div>
-        <div>Expense History:</div>
-        <ul>
-            {% for record in expense_history %}
-            <li>{{ record.date }} - Ratio: {{ record.ratio }}%</li>
-            {% empty %}
-            <li>No expense history available</li>
-            {% endfor %}
-        </ul>
+      {% if is_stale %}
+        <span class="fd-badge stale">
+          <i class="fas fa-exclamation-triangle"></i> Data may be outdated
+        </span>
+      {% endif %}
     </div>
-
-    <!-- Debug View (Visible only in development) -->
-    {% if debug %}
-    <div class="card hidden">
-        <h2>Debug Information</h2>
-        <pre>{{ all_data|pprint }}</pre>
-    </div>
-    {% endif %}
+  </div>
 </div>
 
-</body>
-</html>
+<!-- BASIC INFORMATION -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-circle-info"></i> Basic Information</h2>
+  </div>
+
+  <div class="fd-kv-grid">
+    <div class="fd-kv">
+      <span class="lbl">Category</span>
+      <span class="val">{{ category|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Plan Type</span>
+      <span class="val">{{ plan_type|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Scheme Type</span>
+      <span class="val">{{ scheme_type|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Inception Date</span>
+      <span class="val">{{ inception_date|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Benchmark</span>
+      <span class="val">
+        {{ benchmark|default:"—" }}
+        {% if benchmark_name %}<span class="val muted">({{ benchmark_name }})</span>{% endif %}
+      </span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Fund Size</span>
+      <span class="val">
+        {% if fund_size %}₹{{ fund_size|floatformat:2 }} Cr{% else %}—{% endif %}
+      </span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Fund Manager</span>
+      <span class="val">{{ fund_manager|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Registrar Agent</span>
+      <span class="val">{{ registrar_agent|default:"—" }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- CURRENT NAV -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-indian-rupee-sign"></i> Current NAV</h2>
+  </div>
+
+  <div class="fd-nav">
+    <span class="fd-nav-value">
+      ₹{{ current_nav|floatformat:4|default:"—" }}
+    </span>
+    <span class="fd-nav-date">
+      <i class="fas fa-calendar-day"></i> as of {{ nav_date|default:"—" }}
+    </span>
+  </div>
+
+  {% if is_stale %}
+    <div class="fd-stale-note">
+      <i class="fas fa-exclamation-triangle"></i>
+      NAV data is more than 24 hours old
+    </div>
+  {% endif %}
+</div>
+
+<!-- RETURNS -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-chart-line"></i> Returns</h2>
+  </div>
+
+  <div class="fd-table-wrap">
+    <table class="fd-table">
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th>Absolute Return</th>
+          <th>Annualized Return</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for period, value in absolute_returns.items %}
+          <tr>
+            <td class="period">{{ period|upper }}</td>
+            <td class="{% if value >= 0 %}fd-positive{% else %}fd-negative{% endif %}">
+              {{ value|floatformat:2 }}%
+            </td>
+            <td class="{% if cagr|get_item:period >= 0 %}fd-positive{% else %}fd-negative{% endif %}">
+              {{ cagr|get_item:period|floatformat:2 }}%
+            </td>
+          </tr>
+        {% empty %}
+          <tr class="fd-empty-row">
+            <td colspan="3">
+              <i class="fas fa-circle-info me-2"></i>
+              Return data not available
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- RISK METRICS -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-shield-halved"></i> Risk Metrics</h2>
+  </div>
+
+  <div class="fd-kv-grid">
+    <div class="fd-kv">
+      <span class="lbl">Alpha</span>
+      <span class="val">{{ risk_metrics.alpha|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Beta</span>
+      <span class="val">{{ risk_metrics.beta|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Sharpe Ratio</span>
+      <span class="val">{{ risk_metrics.sharpe_ratio|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Sortino Ratio</span>
+      <span class="val">{{ risk_metrics.sortino_ratio|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Standard Deviation</span>
+      <span class="val">
+        {% if risk_metrics.standard_deviation %}
+          {{ risk_metrics.standard_deviation|floatformat:2 }}%
+        {% else %}—{% endif %}
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- EXPENSE RATIO -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-percent"></i> Expense Ratio</h2>
+    {% if expense_ratio %}
+      <span class="fd-badge plan">
+        <i class="fas fa-tag"></i> Current: {{ expense_ratio }}%
+      </span>
+    {% endif %}
+  </div>
+
+  {% if expense_history %}
+    <div style="font-size:0.78rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:0.35rem;">
+      Expense History
+    </div>
+    <ul class="fd-expense-list">
+      {% for record in expense_history %}
+        <li class="fd-expense-item">
+          <span class="date"><i class="fas fa-calendar me-1" style="opacity:0.5;"></i>{{ record.date }}</span>
+          <span class="ratio">{{ record.ratio }}%</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="fd-expense-empty">
+      <i class="fas fa-circle-info me-1"></i> No expense history available
+    </p>
+  {% endif %}
+</div>
+
+<a href="{% url 'fund_result' %}" class="fd-back">
+  <i class="fas fa-arrow-left"></i> Back to All Funds
+</a>
+
+{% endblock content %}

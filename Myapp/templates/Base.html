@@ -84,23 +84,104 @@
         z-index: 1030;
     }
 
-    /* ---------- FLASH MESSAGES ---------- */
+    /* ---------- FLASH MESSAGES (with dismiss) ---------- */
     .msg-wrap {
-        max-width: 1080px;
-        margin: 20px auto;
+      position: fixed;
+      top: 80px;                 /* below the sticky header (~60-70px tall) */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 640px;          /* comfortable reading width */
+      padding: 0 1rem;
+      box-sizing: border-box;
+      z-index: 1090;             /* above header (1030) but below modal (1095) */
+      pointer-events: none;      /* let clicks pass through the wrapper */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
     }
+
     .msg-box {
-        padding: 0.85rem 1.1rem;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        margin-bottom: 0.75rem;
-        border-left: 4px solid;
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
+      position: relative;
+      padding: 0.85rem 3rem 0.85rem 1.1rem;   /* extra right padding for × */
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      border-left: 4px solid;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      overflow: hidden;
+      max-height: 200px;
+      animation: msgSlideIn 0.35s ease-out;
+      transition: opacity 0.35s ease, transform 0.35s ease,
+                  margin 0.35s ease, padding 0.35s ease, max-height 0.35s ease;
     }
-    .msg-box i { font-size: 1rem; }
+
+    /* Slide-in animation when the message appears */
+    @keyframes msgSlideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Collapse animation when dismissing */
+    .msg-box.dismissing {
+      opacity: 0;
+      transform: translateX(24px);
+      max-height: 0 !important;
+      margin-bottom: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      border-left-width: 0;
+    }
+
+    .msg-box .msg-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .msg-box .msg-text {
+      flex: 1 1 auto;
+      min-width: 0;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    /* Dismiss (×) button */
+    .msg-box .msg-dismiss {
+      position: absolute;
+      top: 50%;
+      right: 0.75rem;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.06);
+      color: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      opacity: 0.6;
+      transition: opacity 0.18s ease, background 0.18s ease, transform 0.18s ease;
+    }
+
+    .msg-box .msg-dismiss:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.14);
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .msg-box .msg-dismiss:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Color variants */
     .msg-box.error   { background: #fef2f2; color: #991b1b; border-left-color: #dc2626; }
     .msg-box.success { background: #f0fdf4; color: #166534; border-left-color: #16a34a; }
     .msg-box.warning { background: #fffbeb; color: #92400e; border-left-color: #f59e0b; }
@@ -432,6 +513,28 @@
 
     <div class="menu-overlay"></div>
 
+<!-- ============================================================
+    FLASH MESSAGES (with dismiss)
+    ============================================================ -->
+{% if messages %}
+<div class="msg-wrap" id="flashMessages">
+  {% for message in messages %}
+    <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}"
+         role="alert"
+         data-autodismiss="6000">
+      <i class="msg-icon {% if message.tags == 'success' %}fas fa-check-circle{% elif message.tags == 'error' %}fas fa-exclamation-circle{% elif message.tags == 'warning' %}fas fa-exclamation-triangle{% else %}fas fa-info-circle{% endif %}"></i>
+      <span class="msg-text">{{ message }}</span>
+      <button type="button"
+              class="msg-dismiss"
+              aria-label="Dismiss message"
+              onclick="dismissFlashMessage(this)">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
     <main>
         {% block content %}{% endblock %}
     </main>
@@ -532,6 +635,69 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 250);
     });
 
+});
+/* ============================================================
+   FLASH MESSAGES — dismiss + auto-dismiss
+   ============================================================ */
+
+/**
+ * Dismiss a single flash message with fade-out animation.
+ * Called from the × button's onclick attribute.
+ */
+window.dismissFlashMessage = function (btnEl) {
+  const msgBox = btnEl.closest('.msg-box');
+  if (!msgBox || msgBox.classList.contains('dismissing')) return;
+
+  msgBox.classList.add('dismissing');
+
+  // Remove from DOM after the animation completes
+  setTimeout(function () {
+    msgBox.remove();
+
+    // If the wrapper is now empty, hide it too
+    const wrap = document.getElementById('flashMessages');
+    if (wrap && wrap.querySelectorAll('.msg-box').length === 0) {
+      wrap.style.display = 'none';
+    }
+  }, 350);   // matches the CSS transition duration
+};
+
+/**
+ * Auto-dismiss every visible flash message after its data-autodismiss
+ * delay (default 6000 ms). Pauses on hover for accessibility.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.msg-box[data-autodismiss]').forEach(function (box) {
+    const delay = parseInt(box.dataset.autodismiss, 10) || 6000;
+    let timerId = null;
+    let remaining = delay;
+    let startedAt = null;
+
+    const startTimer = function () {
+      startedAt = Date.now();
+      timerId = setTimeout(function () {
+        const btn = box.querySelector('.msg-dismiss');
+        if (btn) window.dismissFlashMessage(btn);
+      }, remaining);
+    };
+
+    const pauseTimer = function () {
+      if (timerId) {
+        clearTimeout(timerId);
+        remaining -= Date.now() - startedAt;
+        if (remaining < 0) remaining = 0;
+        timerId = null;
+      }
+    };
+
+    // Pause the countdown when the user is hovering over the message
+    box.addEventListener('mouseenter', pauseTimer);
+    box.addEventListener('mouseleave', function () {
+      if (!timerId) startTimer();
+    });
+
+    startTimer();
+  });
 });
 </script>
     {% block js_code %}{% endblock %}

@@ -165,9 +165,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Use persistent sessions
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+from django.conf.urls.static import static
+
 # Serve media files in development
 if DEBUG:
-    from django.conf.urls.static import static
     MEDIAFILES = static(MEDIA_URL, document_root=MEDIA_ROOT)
 else:
     MEDIAFILES = []

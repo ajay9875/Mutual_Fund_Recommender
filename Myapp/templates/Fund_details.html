@@ -1,424 +1,988 @@
+{% extends "BaseLoggedIn.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ basic_info.fund_name|default:"Mutual Fund" }} - Fund Details</title>
-    <link rel="stylesheet" href="{% static 'css/Header.css' %}">
-    <link rel="stylesheet" href="{% static 'css/Allmessage.css' %}">
-    <script src="{% static 'javascript/allmessage.js' %}"></script>
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon/favicon.png' %}">
-    <link rel="stylesheet" href="{% static 'css/Fund_details.css' %}">
-</head>
-<body>
-    <!-- Reusable Header -->
-    <header class="header">
-        Fund Details
-    </header>
 
-    <div class="home">
-        <a href="/" class="btn">
-            <img src="{% static 'icons/homeicon.png' %}" alt="Home">
-        </a>
-        <div class="tooltip-text">
-            <pre>Clicking this button will redirect you to the main page. Any unsaved changes will be lost.</pre>
-        </div>
+{% block title %}{{ basic_info.fund_name|default:"Fund Details" }} | MF Recommender{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ============================================================
+     FUND DETAILS PAGE (with search + full data sections)
+     ============================================================ */
+
+  /* ---------- PAGE HEADER ---------- */
+  .fd-header {
+    margin-bottom: 1.5rem;
+  }
+  .fd-breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+  .fd-breadcrumb a { color: #4f8cff; text-decoration: none; font-weight: 500; }
+  .fd-breadcrumb a:hover { text-decoration: underline; }
+  .fd-breadcrumb i { font-size: 0.65rem; color: #94a3b8; }
+
+  .fd-title {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.5px;
+  }
+  .fd-subtitle {
+    font-size: 0.92rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  /* ---------- SEARCH PANEL ---------- */
+  .fd-search {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.35rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    margin-bottom: 1.5rem;
+  }
+  .fd-search-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .fd-search-title i { color: #4f8cff; }
+
+  .fd-search-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .fd-search-block label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.4rem;
+  }
+  .fd-search-form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  .fd-search-form select,
+  .fd-search-form input[type="text"] {
+    flex: 1;
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+    min-width: 0;
+  }
+  .fd-search-form select:focus,
+  .fd-search-form input[type="text"]:focus {
+    outline: none;
+    border-color: #4f8cff;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.12);
+  }
+  .fd-search-form button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.25rem;
+    background: linear-gradient(135deg, #4f8cff, #3b7bf0);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(79, 140, 255, 0.3);
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .fd-search-form button:hover {
+    background: linear-gradient(135deg, #3b7bf0, #2563eb);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(79, 140, 255, 0.4);
+  }
+
+  /* ---------- CARD ---------- */
+  .fd-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.5rem 1.5rem 1.35rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    margin-bottom: 1.25rem;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .fd-card:hover {
+    box-shadow: 0 8px 26px rgba(79, 140, 255, 0.10);
+    border-color: rgba(79, 140, 255, 0.3);
+  }
+
+  .fd-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.15rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .fd-card-head h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+  .fd-card-head h2 i { color: #4f8cff; font-size: 1rem; }
+
+  .fd-subsection {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 1.25rem 0 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .fd-subsection:first-of-type { margin-top: 0; }
+  .fd-subsection i { color: #4f8cff; font-size: 0.85rem; }
+
+  /* ---------- FUND HERO (when a fund is loaded) ---------- */
+  .fd-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 18px;
+    padding: 2rem 1.75rem;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 36px rgba(15, 23, 42, 0.20);
+    margin-bottom: 1.5rem;
+  }
+  .fd-hero::before {
+    content: "";
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(79, 140, 255, 0.35), transparent 70%);
+    border-radius: 50%;
+  }
+  .fd-hero-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .fd-hero-info { flex: 1 1 auto; min-width: 0; }
+  .fd-hero-info h1 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    margin: 0 0 0.65rem;
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+  .fd-hero-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .fd-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.8rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 100px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+  .fd-hero-badge.blue   i { color: #60a5fa; }
+  .fd-hero-badge.green  i { color: #4ade80; }
+  .fd-hero-badge.amber  i { color: #fbbf24; }
+
+  /* ---------- KEY-VALUE GRID ---------- */
+  .fd-kv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem 1.25rem;
+  }
+  .fd-kv-grid.cols-2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+  .fd-kv-grid.cols-4 { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+
+  .fd-kv {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+    padding: 0.85rem 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .fd-kv:hover {
+    background: #ffffff;
+    border-color: rgba(79, 140, 255, 0.35);
+  }
+  .fd-kv .lbl {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .fd-kv .val {
+    font-size: 0.94rem;
+    font-weight: 600;
+    color: #0f172a;
+    word-break: break-word;
+  }
+  .fd-kv .val.positive { color: #16a34a; }
+  .fd-kv .val.negative { color: #dc2626; }
+  .fd-kv .val.muted    { color: #64748b; font-weight: 500; }
+
+  /* Full-width KV for description */
+  .fd-kv.full {
+    grid-column: 1 / -1;
+  }
+
+  /* ---------- TABLE ---------- */
+  .fd-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+  }
+  .fd-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+    min-width: 620px;
+  }
+  .fd-table thead th {
+    background: #f8fafc;
+    color: #475569;
+    text-align: left;
+    padding: 0.8rem 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+  }
+  .fd-table tbody td {
+    padding: 0.8rem 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+    vertical-align: middle;
+  }
+  .fd-table tbody tr:last-child td { border-bottom: none; }
+  .fd-table tbody tr:hover { background: #f8fafc; }
+
+  /* ---------- MATCH CARDS (filtered_funds) ---------- */
+  .fd-match-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+  }
+  .fd-match-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.35rem 1.35rem 1.25rem;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .fd-match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(79, 140, 255, 0.14);
+    border-color: rgba(79, 140, 255, 0.35);
+  }
+  .fd-match-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .fd-match-head h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    letter-spacing: -0.2px;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+  .fd-match-score {
+    flex-shrink: 0;
+    padding: 0.25rem 0.6rem;
+    background: rgba(34, 197, 94, 0.12);
+    color: #16a34a;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .fd-match-kv {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 0.85rem;
+  }
+  .fd-match-kv .item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+  .fd-match-kv .lbl {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .fd-match-kv .val {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0f172a;
+    word-break: break-word;
+  }
+
+  /* ---------- EMPTY ---------- */
+  .fd-empty {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+  }
+  .fd-empty-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(79, 140, 255, 0.10);
+    color: #4f8cff;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+  .fd-empty h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.3px;
+  }
+  .fd-empty p {
+    font-size: 0.92rem;
+    color: #64748b;
+    margin: 0 auto;
+    max-width: 420px;
+    line-height: 1.6;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 768px) {
+    .fd-title { font-size: 1.3rem; }
+    .fd-subtitle { font-size: 0.86rem; }
+
+    .fd-search { padding: 1.25rem 1.15rem 1.15rem; }
+    .fd-search-grid { grid-template-columns: 1fr; gap: 0.85rem; }
+    .fd-search-form { flex-direction: column; }
+    .fd-search-form button { width: 100%; justify-content: center; }
+
+    .fd-card { padding: 1.25rem 1.15rem 1.15rem; border-radius: 12px; }
+    .fd-card-head h2 { font-size: 0.98rem; }
+
+    .fd-hero { padding: 1.5rem 1.25rem; border-radius: 14px; }
+    .fd-hero-info h1 { font-size: 1.25rem; }
+
+    .fd-kv-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    .fd-kv-grid.cols-2 { grid-template-columns: 1fr; }
+    .fd-kv-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+
+    .fd-match-grid { grid-template-columns: 1fr; }
+    .fd-match-kv { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .fd-kv-grid,
+    .fd-kv-grid.cols-4 { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="fd-header">
+  <div class="fd-breadcrumb">
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <i class="fas fa-chevron-right"></i>
+    <span>Fund Details</span>
+  </div>
+  <h1 class="fd-title">Fund Details</h1>
+  <p class="fd-subtitle">Search, view, and compare detailed information about any mutual fund.</p>
+</div>
+
+<!-- ============================================================
+     SEARCH PANEL
+     ============================================================ -->
+<div class="fd-search">
+  <p class="fd-search-title"><i class="fas fa-magnifying-glass"></i> Find a Fund</p>
+
+  <div class="fd-search-grid">
+
+    <!-- Dropdown select -->
+    <div class="fd-search-block">
+      <label for="fund_name">Select from all funds</label>
+      <form action="{% url 'fund_details' %}" method="POST" class="fd-search-form">
+        {% csrf_token %}
+        <select name="fund_name" id="fund_name">
+          <option value="">— Please Select a Fund —</option>
+          {% for fund in all_funds %}
+            <option value="{{ fund.fund_name }}">{{ fund.fund_name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit"><i class="fas fa-arrow-right"></i> Search</button>
+      </form>
     </div>
 
-    <div class="fund-search">
-        <div class="fund-dropdown">
-          <form action="{% url 'fund_details' %}" method="POST">
-            {% csrf_token %}
-
-            <label for="fund_name">Select Fund:</label>
-            <select name="fund_name" id="fund_name">
-                <option value="">-- Please Select a Fund --</option>
-                {% for fund in all_funds %}
-                    <option value="{{ fund.fund_name }}">{{ fund.fund_name }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Search</button>
-          </form>
-        </div>
-        <div class="search-container">
-          <form action="{% url 'fund_details' %}" method="POST">
-            {% csrf_token %}
-
-            <input type="text" id="searchInput" name="fund_name" placeholder="Search for a mutual fund...">
-            <button type="submit">Search</button>
-          </form>
-        </div>
+    <!-- Text search -->
+    <div class="fd-search-block">
+      <label for="searchInput">Or search by name</label>
+      <form action="{% url 'fund_details' %}" method="POST" class="fd-search-form">
+        {% csrf_token %}
+        <input type="text" id="searchInput" name="fund_name"
+               placeholder="Type a fund name…" autocomplete="off">
+        <button type="submit"><i class="fas fa-search"></i> Search</button>
+      </form>
     </div>
 
-        {% if messages %}
-        <div class="messages-container"> {# Added a container for messages for better styling/grouping #}
-        {% for message in messages %}
-            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
-                <div class='msg'> {{ message }} </div>
-            </div> {# Corrected: Removed extra closing div here #}
-        {% endfor %}
-        </div> {# Close messages-container #}
+  </div>
+</div>
+
+{% if basic_info.fund_name %}
+<!-- ============================================================
+     FUND LOADED — show all detail sections
+     ============================================================ -->
+
+<!-- HERO -->
+<div class="fd-hero">
+  <div class="fd-hero-inner">
+    <div class="fd-hero-info">
+      <h1>{{ basic_info.fund_name }}</h1>
+      <div class="fd-hero-badges">
+        {% if basic_info.plan_type %}
+          <span class="fd-hero-badge blue">
+            <i class="fas fa-layer-group"></i> {{ basic_info.plan_type }}
+          </span>
         {% endif %}
-
-      {% if basic_info.fund_name %}
-        <h1>{{ basic_info.fund_name }}</h1>
-
-        <div class="card">
-            <h2 class="section-title">Basic Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="data-item">
-                    <div class="data-label">Category:</div>
-                    <div class="data-value">{{ basic_info.category }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Plan Type:</div>
-                    <div class="data-value">{{ basic_info.plan_type }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Scheme Type:</div>
-                    <div class="data-value">{{ basic_info.scheme_type }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Risk Level:</div>
-                    <div class="data-value">{{ basic_info.risk_level }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Benchmark:</div>
-                    <div class="data-value">{{ basic_info.benchmark }} ({{ benchmark_name }})</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Fund Size:</div>
-                    <div class="data-value">₹{{ basic_info.fund_size|floatformat:2 }} Cr</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Fund Manager:</div>
-                    <div class="data-value">{{ basic_info.fund_manager }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Registrar Agent:</div>
-                    <div class="data-value">{{ basic_info.registrar_agent }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Face Value:</div>
-                    <div class="data-value">{{ basic_info.face_value|default:"N/A" }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">NFO Risk:</div>
-                    <div class="data-value">{{ basic_info.nfo_risk }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Inception Date:</div>
-                    <div class="data-value">{{ basic_info.inception_date }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="section-title">NAV Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="data-item">
-                    <div class="data-label">Current NAV:</div>
-                    <div class="data-value">₹{{ nav_info.current_nav|floatformat:2 }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">NAV Date:</div>
-                    <div class="data-value">{{ nav_info.nav_date }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="section-title">Returns</h2>
-            <div class="sub-section-title">Absolute Returns</div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {% for key, value in absolute_returns.items %}
-                <div class="data-item">
-                    <div class="data-label">{{ key|upper }}:</div>
-                    <div class="data-value {% if value >= 0 %}positive-return{% else %}negative-return{% endif %}">{{ value|floatformat:2 }}%</div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <div class="sub-section-title">CAGR Returns</div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {% for key, value in cagr_returns.items %}
-                <div class="data-item">
-                    <div class="data-label">{{ key|upper }}:</div>
-                    <div class="data-value {% if value >= 0 %}positive-return{% else %}negative-return{% endif %}">{{ value|floatformat:2 }}%</div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <div class="sub-section-title">Category Returns</div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {% for key, value in category_returns.items %}
-                <div class="data-item">
-                    <div class="data-label">{{ key|upper }}:</div>
-                    <div class="data-value {% if value >= 0 %}positive-return{% else %}negative-return{% endif %}">{{ value|floatformat:2 }}%</div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <div class="sub-section-title">Index Returns</div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {% for key, value in index_returns.items %}
-                <div class="data-item">
-                    <div class="data-label">{{ key|upper }}:</div>
-                    <div class="data-value {% if value >= 0 %}positive-return{% else %}negative-return{% endif %}">{{ value|floatformat:2|default:"N/A" }}%</div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-           <div class="card">
-            <div class="section-title"><strong>Risk Metrics</strong></div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="data-item">
-                    <div class="data-label">Alpha:</div>
-                    <div class="data-value">{{ risk_metrics.alpha|floatformat:2 }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Beta:</div>
-                    <div class="data-value">{{ risk_metrics.beta|floatformat:2 }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Sharpe Ratio:</div>
-                    <div class="data-value">{{ risk_metrics.sharpe_ratio|floatformat:2 }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Sortino Ratio:</div>
-                    <div class="data-value">{{ risk_metrics.sortino_ratio|floatformat:2 }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Standard Deviation:</div>
-                    <div class="data-value">{{ risk_metrics.standard_deviation|floatformat:2 }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Risk Rating:</div>
-                    <div class="data-value">{{ risk_metrics.risk_rating }}</div>
-                </div>
-            </div>
-        </div>
-          
-        <div class="card">
-            <h2 class="section-title">Investment Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="data-item">
-                    <div class="data-label">Minimum SIP:</div>
-                    <div class="data-value">₹{{ investment_info.minimum_sip|floatformat:2 }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Maximum SIP:</div>
-                    <div class="data-value">{% if investment_info.maximum_sip %}&#8377;{{ investment_info.maximum_sip|floatformat:2 }}{% else %}NA{% endif %}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Minimum Lumpsum:</div>
-                    <div class="data-value">₹{{ investment_info.minimum_lumpsum|floatformat:2 }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Maximum Lumpsum:</div>
-                    <div class="data-value">{% if investment_info.maximum_lumpsum %}&#8377;{{ investment_info.maximum_lumpsum|floatformat:2 }}{% else %}NA{% endif %}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Stamp Duty:</div>
-                    <div class="data-value">{{ investment_info.stamp_duty }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">SIP Multiplier:</div>
-                    <div class="data-value">{{ investment_info.sip_multiplier }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Mini Additional Investment:</div>
-                    <div class="data-value">₹{{ investment_info.mini_additional_investment|floatformat:2 }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 class="section-title">Exit Load</h2>
-            {% if exit_load %}
-                <table class="info-table">
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>As On Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for load in exit_load %}
-                        <tr>
-                            <td>{{ load.description|default:"NA" }}</td>
-                            <td>{{ load.as_on_date|slice:":10"|default:"NA" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="text-gray-600">No exit load information available.</p>
-            {% endif %}
-        </div>
-
-        <div class="card">
-            <h2 class="section-title">Holdings</h2>
-            {% if holdings %}
-            <div class="overflow-x-auto rounded-lg shadow">
-                <table class="min-w-full bg-white">
-                    <thead>
-                        <tr class="table-header">
-                            <th>Company Name</th>
-                            <th>Nature</th>
-                            <th>Sector</th>
-                            <th>Instrument</th>
-                            <th>Market Value (₹)</th>
-                            <th>Corpus (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for holding in holdings %}
-                        <tr class="table-row">
-                            <td>{{ holding.company_name }}</td>
-                            <td>{{ holding.nature_name }}</td>
-                            <td>{{ holding.sector_name }}</td>
-                            <td>{{ holding.instrument_name }}</td>
-                            <td>{{ holding.market_value|floatformat:2 }}</td>
-                            <td>{{ holding.corpus_percentage|floatformat:2 }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <p class="text-gray-600">No holdings data available.</p>
-            {% endif %}
-        </div>
-        <div class="card">
-            <h2 class="section-title">Fund House Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="data-item">
-                    <div class="data-label">Fund House Name:</div>
-                    <div class="data-value">{{ fund_house_info.name }}</div>
-                </div>
-
-                <div class="data-item">
-                    <div class="data-label">Custodian:</div>
-                    <div class="data-value">{{ fund_house_info.custodian }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Address:</div>
-                    <div class="data-value">{{ fund_house_info.address }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Email:</div>
-                    <div class="data-value">{{ fund_house_info.email }}</div>
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <h2 class="section-title">Additional Information</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="data-item">
-                    <div class="data-label">Closed Ended:</div>
-                    <div class="data-value">{{ additional_info.is_closed_ended|yesno:"Yes,No" }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Closure Date:</div>
-                    <div class="data-value">{{ additional_info.closure_date|default:"N/A" }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">CRISIL Rating:</div>
-                    <div class="data-value">{{ additional_info.crisil_rating|default:"N/A" }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Super Category:</div>
-                    <div class="data-value">{{ additional_info.super_category }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Sub Category:</div>
-                    <div class="data-value">{{ additional_info.sub_category }}</div>
-                </div>
-                <div class="data-item col-div-full">
-                    <div class="data-label block mb-2">Description:</div>
-                    <div class="data-value block text-justify">{{ additional_info.description }}</div>
-                </div>
-            </div>
-
-         <div class="card">
-            <h2 class="section-title">Expense Ratio</h2>
-            <div class="data-item">
-                <div class="data-label">Current Expense Ratio:</div>
-                <div class="data-value">{{ current_expense_ratio|floatformat:2 }}%</div>
-            </div>
-            <div class="sub-section-title">Expense Ratio History</div>
-            {% if expense_ratio_history %}
-            <div class="overflow-x-auto rounded-lg shadow">
-                <table class="min-w-full bg-white">
-                    <thead>
-                        <tr class="table-header">
-                            <th>Date</th>
-                            <th>Ratio</th>
-                            <th>Turnover Ratio</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for entry in expense_ratio_history %}   
-                        <tr class="table-row">
-                            <td>{{ entry.date|slice:":10" }}</td>
-                            <td>{{ entry.ratio|floatformat:2 }}%</td>
-                            <td>{{ entry.turnover_ratio|default:"None" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <p class="text-gray-600">No expense ratio history available.</p>
-            {% endif %}
-        </div>
+        {% if basic_info.risk_level %}
+          <span class="fd-hero-badge amber">
+            <i class="fas fa-shield-halved"></i> {{ basic_info.risk_level }} Risk
+          </span>
+        {% endif %}
+        {% if basic_info.category %}
+          <span class="fd-hero-badge green">
+            <i class="fas fa-tag"></i> {{ basic_info.category }}
+          </span>
+        {% endif %}
+      </div>
     </div>
-    {% elif filtered_funds %}
-        <h2 class="section-title">Matching Mutual Funds</h2>
-        {% for fund in filtered_funds %}
-        <div class="card p-4 mb-4 shadow rounded-lg border border-gray-200 bg-white">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="data-item">
-                    <div class="data-label">Fund Name</div>
-                    <div class="data-value">{{ fund.scheme_name }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Plan Type</div>
-                    <div class="data-value">{{ fund.plan_type }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Scheme Type</div>
-                    <div class="data-value">{{ fund.category }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">NAV</div>
-                    <div class="data-value">₹{{ fund.nav|floatformat:2 }} as of {{ fund.date }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Duration</div>
-                    <div class="data-value">{{ fund.duration }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Scheme Code</div>
-                    <div class="data-value">{{ fund.scheme_code }}</div>
-                </div>
-                <div class="data-item">
-                    <div class="data-label">Match Score</div>
-                    <div class="data-value">{{ fund.match_score|floatformat:2 }}%</div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+  </div>
+</div>
 
-    {% else %}
-        <p id="nothing">No fund results available. Kindly type a fund name and press the "Search" button above.</p>
+<!-- BASIC INFORMATION -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-circle-info"></i> Basic Information</h2>
+  </div>
+  <div class="fd-kv-grid">
+    <div class="fd-kv">
+      <span class="lbl">Category</span>
+      <span class="val">{{ basic_info.category|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Plan Type</span>
+      <span class="val">{{ basic_info.plan_type|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Scheme Type</span>
+      <span class="val">{{ basic_info.scheme_type|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Risk Level</span>
+      <span class="val">{{ basic_info.risk_level|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Benchmark</span>
+      <span class="val">
+        {{ basic_info.benchmark|default:"—" }}
+        {% if benchmark_name %}<span class="val muted">({{ benchmark_name }})</span>{% endif %}
+      </span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Fund Size</span>
+      <span class="val">
+        {% if basic_info.fund_size %}₹{{ basic_info.fund_size|floatformat:2 }} Cr{% else %}—{% endif %}
+      </span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Fund Manager</span>
+      <span class="val">{{ basic_info.fund_manager|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Registrar Agent</span>
+      <span class="val">{{ basic_info.registrar_agent|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Face Value</span>
+      <span class="val">{{ basic_info.face_value|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">NFO Risk</span>
+      <span class="val">{{ basic_info.nfo_risk|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Inception Date</span>
+      <span class="val">{{ basic_info.inception_date|default:"—" }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-indian-rupee-sign"></i> NAV Information</h2>
+  </div>
+  <div class="fd-kv-grid cols-2">
+    <div class="fd-kv">
+      <span class="lbl">Current NAV</span>
+      <span class="val">₹{{ nav_info.current_nav|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">NAV Date</span>
+      <span class="val">{{ nav_info.nav_date|default:"—" }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- RETURNS -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-chart-line"></i> Returns</h2>
+  </div>
+
+  <p class="fd-subsection"><i class="fas fa-circle-dot"></i> Absolute Returns</p>
+  <div class="fd-kv-grid cols-4">
+    {% for key, value in absolute_returns.items %}
+      <div class="fd-kv">
+        <span class="lbl">{{ key|upper }}</span>
+        <span class="val {% if value >= 0 %}positive{% else %}negative{% endif %}">
+          {{ value|floatformat:2 }}%
+        </span>
+      </div>
+    {% empty %}
+      <div class="fd-kv"><span class="val muted">No data available</span></div>
+    {% endfor %}
+  </div>
+
+  <p class="fd-subsection"><i class="fas fa-circle-dot"></i> CAGR Returns</p>
+  <div class="fd-kv-grid cols-4">
+    {% for key, value in cagr_returns.items %}
+      <div class="fd-kv">
+        <span class="lbl">{{ key|upper }}</span>
+        <span class="val {% if value >= 0 %}positive{% else %}negative{% endif %}">
+          {{ value|floatformat:2 }}%
+        </span>
+      </div>
+    {% empty %}
+      <div class="fd-kv"><span class="val muted">No data available</span></div>
+    {% endfor %}
+  </div>
+
+  <p class="fd-subsection"><i class="fas fa-circle-dot"></i> Category Returns</p>
+  <div class="fd-kv-grid cols-4">
+    {% for key, value in category_returns.items %}
+      <div class="fd-kv">
+        <span class="lbl">{{ key|upper }}</span>
+        <span class="val {% if value >= 0 %}positive{% else %}negative{% endif %}">
+          {{ value|floatformat:2 }}%
+        </span>
+      </div>
+    {% empty %}
+      <div class="fd-kv"><span class="val muted">No data available</span></div>
+    {% endfor %}
+  </div>
+
+  <p class="fd-subsection"><i class="fas fa-circle-dot"></i> Index Returns</p>
+  <div class="fd-kv-grid cols-4">
+    {% for key, value in index_returns.items %}
+      <div class="fd-kv">
+        <span class="lbl">{{ key|upper }}</span>
+        <span class="val {% if value >= 0 %}positive{% else %}negative{% endif %}">
+          {% if value %}{{ value|floatformat:2 }}%{% else %}<span class="muted">N/A</span>{% endif %}
+        </span>
+      </div>
+    {% empty %}
+      <div class="fd-kv"><span class="val muted">No data available</span></div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- RISK METRICS -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-shield-halved"></i> Risk Metrics</h2>
+  </div>
+  <div class="fd-kv-grid cols-4">
+    <div class="fd-kv">
+      <span class="lbl">Alpha</span>
+      <span class="val">{{ risk_metrics.alpha|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Beta</span>
+      <span class="val">{{ risk_metrics.beta|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Sharpe Ratio</span>
+      <span class="val">{{ risk_metrics.sharpe_ratio|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Sortino Ratio</span>
+      <span class="val">{{ risk_metrics.sortino_ratio|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Standard Deviation</span>
+      <span class="val">{{ risk_metrics.standard_deviation|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Risk Rating</span>
+      <span class="val">{{ risk_metrics.risk_rating|default:"—" }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- INVESTMENT INFORMATION -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-coins"></i> Investment Information</h2>
+  </div>
+  <div class="fd-kv-grid cols-2">
+    <div class="fd-kv">
+      <span class="lbl">Minimum SIP</span>
+      <span class="val">₹{{ investment_info.minimum_sip|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Maximum SIP</span>
+      <span class="val">
+        {% if investment_info.maximum_sip %}₹{{ investment_info.maximum_sip|floatformat:2 }}{% else %}<span class="muted">NA</span>{% endif %}
+      </span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Minimum Lumpsum</span>
+      <span class="val">₹{{ investment_info.minimum_lumpsum|floatformat:2|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Maximum Lumpsum</span>
+      <span class="val">
+        {% if investment_info.maximum_lumpsum %}₹{{ investment_info.maximum_lumpsum|floatformat:2 }}{% else %}<span class="muted">NA</span>{% endif %}
+      </span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Stamp Duty</span>
+      <span class="val">{{ investment_info.stamp_duty|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">SIP Multiplier</span>
+      <span class="val">{{ investment_info.sip_multiplier|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Mini Additional Investment</span>
+      <span class="val">₹{{ investment_info.mini_additional_investment|floatformat:2|default:"—" }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- EXIT LOAD -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-door-open"></i> Exit Load</h2>
+  </div>
+  {% if exit_load %}
+    <div class="fd-table-wrap">
+      <table class="fd-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>As On Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for load in exit_load %}
+            <tr>
+              <td>{{ load.description|default:"NA" }}</td>
+              <td>{{ load.as_on_date|slice:":10"|default:"NA" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color:#94a3b8; font-size:0.9rem; margin:0;">
+      <i class="fas fa-circle-info me-1"></i> No exit load information available.
+    </p>
+  {% endif %}
+</div>
+
+<!-- HOLDINGS -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-briefcase"></i> Holdings</h2>
+  </div>
+  {% if holdings %}
+    <div class="fd-table-wrap">
+      <table class="fd-table">
+        <thead>
+          <tr>
+            <th>Company Name</th>
+            <th>Nature</th>
+            <th>Sector</th>
+            <th>Instrument</th>
+            <th>Market Value (₹)</th>
+            <th>Corpus (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for holding in holdings %}
+            <tr>
+              <td style="font-weight:600; color:#0f172a;">{{ holding.company_name|default:"—" }}</td>
+              <td>{{ holding.nature_name|default:"—" }}</td>
+              <td>{{ holding.sector_name|default:"—" }}</td>
+              <td>{{ holding.instrument_name|default:"—" }}</td>
+              <td style="font-weight:600; font-variant-numeric:tabular-nums;">{{ holding.market_value|floatformat:2 }}</td>
+              <td style="font-weight:600; font-variant-numeric:tabular-nums;">{{ holding.corpus_percentage|floatformat:2 }}%</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color:#94a3b8; font-size:0.9rem; margin:0;">
+      <i class="fas fa-circle-info me-1"></i> No holdings data available.
+    </p>
+  {% endif %}
+</div>
+
+<!-- FUND HOUSE INFO -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-building"></i> Fund House Information</h2>
+  </div>
+  <div class="fd-kv-grid cols-2">
+    <div class="fd-kv">
+      <span class="lbl">Fund House Name</span>
+      <span class="val">{{ fund_house_info.name|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Custodian</span>
+      <span class="val">{{ fund_house_info.custodian|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Address</span>
+      <span class="val">{{ fund_house_info.address|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Email</span>
+      <span class="val">
+        {% if fund_house_info.email %}
+          <a href="mailto:{{ fund_house_info.email }}" style="color:#4f8cff; text-decoration:none;">
+            {{ fund_house_info.email }}
+          </a>
+        {% else %}—{% endif %}
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ADDITIONAL INFO -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-info-circle"></i> Additional Information</h2>
+  </div>
+  <div class="fd-kv-grid cols-2">
+    <div class="fd-kv">
+      <span class="lbl">Closed Ended</span>
+      <span class="val">{{ additional_info.is_closed_ended|yesno:"Yes,No" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Closure Date</span>
+      <span class="val">{{ additional_info.closure_date|default:"N/A" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">CRISIL Rating</span>
+      <span class="val">{{ additional_info.crisil_rating|default:"N/A" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Super Category</span>
+      <span class="val">{{ additional_info.super_category|default:"—" }}</span>
+    </div>
+    <div class="fd-kv">
+      <span class="lbl">Sub Category</span>
+      <span class="val">{{ additional_info.sub_category|default:"—" }}</span>
+    </div>
+    {% if additional_info.description %}
+      <div class="fd-kv full">
+        <span class="lbl">Description</span>
+        <span class="val" style="font-weight:500; line-height:1.6;">{{ additional_info.description }}</span>
+      </div>
     {% endif %}
+  </div>
+</div>
 
-    <!-- Reusable Footer -->
-    <footer class='footer'>
-        <p>&copy; 2025 AI Powered Mutual Fund Recommendation System | All Rights Reserved</p>
-    </footer>
-</body>
-</html>
+<!-- EXPENSE RATIO -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-percent"></i> Expense Ratio</h2>
+  </div>
+
+  <div class="fd-kv-grid cols-2" style="margin-bottom:1.25rem;">
+    <div class="fd-kv">
+      <span class="lbl">Current Expense Ratio</span>
+      <span class="val">{{ current_expense_ratio|floatformat:2|default:"—" }}%</span>
+    </div>
+  </div>
+
+  <p class="fd-subsection"><i class="fas fa-circle-dot"></i> Expense Ratio History</p>
+
+  {% if expense_ratio_history %}
+    <div class="fd-table-wrap">
+      <table class="fd-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Ratio</th>
+            <th>Turnover Ratio</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in expense_ratio_history %}
+            <tr>
+              <td>{{ entry.date|slice:":10" }}</td>
+              <td style="font-weight:600;">{{ entry.ratio|floatformat:2 }}%</td>
+              <td>{{ entry.turnover_ratio|default:"None" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color:#94a3b8; font-size:0.9rem; margin:0;">
+      <i class="fas fa-circle-info me-1"></i> No expense ratio history available.
+    </p>
+  {% endif %}
+</div>
+
+{% elif filtered_funds %}
+<!-- ============================================================
+     MULTIPLE MATCHES
+     ============================================================ -->
+<div class="fd-card">
+  <div class="fd-card-head">
+    <h2><i class="fas fa-list"></i> Matching Mutual Funds</h2>
+  </div>
+
+  <div class="fd-match-grid">
+    {% for fund in filtered_funds %}
+      <div class="fd-match-card">
+        <div class="fd-match-head">
+          <h3>{{ fund.scheme_name|default:"—" }}</h3>
+          {% if fund.match_score %}
+            <span class="fd-match-score">
+              <i class="fas fa-bullseye"></i> {{ fund.match_score|floatformat:2 }}%
+            </span>
+          {% endif %}
+        </div>
+        <div class="fd-match-kv">
+          <div class="item">
+            <span class="lbl">Plan Type</span>
+            <span class="val">{{ fund.plan_type|default:"—" }}</span>
+          </div>
+          <div class="item">
+            <span class="lbl">Scheme Type</span>
+            <span class="val">{{ fund.category|default:"—" }}</span>
+          </div>
+          <div class="item">
+            <span class="lbl">NAV</span>
+            <span class="val">₹{{ fund.nav|floatformat:2|default:"—" }}</span>
+          </div>
+          <div class="item">
+            <span class="lbl">As of</span>
+            <span class="val">{{ fund.date|default:"—" }}</span>
+          </div>
+          <div class="item">
+            <span class="lbl">Duration</span>
+            <span class="val">{{ fund.duration|default:"—" }}</span>
+          </div>
+          <div class="item">
+            <span class="lbl">Scheme Code</span>
+            <span class="val">{{ fund.scheme_code|default:"—" }}</span>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% else %}
+<!-- ============================================================
+     EMPTY STATE
+     ============================================================ -->
+<div class="fd-empty">
+  <div class="fd-empty-icon"><i class="fas fa-magnifying-glass"></i></div>
+  <h3>No fund selected yet</h3>
+  <p>
+    Type a fund name above and press <strong>Search</strong>, or pick one from the
+    dropdown list to see its complete details.
+  </p>
+</div>
+
+{% endif %}
+
+{% endblock content %}

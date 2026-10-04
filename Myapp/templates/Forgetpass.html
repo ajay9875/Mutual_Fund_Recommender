@@ -447,26 +447,6 @@
 
 {% block content %}
 
-    <!-- FLASH MESSAGES -->
-    {% if messages %}
-    <div class="msg-wrap">
-        {% for message in messages %}
-            <div class="msg-box {% if message.tags %}{{ message.tags }}{% endif %}">
-                {% if message.tags == 'success' %}
-                    <i class="fas fa-check-circle"></i>
-                {% elif message.tags == 'error' %}
-                    <i class="fas fa-exclamation-circle"></i>
-                {% elif message.tags == 'warning' %}
-                    <i class="fas fa-exclamation-triangle"></i>
-                {% else %}
-                    <i class="fas fa-info-circle"></i>
-                {% endif %}
-                <span>{{ message }}</span>
-            </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-
 <div class="forgot-page">
 
     <div class="forgot-layout">
