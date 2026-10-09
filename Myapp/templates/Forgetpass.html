@@ -515,17 +515,6 @@
             <form method="POST" action="/forgetpass/" novalidate>
                 {% csrf_token %}
 
-                <!-- Username -->
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-wrap">
-                        <input type="text" id="username" name="username"
-                               placeholder="Enter your username"
-                               autocomplete="username" required>
-                        <i class="fas fa-user input-icon"></i>
-                    </div>
-                </div>
-
                 <!-- Registered Email -->
                 <div class="form-group">
                     <label for="email">Registered Email</label>

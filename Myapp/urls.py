@@ -7,7 +7,7 @@ from . import views
 
  # Ensure all views are imported for another routing
 
-handler404 = 'your_app.views.custom_404_view'
+handler404 = 'Myapp.views.custom_404_view'
 
 urlpatterns = [
     path('', views.default, name='default'),  # First hit goes to dashboard

@@ -49,6 +49,9 @@ def default(request):
 def landing_page(request):
     return render(request,'Default.html')
 
+def custom_404_view(request, exception=None):
+    return render(request, '404.html', status=404)
+
 #By IndianAPI.in
 API_KEY = config("API_ACCESS_KEY")
 #At Rapidapi by indian market api
@@ -956,36 +959,52 @@ def sip_calculator(request):
         'calculated':          True,
     })
 
-# Handle login request by user
+from django.contrib.auth.models import User
+from django.db.models import Q
+
 def loginUser(request):
     if request.user.is_authenticated:
-        return redirect("dashboard")  # Prevent logged-in users from seeing login page
+        return redirect("dashboard")
 
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username_or_email = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '').strip()
 
-        if not username or not password:
-            messages.error(request, "Missing fields: Username and Password are required.")
+        if not username_or_email or not password:
+            messages.error(request, "Missing fields: Username/Email and Password are required.")
             return redirect('login')
-        
-        user = authenticate(request, username=username, password=password)
+
+        # -------- Find the user by username OR email --------
+        try:
+            user_obj = User.objects.get(
+                Q(username__iexact=username_or_email) |
+                Q(email__iexact=username_or_email)
+            )
+        except User.DoesNotExist:
+            user_obj = None
+        except User.MultipleObjectsReturned:
+            # Rare: multiple users share the same email → fall back to username only
+            user_obj = User.objects.filter(username__iexact=username_or_email).first()
+
+        # -------- Authenticate with the resolved username --------
+        user = None
+        if user_obj is not None:
+            user = authenticate(request, username=user_obj.username, password=password)
 
         if user is not None:
             login(request, user)
-            #request.session.set_expiry(60)  # Explicit 30-minute timeout
-            request.session['session_start'] = int(time.time())  # Critical anchor point
-            
-            # Store user details in session
-            request.session['username'] = user.username  # Store username
-            #request.session['profilepic'] = user.profile_picture  # Store username
-            request.session['full_name'] = f"{user.first_name} {user.last_name}"  # Store full name
+            # request.session.set_expiry(60)
+            request.session['session_start'] = int(time.time())
+
+            request.session['username']  = user.username
+            request.session['full_name'] = f"{user.first_name} {user.last_name}"
+
             messages.success(request, "Login successful!")
             return redirect('dashboard')
         else:
             messages.error(request, "Invalid Credentials! Please try again.")
             return redirect('login')
-        
+
     context = {
         'title': 'User Login',
         'header': 'Login Now'
@@ -1058,7 +1077,7 @@ def verifyOTP(request):
                     full_name = user.username
 
                 # Website name (Customize this)
-                WEBSITE_NAME = "🔷Mutual Fund Recommendation System"
+                WEBSITE_NAME = "📈 Mutual Fund Recommendation System"
 
                 # Subject Line
                 subject = f"{WEBSITE_NAME} 🔑 Username Recovery Request"
@@ -1117,11 +1136,10 @@ def verifyOTP(request):
 def forgetpassword(request):
     if request.method == "POST":
         email = request.POST.get('email')
-        username = request.POST.get('username')
 
         try:
             # Check if user exists
-            user = User.objects.get(email=email, username=username)
+            user = User.objects.get(email=email)
 
             # Generate a 6-digit OTP
             otp = random.randint(100000, 999999)
@@ -1146,7 +1164,7 @@ def forgetpassword(request):
                 full_name = user.username
 
             # Website Name
-            WEBSITE_NAME = "🔷 Mutual Fund Recommendation System"
+            WEBSITE_NAME = "📈 Mutual Fund Recommendation System"
 
             # Subject Line
             subject = f"{WEBSITE_NAME} 🔑 Your OTP to Reset Password"
@@ -1162,7 +1180,7 @@ def forgetpassword(request):
                         <p><strong>Your One-Time Password (OTP):</strong> 
                             <span style="color: #2c3e50; font-weight: bold; font-size: 20px;">{otp}</span>
                         </p>
-                        <p>Use this OTP to reset your password. This OTP is valid for a limited time.</p>
+                        <p>Use this OTP to reset your password. This OTP is valid only for 10 minutes.</p>
                         <p>If you did not request this, please ignore this email or contact support.</p>
                         <hr style="border: 0; height: 1px; background: #ddd;">
                         <p style="text-align: center; font-size: 12px; color: #555;">
@@ -1188,7 +1206,7 @@ def forgetpassword(request):
             return redirect('verifyotp')
 
         except User.DoesNotExist:
-            messages.error(request, "Invalid username or email!")
+            messages.error(request, "Email is not registered!")
             return redirect('forgetpass')
         
     context = {
@@ -1241,7 +1259,7 @@ def resetpassword(request):
                 full_name = user.username
 
             # Website Name
-            WEBSITE_NAME = "🔷 Mutual Fund Recommendation System"
+            WEBSITE_NAME = "📈 Mutual Fund Recommendation System"
 
             # Email subject
             subject = f"{WEBSITE_NAME} 🔑 Password Reset Successful"
@@ -1322,7 +1340,7 @@ def forgetusername(request):
                 full_name = user.username
 
             # Website Name
-            WEBSITE_NAME = "🔷 Mutual Fund Recommendation System"
+            WEBSITE_NAME = "📈 Mutual Fund Recommendation System"
 
             # Subject Line
             subject = f"{WEBSITE_NAME} 🔑 OTP for Username Recovery"
@@ -1426,7 +1444,7 @@ def newuser(request):
         full_name = f"{first_name} {last_name}".strip()  # Removes extra spaces if any field is empty
 
         # Website Name
-        WEBSITE_NAME = "🔷 Mutual Fund Recommendation System"
+        WEBSITE_NAME = "📈 Mutual Fund Recommendation System"
 
         # Subject Line
         subject = f"{WEBSITE_NAME} 🎉Registration Successful!"
